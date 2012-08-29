@@ -1,0 +1,18 @@
+url： http://runexample.com/swallow或lion 
+
+界面：
+pom.xml的dependency配置
+demo的java代码
+
+操作：
+(1)打开url时，根据sessionid创建临时目录<sessionid_dir>，接下来的操作都在该目录下执行。
+(2)保存pom.xml时，后台生成pom文件，在<sessionid_dir>目录执行“mvn eclipse:clean eclipse:eclipse”提前下载依赖jar到.m2库，并且生成.classpath文件(可以解析出classpath)。web界面显示maven的终端输出。
+(3)编译java代码时，后台保存java文件到"<sessionid_dir>/src/main/java/"目录，执行"mvn clean compile"，在"<sessionid_dir>/target/"下生成class文件。
+(4)运行java代码时，后台执行"java -cp <sessionid_dir>/target/:<classpath> 具体demo类"
+
+
+
+todo:看看hudson如何调用maven，如何将maven输出显示到web解码。以前使用maven-Embedder，后来(maven-Embedder不再维护)据说使用Runtime.exec
+使用maven从pom.xml解析出classpath：mvn dependency:build-classpath -Dmdep.outputFile=classpath
+编译javac -cp <classpath> xx.java
+
