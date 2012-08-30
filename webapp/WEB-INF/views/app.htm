@@ -31,6 +31,9 @@ body {
 	window.contextpath = "${rc.contextPath}";
 	window.app = "${app}";
 	window.pageid = "${pageid}";
+	window.codeLastModifiedTime = new Date();
+	window.codeLastCompiledTime = 0;
+	window.tempCodeLastCompiledTime;
 </script>
 </head>
 
@@ -42,21 +45,18 @@ body {
          <div class="span2">#parse("sidebar.htm")</div>
          <div class="span10">
             <!-- <form > -->
-            <legend>发送消息</legend>
+            <legend>代码演示</legend>
             <div class="container-fluid">
                <div class="row-fluid">
                   <div class="span7">
                      <!--Sidebar content-->
                      <label>Java代码：</label>
                      <textarea style="width: 100%" name="content"
-                        id="content" rows="15"></textarea>
+                        id="content" onchange="rundemo_app.modifyCode()" rows="15"></textarea>
                      <hr>
-                     <button id="compileButton" type="button"
-                        onclick="rundemo_app.compile()"
-                        class="btn btn-primary">编译</button>
                      <button id="runButton" type="button"
-                        onclick="rundemo_app.run()"
-                        class="btn btn-primary">运行</button>
+                        onclick="rundemo_app.runDemo()"
+                        class="btn btn-primary">Run Demo</button>
                   </div>
                   <div class="span5">
                      <textarea readonly="readonly" style="cursor:text;width: 100%" id="console"

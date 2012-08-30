@@ -1,13 +1,15 @@
 package com.dianping.rundemo.project;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.apache.commons.io.IOUtils;
 
 public class JavaProject {
 
@@ -21,11 +23,9 @@ public class JavaProject {
 
    private final String     srcPath;
 
-   private long             pid;
-
-   private InputStream      compileProcessInputStream;
-
    private InputStream      runProcessInputStream;
+
+   private boolean          isRunning;
 
    public JavaProject(String app, String pageid) {
       AppProject appProject = ProjectContext.getAppProject(app);
@@ -41,6 +41,27 @@ public class JavaProject {
       new File(srcPath).mkdirs();
 
       //启动监测pid进程是否关闭的线程，如果关闭，则移除pid和processInputStream
+      TimerTask task = new TimerTask() {
+         @Override
+         public void run() {
+            try {
+               Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/check.sh", dirPath });
+               String isRunning = IOUtils.toString(proc.getInputStream());
+               if ("false".equals(isRunning.trim())) {//如果已经关闭，再清理runProcessInputStream和pid
+                  //虽然已经关闭，但是runProcessInputStream还没读完呢？
+                  System.out.println("---------------");
+                  JavaProject.this.isRunning = false;
+                  System.out.println(JavaProject.this.isRunning);
+                  System.out.println("---------------");
+               }
+            } catch (IOException e) {
+               e.printStackTrace();
+            }
+         }
+      };
+      Timer t = new Timer();
+      t.schedule(task, 0, 500);
+
    }
 
    /**
@@ -48,7 +69,7 @@ public class JavaProject {
     * 
     * @throws IOException
     */
-   public void compile(String filename, String content) throws IOException {
+   public String compile(String filename, String content) throws IOException {
       //创建java文件
       BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(srcPath + filename),
             "UTF-8"));
@@ -58,15 +79,7 @@ public class JavaProject {
       Process proc = Runtime.getRuntime()
             .exec(new String[] { "/data/rundemo/compile.sh", binPath, appProject.getClasspath(), srcPath + filename,
                   filename });
-      this.compileProcessInputStream = proc.getInputStream();
-
-      //debug信息
-      //      BufferedReader stdInput = new BufferedReader(new InputStreamReader(compileProcessInputStream));
-      //      System.out.println("Here is the standard output of the command:\n");
-      //      String s;
-      //      while ((s = stdInput.readLine()) != null) {
-      //         System.out.println(s);
-      //      }
+      return IOUtils.toString(proc.getInputStream());//TODO encoding
    }
 
    /**
@@ -77,24 +90,13 @@ public class JavaProject {
    public void run(String filename) throws IOException {
       //编译（java -cp ${1}:${2} ${3} ）
       Process proc = Runtime.getRuntime().exec(
-            new String[] { "/data/rundemo/run.sh", binPath, appProject.getClasspath(), filename });
+            new String[] { "/data/rundemo/run.sh", binPath, appProject.getClasspath(), filename, dirPath });
       this.runProcessInputStream = proc.getInputStream();
-   }
-
-   public InputStream getCompileProcessInputStream() {
-      return compileProcessInputStream;
+      this.isRunning = true;
    }
 
    public InputStream getRunProcessInputStream() {
       return runProcessInputStream;
-   }
-
-   public long getPid() {
-      return pid;
-   }
-
-   public void setPid(long pid) {
-      this.pid = pid;
    }
 
    public AppProject getAppProject() {
@@ -103,6 +105,10 @@ public class JavaProject {
 
    public String getPageid() {
       return pageid;
+   }
+
+   public boolean isRunning() {
+      return isRunning;
    }
 
    public static void main(String[] args) throws IOException {
