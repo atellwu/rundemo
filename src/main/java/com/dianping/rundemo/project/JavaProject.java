@@ -60,21 +60,25 @@ public class JavaProject {
                   filename });
       this.compileProcessInputStream = proc.getInputStream();
 
-      BufferedReader stdInput = new BufferedReader(new InputStreamReader(compileProcessInputStream));
-
-      // read the output from the command
-      System.out.println("Here is the standard output of the command:\n");
-      String s;
-      while ((s = stdInput.readLine()) != null) {
-         System.out.println(s);
-      }
+      //debug信息
+      //      BufferedReader stdInput = new BufferedReader(new InputStreamReader(compileProcessInputStream));
+      //      System.out.println("Here is the standard output of the command:\n");
+      //      String s;
+      //      while ((s = stdInput.readLine()) != null) {
+      //         System.out.println(s);
+      //      }
    }
 
    /**
     * 运行java实例
+    * 
+    * @throws IOException
     */
-   public void run() {
-
+   public void run(String filename) throws IOException {
+      //编译（java -cp ${1}:${2} ${3} ）
+      Process proc = Runtime.getRuntime().exec(
+            new String[] { "/data/rundemo/run.sh", binPath, appProject.getClasspath(), filename });
+      this.runProcessInputStream = proc.getInputStream();
    }
 
    public InputStream getCompileProcessInputStream() {

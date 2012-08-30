@@ -62,12 +62,12 @@ public class AppController {
       Map<String, Object> map = new HashMap<String, Object>();
       map.put("app", app);
       map.put("path", path);
-      
+
       //打开页面时，生成pageid，生成JavaProject
       String pageid = UUID.randomUUID().toString();
       JavaProject javaProject = new JavaProject(app, pageid);
       ProjectContext.putJavaProject(app, pageid, javaProject);
-      
+
       map.put("pageid", pageid);
       return new ModelAndView("app", map);
    }
@@ -92,13 +92,37 @@ public class AppController {
 
    @RequestMapping(value = "/{app}/compile", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
    @ResponseBody
-   public Object compile(@PathVariable String app,String pageid, String content) throws JsonGenerationException,
+   public Object compile(@PathVariable String app, String pageid, String content) throws JsonGenerationException,
          JsonMappingException, IOException {
       Map<String, Object> map = new HashMap<String, Object>();
       try {
          //获取JavaProject，然后编译
          JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
          javaProject.compile("Demo.java", content);//TODO 先mock filename，后续应该从content中解析出来
+         map.put("success", true);
+      } catch (RuntimeException e) {
+         StringBuilder error = new StringBuilder();
+         error.append(e.getMessage()).append("\n");
+         for (StackTraceElement element : e.getStackTrace()) {
+            error.append(element.toString()).append("\n");
+         }
+         map.put("success", false);
+         map.put("errorMsg", error.toString());
+      }
+      Gson gson = new Gson();
+      return gson.toJson(map);
+
+   }
+
+   @RequestMapping(value = "/{app}/run", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+   @ResponseBody
+   public Object run(@PathVariable String app, String pageid, String content) throws JsonGenerationException,
+         JsonMappingException, IOException {
+      Map<String, Object> map = new HashMap<String, Object>();
+      try {
+         //获取JavaProject，然后编译
+         JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
+         javaProject.run("Demo");//TODO 先mock filename，后续应该从前端传递过来
          map.put("success", true);
       } catch (RuntimeException e) {
          StringBuilder error = new StringBuilder();
@@ -131,10 +155,10 @@ public class AppController {
     * @throws JsonMappingException
     * @throws IOException
     */
-   @RequestMapping(value = "/{app}/compileConsole", method = RequestMethod.GET, produces = "application/javascript; charset=utf-8")
+   @RequestMapping(value = "/{app}/compileConsole", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
    @ResponseBody
-   public Object compileConsole(@PathVariable String app, String pageid, String callback)
-         throws JsonGenerationException, JsonMappingException, IOException {
+   public Object compileConsole(@PathVariable String app, String pageid) throws JsonGenerationException,
+         JsonMappingException, IOException {
       Map<String, Object> map = new HashMap<String, Object>();
       try {
          StringBuilder data = new StringBuilder();
@@ -159,8 +183,9 @@ public class AppController {
                   }
                }
             }
+            map.put("status", "continue");
          }
-         map.put("data", data.toString());
+         map.put("content", data.toString());
          map.put("success", true);
 
       } catch (RuntimeException e) {
@@ -173,12 +198,76 @@ public class AppController {
          map.put("errorMsg", error.toString());
       }
       Gson gson = new Gson();
-      return callback + "(" + gson.toJson(map) + ");";
+      return gson.toJson(map);
+
+   }
+
+   /**
+    * js使用长polling不断调用console()。<br>
+    * <br>
+    * console()通过app和pageid获取对应的JavaProject对象,
+    * 从JavaProject对象获取其正在运行的jvm的InputStream，<br>
+    * 1 如果获取不到InputStream，说明没有正在运行的jvm，返回map.put("status", "done")，指示前端js停止轮询;<br>
+    * 2 如果获取到InputStream，则尝试从InputStream读取数据:<br>
+    * ---2.1 尝试available()+read() 10次，直到10次结束(注意，此处为了不阻塞，无法知道read()返回-1的情况) <br>
+    * ---2.2 将读到的data(无论data是否有数据)，输出给前端<br>
+    * 
+    * @param app
+    * @param pageid
+    * @return
+    * @throws JsonGenerationException
+    * @throws JsonMappingException
+    * @throws IOException
+    */
+   @RequestMapping(value = "/{app}/runConsole", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+   @ResponseBody
+   public Object runConsole(@PathVariable String app, String pageid) throws JsonGenerationException,
+         JsonMappingException, IOException {
+      Map<String, Object> map = new HashMap<String, Object>();
+      try {
+         StringBuilder data = new StringBuilder();
+         JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
+         InputStream processInputStream = javaProject.getRunProcessInputStream();
+         if (processInputStream == null) {
+            map.put("status", "done");
+         } else {
+            int count = 0;
+            int available;
+            while (count++ < 10) {
+               available = processInputStream.available();
+               if (available > 0) {
+                  byte[] bytes = new byte[available];
+                  processInputStream.read(bytes);
+                  data.append(new String(bytes));//TODO add encode
+               } else {
+                  try {
+                     Thread.sleep(200);
+                  } catch (InterruptedException e) {
+                     break;
+                  }
+               }
+            }
+            map.put("status", "continue");
+         }
+         map.put("content", data.toString());
+         map.put("success", true);
+
+      } catch (RuntimeException e) {
+         StringBuilder error = new StringBuilder();
+         error.append(e.getMessage()).append("\n");
+         for (StackTraceElement element : e.getStackTrace()) {
+            error.append(element.toString()).append("\n");
+         }
+         map.put("success", false);
+         map.put("errorMsg", error.toString());
+      }
+      Gson gson = new Gson();
+      return gson.toJson(map);
 
    }
 
    public static void main(String[] args) throws IOException {
-System.out.println(UUID.randomUUID().toString());
+      System.out.println(UUID.randomUUID().toString());
    }
 
    static void print(byte[] bytes) {

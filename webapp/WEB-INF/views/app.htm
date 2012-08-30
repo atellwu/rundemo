@@ -51,12 +51,15 @@ body {
                      <textarea style="width: 100%" name="content"
                         id="content" rows="15"></textarea>
                      <hr>
-                     <button id="compileButton" type="compileButton"
+                     <button id="compileButton" type="button"
                         onclick="rundemo_app.compile()"
                         class="btn btn-primary">编译</button>
+                     <button id="runButton" type="button"
+                        onclick="rundemo_app.run()"
+                        class="btn btn-primary">运行</button>
                   </div>
                   <div class="span5">
-                     <textarea style="width: 100%" id="compileConsole"
+                     <textarea readonly="readonly" style="cursor:text;width: 100%" id="console"
                         rows="20"></textarea>
                      <p></p>
                   </div>
