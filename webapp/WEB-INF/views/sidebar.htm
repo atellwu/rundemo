@@ -1,0 +1,16 @@
+<div class="well sidebar-nav">
+   <ul class="nav nav-list">
+      <li class="nav-header">配置</li> #if ($path=="pom")
+      <li class="active"><a href="/swallow-dashboard-pom/producer">pom</a></li>
+      #else
+      <li><a href="${rc.contextPath}/${app}/pom">pom</a></li> #end #if
+      ($path=="res")
+      <li class="active"><a
+         href="${rc.contextPath}/${app}/res">resource</a></li> #else
+      <li><a href="${rc.contextPath}/${app}/res">resource</a></li>
+      #end #if ($path=="java")
+      <li class="active"><a href="${rc.contextPath}/${app}/">java</a></li>
+      #else
+      <li><a href="${rc.contextPath}/${app}/">java</a></li> #end
+   </ul>
+</div>

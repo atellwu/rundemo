@@ -34,6 +34,12 @@
     <scope>request</scope>
     <class>org.apache.velocity.tools.view.tools.LinkTool</class>
   </tool>
+  
+   <tool>
+    <key>stringUtils</key>
+    <scope>application</scope>
+    <class>org.apache.commons.lang.StringUtils</class>
+  </tool>
 
   <!--
     ordinarily the SecureLinkTool would simply replace the

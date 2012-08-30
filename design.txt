@@ -14,5 +14,6 @@ demo的java代码
 
 todo:看看hudson如何调用maven，如何将maven输出显示到web解码。以前使用maven-Embedder，后来(maven-Embedder不再维护)据说使用Runtime.exec
 使用maven从pom.xml解析出classpath：mvn dependency:build-classpath -Dmdep.outputFile=classpath
-编译javac -cp <classpath> xx.java
+编译: javac -d <output_dir> -cp <classpath> xx.java
+运行: java -cp <output_dir>:<classpath> xx
 
