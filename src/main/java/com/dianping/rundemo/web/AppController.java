@@ -166,33 +166,36 @@ public class AppController {
          StringBuilder data = new StringBuilder();
          JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
          InputStream processInputStream = javaProject.getRunProcessInputStream();
-         boolean isRunning = javaProject.isRunning();
+         String status = "continue";
          if (processInputStream == null) {
-            map.put("status", "done");
+            status = "done";
          } else {
-            if (!isRunning) {//如果已经不在运行，则读完直到-1
-               data.append(IOUtils.toString(processInputStream));//TODO encoding
-               map.put("status", "done");
-            } else {//如果已经还在运行，则尝试读一部分
-               int count = 0;
-               int available;
-               while (count++ < 5) {
+            int count = 0;
+            int available;
+            while (count++ < 300) {
+               if (!javaProject.isRunning()) {//如果已经不在运行，则读完直到-1
+                  data.append(IOUtils.toString(processInputStream));//TODO encoding
+                  status = "done";
+                  break;
+               } else {//如果已经还在运行，则尝试读一部分
                   available = processInputStream.available();
                   if (available > 0) {
                      byte[] bytes = new byte[available];
                      processInputStream.read(bytes);
                      data.append(new String(bytes));//TODO add encode
-                  } else {
+                     break;
+                  } else {//如果一直没有数据，最多会等待20s
                      try {
-                        Thread.sleep(50);
+                        Thread.sleep(100);
                      } catch (InterruptedException e) {
                         break;
                      }
                   }
                }
-               map.put("status", "continue");
+
             }
          }
+         map.put("status", status);
          map.put("content", data.toString());
          map.put("success", true);
 

@@ -94,8 +94,10 @@
 				$('#shutdownButton').hide();
 			} else {
 				// 显示到编译控制台
+//				$('#console').text($('#console').text() + data.content);
 				$('#console').append(data.content);
-				$('#console').scrollTop = $('#console').scrollHeight;
+//				$('#console').scrollTop = $('#console').scrollHeight;
+				$("#console").scrollTop($("#console")[0].scrollHeight);
 				if (data.status == 'continue') {// 继续运行
 					rundemo_app.runConsole();
 				} else {// 运行已经停止
