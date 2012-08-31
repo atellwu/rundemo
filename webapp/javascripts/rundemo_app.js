@@ -1,6 +1,14 @@
 (function(w) {
 	var timer;
 	var rundemo_app = {
+		"runDemo" : function() {
+			// 如果有修改源码，则需要编译
+			if (w.codeLastCompiledTime < w.codeLastModifiedTime) {
+				rundemo_app.compile();
+			} else {
+				rundemo_app.run();
+			}
+		},
 		"compile" : function() {
 			var param = new Object();
 			param.pageid = w.pageid;
@@ -15,26 +23,23 @@
 				success : rundemo_app.compileDone,
 				error : rundemo_app.httpError
 			});
-			// disable按钮
-			$('#compileButton').attr('disabled', 'disabled');
 		},
 		"compileDone" : function(data) {
 			if (data.success == false) {
-				// 显示错误消息
-				$('#errorMsg > div[class="modal-body"] > p')
-						.text(data.errorMsg);
-				$('#errorMsg').modal('show');
+				rundemo_app.appError(data.errorMsg);
 			} else {
-				w.codeLastCompiledTime = w.tempCodeLastCompiledTime;// 编译成功才更新CodeLastCompiledTime
-				// 显示编译控制台
-				$('#console').val(data.content);
-				// 开始运行
-				rundemo_app.run();
+				// 判断编译是否成功
+				if(data.content.match("^\\\[info\\\]")){
+					w.codeLastCompiledTime = w.tempCodeLastCompiledTime;// 编译成功才更新CodeLastCompiledTime
+					// 开始运行
+					rundemo_app.run();
+				} else{
+					// 显示编译控制台
+					$('#console').val(data.content);
+				}
 			}
-			// 去掉按钮disable
-			$('#compileButton').removeAttr('disabled');
 		},
-		"run" : function(){
+		"run" : function() {
 			var param = new Object();
 			param.pageid = w.pageid;
 			var url = w.contextpath + '/' + w.app + '/run';
@@ -46,24 +51,17 @@
 				success : rundemo_app.runDone,
 				error : rundemo_app.httpError
 			});
-			// disable按钮
-			$('#runButton').attr('disabled', 'disabled');
-		},
-		"runDemo" : function() {
-			// 如果有修改源码，则需要编译
-			if (w.codeLastCompiledTime < w.codeLastModifiedTime) {
-				w.codeLastCompiledTime = new Date();
-				rundemo_app.compile();
-			} else {
-				rundemo_app.run();
-			}
+			// 按钮变换
+			$('#runButton').hide();
+			$('#shutdownButton').show();
 		},
 		"runDone" : function(data) {
 			if (data.success == false) {
 				// 显示错误消息
-				$('#errorMsg > div[class="modal-body"] > p')
-						.text(data.errorMsg);
-				$('#errorMsg').modal('show');
+				rundemo_app.appError(data.errorMsg);
+				// 按钮变换
+				$('#runButton').show();
+				$('#shutdownButton').hide();
 			} else {
 				// 开始显示控制台
 				$('#console').val('');
@@ -89,29 +87,53 @@
 		},
 		"runConsoleDone" : function(data) {
 			if (data.success == false) {
-				// 显示错误消息
-				$('#errorMsg > div[class="modal-body"] > p')
-						.text(data.errorMsg);
-				$('#errorMsg').modal('show');
+				rundemo_app.appError(data.errorMsg);
+				// 按钮变换
+				$('#runButton').show();
+				$('#shutdownButton').hide();
 			} else {
 				// 显示到编译控制台
 				$('#console').val($('#console').val() + data.content);
-				if (data.status == 'continue') {
+				if (data.status == 'continue') {// 继续运行
 					rundemo_app.runConsole();
+				} else {// 运行已经停止
+					$('#runButton').show();
+					$('#shutdownButton').hide();
 				}
+			}
+		},
+		"shutdown" : function() {
+			var param = new Object();
+			param.pageid = w.pageid;
+			var url = w.contextpath + '/' + w.app + '/shutdown';
+			$.ajax({
+				type : 'POST',
+				url : url,
+				data : param,
+				dataType : "json",
+				success : rundemo_app.shutdownDone,
+				error : rundemo_app.httpError
+			});
+		},
+		"shutdownDone" : function(data) {
+			if (data.success == false) {
+				rundemo_app.appError(data.errorMsg);
 			}
 		},
 		"modifyCode" : function() {
 			w.codeLastModifiedTime = new Date();
 		},
+		"appError":function(errorMsg){
+			rundemo_app.alertError(errorMsg);
+		},
 		"httpError" : function(xhr, textStatus, errorThrown) {
+			rundemo_app.alertError('error:' + textStatus + '(' + errorThrown + ')');
+		},
+		"alertError":function(errorMsg){
 			// 显示错误消息
-			$('#errorMsg > div[class="modal-body"] > p').text(
-					'error:' + textStatus + '(' + errorThrown + ')');
+			$('#errorMsg > div[class="modal-body"] > p')
+					.text(errorMsg);
 			$('#errorMsg').modal('show');
-			// 去掉按钮disable
-			$('#compileButton').removeAttr('disabled');
-			$('#runButton').removeAttr('disabled');
 		}
 	};
 	w.rundemo_app = rundemo_app;

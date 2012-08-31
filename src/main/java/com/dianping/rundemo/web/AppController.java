@@ -118,8 +118,8 @@ public class AppController {
 
    @RequestMapping(value = "/{app}/run", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
    @ResponseBody
-   public Object run(@PathVariable String app, String pageid, String content) throws JsonGenerationException,
-         JsonMappingException, IOException {
+   public Object run(@PathVariable String app, String pageid) throws JsonGenerationException, JsonMappingException,
+         IOException {
       Map<String, Object> map = new HashMap<String, Object>();
       try {
          //获取JavaProject，然后编译
@@ -196,6 +196,30 @@ public class AppController {
          map.put("content", data.toString());
          map.put("success", true);
 
+      } catch (RuntimeException e) {
+         StringBuilder error = new StringBuilder();
+         error.append(e.getMessage()).append("\n");
+         for (StackTraceElement element : e.getStackTrace()) {
+            error.append(element.toString()).append("\n");
+         }
+         map.put("success", false);
+         map.put("errorMsg", error.toString());
+      }
+      Gson gson = new Gson();
+      return gson.toJson(map);
+
+   }
+
+   @RequestMapping(value = "/{app}/shutdown", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+   @ResponseBody
+   public Object shutdown(@PathVariable String app, String pageid) throws JsonGenerationException,
+         JsonMappingException, IOException {
+      Map<String, Object> map = new HashMap<String, Object>();
+      try {
+         //获取JavaProject，然后编译
+         JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
+         javaProject.shutdown();
+         map.put("success", true);
       } catch (RuntimeException e) {
          StringBuilder error = new StringBuilder();
          error.append(e.getMessage()).append("\n");

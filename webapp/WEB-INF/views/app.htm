@@ -52,14 +52,19 @@ body {
                      <!--Sidebar content-->
                      <label>Java代码：</label>
                      <textarea style="width: 100%" name="content"
-                        id="content" onchange="rundemo_app.modifyCode()" rows="15"></textarea>
+                        id="content" onchange="rundemo_app.modifyCode()"
+                        rows="15"></textarea>
                      <hr>
                      <button id="runButton" type="button"
                         onclick="rundemo_app.runDemo()"
                         class="btn btn-primary">Run Demo</button>
+                     <button id="shutdownButton" type="button"
+                        onclick="rundemo_app.shutdown()"
+                        class="btn btn-danger" style="display:none">Shutdown</button>
                   </div>
                   <div class="span5">
-                     <textarea readonly="readonly" style="cursor:text;width: 100%" id="console"
+                     <textarea readonly="readonly"
+                        style="cursor: text; width: 100%" id="console"
                         rows="20"></textarea>
                      <p></p>
                   </div>
