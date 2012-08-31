@@ -176,7 +176,7 @@ public class AppController {
             } else {//如果已经还在运行，则尝试读一部分
                int count = 0;
                int available;
-               while (count++ < 10) {
+               while (count++ < 5) {
                   available = processInputStream.available();
                   if (available > 0) {
                      byte[] bytes = new byte[available];
@@ -184,7 +184,7 @@ public class AppController {
                      data.append(new String(bytes));//TODO add encode
                   } else {
                      try {
-                        Thread.sleep(200);
+                        Thread.sleep(50);
                      } catch (InterruptedException e) {
                         break;
                      }

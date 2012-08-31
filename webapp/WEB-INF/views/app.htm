@@ -9,6 +9,9 @@
 <!-- Le styles -->
 <link href="${rc.contextPath}/stylesheets/bootstrap.css"
    rel="stylesheet">
+<link
+   href="${rc.contextPath}/stylesheets/google-code-prettify/prettify.css"
+   type="text/css" rel="stylesheet" />
 <style type="text/css">
 body {
 	padding-top: 60px;
@@ -17,6 +20,12 @@ body {
 
 .sidebar-nav {
 	padding: 9px 0;
+}
+
+#editor {
+	position: relative;
+	width: 100%;
+	height: 400px;
 }
 </style>
 <link href="${rc.contextPath}/stylesheets/bootstrap-responsive.css"
@@ -49,24 +58,31 @@ body {
             <div class="container-fluid">
                <div class="row-fluid">
                   <div class="span7">
-                     <!--Sidebar content-->
-                     <label>Java代码：</label>
+                     <!--
                      <textarea style="width: 100%" name="content"
                         id="content" onchange="rundemo_app.modifyCode()"
                         rows="15"></textarea>
+                        <pre class="prettyprint">import</pre>-->
+                     <div id="editor"
+                        style="border: 1px solid #A9E2F3; border-radius: 3px 3px 3px 3px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;"></div>
                      <hr>
                      <button id="runButton" type="button"
                         onclick="rundemo_app.runDemo()"
                         class="btn btn-primary">Run Demo</button>
                      <button id="shutdownButton" type="button"
                         onclick="rundemo_app.shutdown()"
-                        class="btn btn-danger" style="display:none">Shutdown</button>
+                        class="btn btn-danger" style="display: none">Shutdown</button>
                   </div>
                   <div class="span5">
+                     <!--
                      <textarea readonly="readonly"
                         style="cursor: text; width: 100%" id="console"
                         rows="20"></textarea>
-                     <p></p>
+                        -->
+                        <pre
+                           style="cursor: text;background-color:#2E2E2E;color:#298A08; font-size: 12px; width: 100%; height: 300px; overflow-x: auto;"
+                           id="console"></pre>
+                        <p></p>
                   </div>
                </div>
             </div>
@@ -105,9 +121,24 @@ body {
    <!-- Le javascript
     ================================================== -->
    <!-- Placed at the end of the document so the pages load faster -->
-   <script src="${rc.contextPath}/javascripts/jquery-1.7.2.min.js"></script>
-   <script src="${rc.contextPath}/javascripts/bootstrap.js"></script>
-   <script src="${rc.contextPath}/javascripts/rundemo_app.js"></script>
+   <script type="text/javascript"
+      src="${rc.contextPath}/javascripts/jquery-1.7.2.min.js"></script>
+   <script type="text/javascript"
+      src="${rc.contextPath}/javascripts/bootstrap.js"></script>
+   <script type="text/javascript"
+      src="${rc.contextPath}/javascripts/rundemo_app.js"></script>
+   <script type="text/javascript"
+      src="${rc.contextPath}/javascripts/google-code-prettify/prettify.js"></script>
+   <script src="${rc.contextPath}/javascripts/ace-src-min/ace.js"
+      type="text/javascript" charset="utf-8"></script>
+   <script type="text/javascript">
+				var editor = ace.edit("editor");
+				editor.setFontSize(14);
+				editor.setTheme("ace/theme/eclipse");
+				editor.getSession().setMode("ace/mode/java");
+				editor.on("change", rundemo_app.modifyCode);
+				window.editor = editor;
+			</script>
 
 </body>
 </html>

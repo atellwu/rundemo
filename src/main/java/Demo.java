@@ -8,7 +8,7 @@ public class Demo {
       int count = 0;
       while (count++ < 50) {
          System.out.println(count);
-         Thread.sleep(1000);
+         Thread.sleep(100);
       }
    }
 

@@ -13,7 +13,8 @@
 			var param = new Object();
 			param.pageid = w.pageid;
 			w.tempCodeLastCompiledTime = new Date();
-			param.content = $("#content").val();
+//			param.content = $("#content").val();//不再使用textArea，使用ace开源编辑器
+			param.content = w.editor.getValue();
 			var url = w.contextpath + '/' + w.app + '/compile';
 			$.ajax({
 				type : 'POST',
@@ -35,7 +36,7 @@
 					rundemo_app.run();
 				} else{
 					// 显示编译控制台
-					$('#console').val(data.content);
+					$('#console').text(data.content);
 				}
 			}
 		},
@@ -64,7 +65,7 @@
 				$('#shutdownButton').hide();
 			} else {
 				// 开始显示控制台
-				$('#console').val('');
+				$('#console').text('');
 				rundemo_app.runConsole();
 			}
 			// 去掉按钮disable
@@ -93,7 +94,8 @@
 				$('#shutdownButton').hide();
 			} else {
 				// 显示到编译控制台
-				$('#console').val($('#console').val() + data.content);
+				$('#console').append(data.content);
+				$('#console').scrollTop = $('#console').scrollHeight;
 				if (data.status == 'continue') {// 继续运行
 					rundemo_app.runConsole();
 				} else {// 运行已经停止
