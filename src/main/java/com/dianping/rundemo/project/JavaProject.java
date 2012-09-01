@@ -47,14 +47,18 @@ public class JavaProject {
       TimerTask task = new TimerTask() {
          @Override
          public void run() {
+            InputStream input = null;
             try {
                Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/check.sh", dirPath });
-               String isRunning = IOUtils.toString(proc.getInputStream());
-               if ("false".equals(isRunning.trim())) {//如果已经关闭，再清理runProcessInputStream和pid
+               input = proc.getInputStream();
+               String isRunning = IOUtils.toString(input);
+               if ("false".equals(isRunning.trim())) {//已经关闭(此处不能关闭runProcessInputStream，因为还需要读完，在读完时关闭)
                   JavaProject.this.isRunning = false;
                }
             } catch (IOException e) {
-               e.printStackTrace();
+               LOG.error(e.getMessage(), e);
+            } finally {
+               IOUtils.closeQuietly(input);
             }
          }
       };
@@ -70,15 +74,25 @@ public class JavaProject {
     */
    public String compile(String filename, String content) throws IOException {
       //创建java文件
-      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(srcPath + filename),
-            "UTF-8"));
-      writer.write(content);
-      writer.close();
+      BufferedWriter writer = null;
+      try {
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(srcPath + filename), "UTF-8"));
+         writer.write(content);
+      } finally {
+         IOUtils.closeQuietly(writer);
+      }
       //编译（javac -d <output_dir> -cp <classpath> xx.java）
-      Process proc = Runtime.getRuntime()
-            .exec(new String[] { "/data/rundemo/compile.sh", binPath, appProject.getClasspath(), srcPath + filename,
-                  filename });
-      return IOUtils.toString(proc.getInputStream());//TODO encoding
+      InputStream input = null;
+      try {
+         Process proc = Runtime.getRuntime().exec(
+               new String[] { "/data/rundemo/compile.sh", binPath, appProject.getClasspath(), srcPath + filename,
+                     filename });
+         input = proc.getInputStream();
+         return IOUtils.toString(input);//TODO encoding
+      } finally {
+         IOUtils.closeQuietly(input);
+      }
+
    }
 
    /**
@@ -90,13 +104,22 @@ public class JavaProject {
       //（java -cp ${1}:${2} ${3} ）
       Process proc = Runtime.getRuntime().exec(
             new String[] { "/data/rundemo/run.sh", binPath, appProject.getClasspath(), filename, dirPath });
+      if (this.runProcessInputStream != null) {
+         IOUtils.closeQuietly(this.runProcessInputStream);
+      }
       this.runProcessInputStream = proc.getInputStream();
       this.isRunning = true;
    }
 
    public void shutdown() throws IOException {
-      Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/shutdown.sh", dirPath });
-      LOG.info(IOUtils.toString(proc.getInputStream()));//TODO encoding
+      InputStream input = null;
+      try {
+         Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/shutdown.sh", dirPath });
+         input = proc.getInputStream();
+         LOG.error(IOUtils.toString(input));
+      } finally {
+         IOUtils.closeQuietly(input);
+      }
    }
 
    public InputStream getRunProcessInputStream() {
@@ -113,6 +136,12 @@ public class JavaProject {
 
    public boolean isRunning() {
       return isRunning;
+   }
+
+   @Override
+   public String toString() {
+      return "JavaProject [appProject=" + appProject + ", pageid=" + pageid + ", dirPath=" + dirPath + ", binPath="
+            + binPath + ", srcPath=" + srcPath + ", isRunning=" + isRunning + "]";
    }
 
    public static void main(String[] args) throws IOException {

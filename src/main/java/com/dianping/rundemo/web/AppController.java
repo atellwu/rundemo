@@ -23,8 +23,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.rundemo.project.AppProject;
+import com.dianping.rundemo.project.JavaCodeInfo;
 import com.dianping.rundemo.project.JavaProject;
 import com.dianping.rundemo.project.ProjectContext;
+import com.dianping.rundemo.utils.CodeUtils;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
@@ -57,10 +59,39 @@ public class AppController {
       }
    }
 
+   @RequestMapping(value = "/{app}/loadCode", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+   @ResponseBody
+   public Object loadCode(@PathVariable String app, String javaFileName) throws JsonGenerationException,
+         JsonMappingException, IOException {
+      Map<String, Object> map = new HashMap<String, Object>();
+      try {
+         AppProject appProject = ProjectContext.getAppProject(app);
+         String code = appProject.loadCode(javaFileName);
+         map.put("code", code);
+         map.put("success", true);
+      } catch (RuntimeException e) {
+         StringBuilder error = new StringBuilder();
+         error.append(e.getMessage()).append("\n");
+         for (StackTraceElement element : e.getStackTrace()) {
+            error.append(element.toString()).append("\n");
+         }
+         map.put("success", false);
+         map.put("errorMsg", error.toString());
+      }
+      Gson gson = new Gson();
+      return gson.toJson(map);
+
+   }
+
    @RequestMapping(value = "/{app}")
    public ModelAndView java(@PathVariable String app, HttpServletRequest request, HttpServletResponse response) {
       String path = "java";
       Map<String, Object> map = new HashMap<String, Object>();
+
+      //TODO 加载app目录下的文件名，作为连接按钮显示
+      AppProject appProject = ProjectContext.getAppProject(app);
+      String[] javaFileNameList = appProject.loadJavaFileNameList();
+      map.put("javaFileNameList", javaFileNameList);
       map.put("app", app);
       map.put("path", path);
 
@@ -99,8 +130,10 @@ public class AppController {
       try {
          //获取JavaProject，然后编译
          JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
-         String compileOutput = javaProject.compile("Demo.java", content);//TODO 先mock filename，后续应该从content中解析出来
+         JavaCodeInfo javaCodeInfo = CodeUtils.getCodeInfo(content);
+         String compileOutput = javaProject.compile(javaCodeInfo.getClassName() + ".java", content);//TODO 先mock filename，后续应该从content中解析出来
          map.put("content", compileOutput);
+         map.put("className", javaCodeInfo.getPackageName() + '.' + javaCodeInfo.getClassName());
          map.put("success", true);
       } catch (RuntimeException e) {
          StringBuilder error = new StringBuilder();
@@ -116,15 +149,24 @@ public class AppController {
 
    }
 
+   /**
+    * @param app
+    * @param pageid
+    * @param className 指定要运行的完整的类名
+    * @return
+    * @throws JsonGenerationException
+    * @throws JsonMappingException
+    * @throws IOException
+    */
    @RequestMapping(value = "/{app}/run", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
    @ResponseBody
-   public Object run(@PathVariable String app, String pageid) throws JsonGenerationException, JsonMappingException,
-         IOException {
+   public Object run(@PathVariable String app, String pageid, String className) throws JsonGenerationException,
+         JsonMappingException, IOException {
       Map<String, Object> map = new HashMap<String, Object>();
       try {
          //获取JavaProject，然后编译
          JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
-         javaProject.run("Demo");//TODO 先mock filename，后续应该从前端传递过来
+         javaProject.run(className);
          map.put("success", true);
       } catch (RuntimeException e) {
          StringBuilder error = new StringBuilder();
@@ -174,7 +216,8 @@ public class AppController {
             int available;
             while (count++ < 300) {
                if (!javaProject.isRunning()) {//如果已经不在运行，则读完直到-1
-                  data.append(IOUtils.toString(processInputStream));//TODO encoding
+                  data.append(IOUtils.toString(processInputStream));
+                  IOUtils.closeQuietly(processInputStream);
                   status = "done";
                   break;
                } else {//如果已经还在运行，则尝试读一部分
@@ -182,7 +225,7 @@ public class AppController {
                   if (available > 0) {
                      byte[] bytes = new byte[available];
                      processInputStream.read(bytes);
-                     data.append(new String(bytes));//TODO add encode
+                     data.append(new String(bytes));
                      break;
                   } else {//如果一直没有数据，最多会等待20s
                      try {
