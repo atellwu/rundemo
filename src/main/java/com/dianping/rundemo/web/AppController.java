@@ -1,6 +1,7 @@
 package com.dianping.rundemo.web;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -84,16 +87,17 @@ public class AppController {
    }
 
    @RequestMapping(value = "/{app}")
-   public ModelAndView java(@PathVariable String app, HttpServletRequest request, HttpServletResponse response) {
-      String path = "java";
+   public ModelAndView java(@PathVariable String app, HttpServletRequest request, HttpServletResponse response)
+         throws FileNotFoundException, IOException {
       Map<String, Object> map = new HashMap<String, Object>();
 
       //TODO 加载app目录下的文件名，作为连接按钮显示
       AppProject appProject = ProjectContext.getAppProject(app);
       String[] javaFileNameList = appProject.loadJavaFileNameList();
+      String pom = appProject.loadPom();
+      map.put("pom", StringEscapeUtils.escapeXml(pom));
       map.put("javaFileNameList", javaFileNameList);
       map.put("app", app);
-      map.put("path", path);
 
       //打开页面时，生成pageid，生成JavaProject
       String pageid = UUID.randomUUID().toString();
@@ -131,9 +135,15 @@ public class AppController {
          //获取JavaProject，然后编译
          JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
          JavaCodeInfo javaCodeInfo = CodeUtils.getCodeInfo(content);
-         String compileOutput = javaProject.compile(javaCodeInfo.getClassName() + ".java", content);//TODO 先mock filename，后续应该从content中解析出来
+         String compileOutput = javaProject.compile(javaCodeInfo.getClassName() + ".java", content);
          map.put("content", compileOutput);
-         map.put("className", javaCodeInfo.getPackageName() + '.' + javaCodeInfo.getClassName());
+         String className;
+         if (StringUtils.isBlank(javaCodeInfo.getPackageName())) {
+            className = javaCodeInfo.getClassName();
+         } else {
+            className = javaCodeInfo.getPackageName() + '.' + javaCodeInfo.getClassName();
+         }
+         map.put("className", className);
          map.put("success", true);
       } catch (RuntimeException e) {
          StringBuilder error = new StringBuilder();

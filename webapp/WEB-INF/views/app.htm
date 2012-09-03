@@ -26,6 +26,11 @@ body {
 	padding: 9px 0;
 }
 
+#pomEditor {
+    position: relative;
+    width: 100%;
+    height: 500px;
+}
 #editor {
 	position: relative;
 	width: 100%;
@@ -37,6 +42,7 @@ body {
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 <script>
+	//环境变量
 	window.contextpath = "${rc.contextPath}";
 	window.app = "${app}";
 	window.pageid = "${pageid}";
@@ -51,21 +57,39 @@ body {
 
    <div class="tabbable tabs-left"
       style="margin: 0 auto; margin-top: 0px; margin-left: 30px; margin-bottom: 50px; height: 500px;">
-      <ul class="nav nav-tabs" style="font-size:14px">
-         <li class=""><a data-toggle="tab" href="#lA">pom.xml配置</a></li>
-         <li class=""><a data-toggle="tab" href="#lB">resource配置</a></li>
-         <li class="active"><a data-toggle="tab" href="#lC">code示例</a></li>
+      <ul class="nav nav-tabs" style="font-size: 14px">
+         <li class=""><a data-toggle="tab" href="#lA">pom.xml</a></li>
+         <li class=""><a data-toggle="tab" href="#lB">resource</a></li>
+         <li class="active"><a data-toggle="tab" href="#lC">java</a></li>
       </ul>
       <div class="tab-content">
-         <div id="lA" class="tab-pane">...</div>
-         <div id="lB" class="tab-pane">...</div>
+         <div id="lA" class="tab-pane">#parse("pom.htm")</div>
+         <div id="lB" class="tab-pane">#parse("resources.htm")</div>
          <div id="lC" class="tab-pane active">#parse("java.htm")</div>
+      </div>
+   </div>
+
+
+   <!-- 错误消息弹出框 -->
+   <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog"
+      tabindex="-1" class="modal hide fade" id="errorMsg"
+      style="display: none;">
+      <div class="modal-header">
+         <button aria-hidden="true" data-dismiss="modal" class="close"
+            type="button">×</button>
+         <h3 id="myModalLabel">错误日志</h3>
+      </div>
+      <div class="modal-body">
+         <p></p>
+      </div>
+      <div class="modal-footer">
+         <button data-dismiss="modal" class="btn">关闭</button>
       </div>
    </div>
 
    <!-- 页脚 -->
    <footer
-      style="background-color: #F5F5F5; border-top: 1px solid #E5E5E5;height:200px">
+      style="background-color: #F5F5F5; border-top: 1px solid #E5E5E5; height: 200px">
       <p
          style="margin: 0 auto; margin-top: 20px; margin-bottom: 0px; width: 200px">&copy;
          dianping.com 2012</p>
@@ -75,7 +99,7 @@ body {
     ================================================== -->
    <!-- Placed at the end of the document so the pages load faster -->
    <script type="text/javascript"
-      src="${rc.contextPath}/javascripts/bootstrap/jquery-1.7.2.min.js"></script>
+      src="${rc.contextPath}/javascripts/bootstrap/jquery-1.7.2.js"></script>
    <script type="text/javascript"
       src="${rc.contextPath}/javascripts/bootstrap/bootstrap.js"></script>
    <script type="text/javascript"
@@ -85,12 +109,21 @@ body {
    <script src="${rc.contextPath}/javascripts/ace-src-min/ace.js"
       type="text/javascript" charset="utf-8"></script>
    <script type="text/javascript">
+				//editor
 				var editor = ace.edit("editor");
 				editor.setFontSize(14);
 				editor.setTheme("ace/theme/eclipse");
 				editor.getSession().setMode("ace/mode/java");
 				editor.on("change", rundemo_app.modifyCode);
 				window.editor = editor;
+				//
+				var pomEditor = ace.edit("pomEditor");
+				pomEditor.setFontSize(14);
+				pomEditor.setTheme("ace/theme/eclipse");
+				pomEditor.getSession().setMode("ace/mode/xml");
+				pomEditor.setReadOnly(true);
+				//pretty
+				//prettyPrint();
 			</script>
 
 </body>

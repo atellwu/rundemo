@@ -6,29 +6,32 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JavaProject {
-   private static final Logger LOG = LoggerFactory.getLogger(JavaProject.class);
+   private static final Logger   LOG      = LoggerFactory.getLogger(JavaProject.class);
 
-   private final AppProject    appProject;
+   private static final Executor executor = Executors.newCachedThreadPool();
 
-   private final String        pageid;
+   private final AppProject      appProject;
 
-   private final String        dirPath;
+   private final String          pageid;
 
-   private final String        binPath;
+   private final String          dirPath;
 
-   private final String        srcPath;
+   private final String          binPath;
 
-   private InputStream         runProcessInputStream;
+   private final String          srcPath;
 
-   private boolean             isRunning;
+   private InputStream           runProcessInputStream;
+
+   private boolean               isRunning;
 
    public JavaProject(String app, String pageid) {
       AppProject appProject = ProjectContext.getAppProject(app);
@@ -42,28 +45,6 @@ public class JavaProject {
       this.srcPath = dirPath + "src/";
       new File(binPath).mkdirs();
       new File(srcPath).mkdirs();
-
-      //启动监测pid进程是否关闭的线程，如果关闭，则移除pid和processInputStream
-      TimerTask task = new TimerTask() {
-         @Override
-         public void run() {
-            InputStream input = null;
-            try {
-               Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/check.sh", dirPath });
-               input = proc.getInputStream();
-               String isRunning = IOUtils.toString(input);
-               if ("false".equals(isRunning.trim())) {//已经关闭(此处不能关闭runProcessInputStream，因为还需要读完，在读完时关闭)
-                  JavaProject.this.isRunning = false;
-               }
-            } catch (IOException e) {
-               LOG.error(e.getMessage(), e);
-            } finally {
-               IOUtils.closeQuietly(input);
-            }
-         }
-      };
-      Timer t = new Timer();
-      t.schedule(task, 0, 500);
 
    }
 
@@ -88,7 +69,7 @@ public class JavaProject {
                new String[] { "/data/rundemo/compile.sh", binPath, appProject.getClasspath(), srcPath + filename,
                      filename });
          input = proc.getInputStream();
-         return IOUtils.toString(input);//TODO encoding
+         return IOUtils.toString(input);
       } finally {
          IOUtils.closeQuietly(input);
       }
@@ -109,6 +90,23 @@ public class JavaProject {
       }
       this.runProcessInputStream = proc.getInputStream();
       this.isRunning = true;
+      //启动监测pid进程是否关闭的线程，如果关闭，则移除pid和processInputStream
+      Runnable checkTask = new Runnable() {
+         @Override
+         public void run() {
+            try {
+               Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/check.sh", dirPath });
+               //本想使用run.sh的proc.waitFor()来阻塞并且等待返回则认为run结束，但实际run使用&，导致run的终端一下子就结束的了，proc.waitFor()不会阻塞。
+               proc.waitFor();//已经关闭(此处不能关闭runProcessInputStream，因为还需要读完，在读完时关闭)
+               JavaProject.this.isRunning = false;
+            } catch (IOException e) {
+               LOG.error(e.getMessage(), e);
+            } catch (InterruptedException e) {
+               LOG.error(e.getMessage(), e);
+            }
+         }
+      };
+      executor.execute(checkTask);
    }
 
    public void shutdown() throws IOException {
@@ -116,7 +114,10 @@ public class JavaProject {
       try {
          Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/shutdown.sh", dirPath });
          input = proc.getInputStream();
-         LOG.error(IOUtils.toString(input));
+         String output = IOUtils.toString(input);
+         if (StringUtils.isBlank(output)) {
+            LOG.error(output);
+         }
       } finally {
          IOUtils.closeQuietly(input);
       }

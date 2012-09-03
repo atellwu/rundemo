@@ -19,6 +19,11 @@
 				rundemo_app.appError(data.errorMsg);
 			} else {
 				window.editor.setValue(data.code);
+				window.editor.moveCursorTo(0,0);
+				//初始化code时间戳
+				window.codeLastModifiedTime = new Date();
+				window.codeLastCompiledTime = 0;
+				window.tempCodeLastCompiledTime;
 			}
 		},
 		"runDemo" : function() {
@@ -49,6 +54,8 @@
 			if (data.success == false) {
 				rundemo_app.appError(data.errorMsg);
 			} else {
+				// 编译完成，设置className
+				w.className = data.className;
 				// 判断编译是否成功
 				if (data.content.match("^\\\[info\\\]")) {
 					w.codeLastCompiledTime = w.tempCodeLastCompiledTime;// 编译成功才更新CodeLastCompiledTime
@@ -63,6 +70,7 @@
 		"run" : function() {
 			var param = new Object();
 			param.pageid = w.pageid;
+			param.className = w.className;
 			var url = w.contextpath + '/' + w.app + '/run';
 			$.ajax({
 				type : 'POST',
@@ -147,6 +155,56 @@
 		"modifyCode" : function() {
 			w.codeLastModifiedTime = new Date();
 		},
+		"changeJavaHash" : function(index) {
+			var hash = window.location.hash;
+			var newHash = "";
+			if (hash.length > 0) {// 去掉#号
+				hash = hash.substring(1);
+				$.each(hash.split('&'), function(i, part) {
+					var keyValue = part.split('=');
+					if (keyValue[0] == 'j') {
+						newHash += "&j=" + index;
+					} else {
+						newHash += '&' + part;
+					}
+				});
+				newHash = newHash.substring(1);
+			} else {
+				newHash = "j=" + index;
+			}
+			window.location.hash = newHash;
+		},
+		"onHashChange" : function() {
+			var hash = window.location.hash;
+			if (hash.length > 0) {// 去掉#号
+				hash = hash.substring(1);
+				$.each(hash.split('&'), function(i, part) {
+					var keyValue = part.split('=');
+					if (keyValue[0] == 'j') {
+						rundemo_app.changeJavaCodeFile(keyValue[1]);
+					} else if (keyValue[0] == 'r') {
+						rundemo_app.changeResourceFile(keyValue[1]);
+					}
+				});
+			}
+		},
+		"changeJavaCodeFile" : function(index) {
+			// 当前的index是多少
+			var curLi = $("#javaCodeTab > li[class='active']");
+			var curIndex = curLi.index();
+			// 如果更改了，则
+			if (index != curIndex) {
+				// 更改active
+				curLi.removeClass("active");
+				var newLi = $("#javaCodeTab > li:eq(" + index + ")");
+				newLi.addClass("active");
+				// 重新加载code
+				rundemo_app.loadCode(newLi.children("a").text());
+			}
+		},
+		"changeResourceFile" : function(index) {
+			console.log(index);
+		},
 		"appError" : function(errorMsg) {
 			rundemo_app.alertError(errorMsg);
 		},
@@ -162,8 +220,11 @@
 	};
 	w.rundemo_app = rundemo_app;
 }(window || this));
-// page loaded
+
 $(document).ready(function() {
 	$('#compileButton').removeAttr('disabled');
 	$('#runButton').removeAttr('disabled');
+	// 根据#hash定位
+	window.onhashchange = rundemo_app.onHashChange;
+	rundemo_app.onHashChange();
 });

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
@@ -36,8 +37,13 @@ public class AppProject {
     * @throws FileNotFoundException
     */
    public String loadCode(String javaFileName) throws FileNotFoundException, IOException {
-      File javaFile = new File("/data/rundemo/appprojects/" + app + "/" + javaFileName);
+      File javaFile = new File("/data/rundemo/appprojects/" + app + "/java/" + javaFileName);
       return IOUtils.toString(new FileInputStream(javaFile), "UTF-8");
+   }
+   
+   public String loadPom() throws FileNotFoundException, IOException {
+      File pomFile = new File("/data/rundemo/appprojects/" + app + "/pom.xml");
+      return IOUtils.toString(new FileInputStream(pomFile), "UTF-8");
    }
 
    /**
@@ -47,14 +53,15 @@ public class AppProject {
     * @return
     */
    public String[] loadJavaFileNameList() {
-      File appprojectsDir = new File("/data/rundemo/appprojects/" + app);
-      return appprojectsDir.list(new FilenameFilter() {
+      File appprojectsDir = new File("/data/rundemo/appprojects/" + app + "/java/");
+      String[] fileNames = appprojectsDir.list(new FilenameFilter() {
          @Override
          public boolean accept(File dir, String name) {
-            return name.endsWith(".java");
+            return !name.endsWith(".desc");
          }
-
       });
+      Arrays.sort(fileNames);
+      return fileNames;
    }
 
    @Override

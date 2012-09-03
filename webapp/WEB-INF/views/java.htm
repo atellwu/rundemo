@@ -1,19 +1,13 @@
 
 <div class="container-fluid">
    <div class="row-fluid">
-      <ul class="nav nav-pills"
+      <ul class="nav nav-pills" id="javaCodeTab"
          style="margin-left: 100px; margin-top: 20px; margin-bottom: 0px;">
-         #foreach($javaFileName in $javaFileNameList)
-         <li #if($velocityCount== 1)class="active" #end><a
-            style="padding: 2px 10px 2px 10px;"
-            href="javascript:rundemo_app.loadCode('${javaFileName}');">${javaFileName}</a></li>
+         #foreach($javaFileName in $javaFileNameList) #set($index =
+         ${velocityCount} - 1)
+         <li><a style="padding: 2px 10px 2px 10px;"
+            href="javascript:rundemo_app.changeJavaHash(${index});">${javaFileName}</a></li>
          #end
-<!-- 
-         <li><a style="padding: 2px 10px 2px 10px;"
-            href="javascript:rundemo_app.loadCode('');return false;">示例2</a></li>
-         <li><a style="padding: 2px 10px 2px 10px;"
-            href="javascript:rundemo_app.loadCode('');return false;">示例3</a></li>
- -->
       </ul>
       <span style="color: #585858; font-size: 14px">代码演示</span>
       <hr style="margin-top: 0px; margin-bottom: 5px">
@@ -35,7 +29,7 @@
                <button id="shutdownButton" type="button"
                   onclick="rundemo_app.shutdown()"
                   class="btn btn-danger"
-                  style="display: none; float: right">Shutdown</button>
+                  style="display: none;">Shutdown</button>
                <pre
                   style="cursor: text; margin-top: 20px; background-color: #2E2E2E; color: #298A08; font-size: 12px; width: 100%; height: 300px; overflow-x: auto;"
                   id="console"></pre>
@@ -45,22 +39,5 @@
       </div>
    </div>
    <!--/row-->
-
-   <!-- 错误消息弹出框 -->
-   <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog"
-      tabindex="-1" class="modal hide fade" id="errorMsg"
-      style="display: none;">
-      <div class="modal-header">
-         <button aria-hidden="true" data-dismiss="modal" class="close"
-            type="button">×</button>
-         <h3 id="myModalLabel">错误日志</h3>
-      </div>
-      <div class="modal-body">
-         <p></p>
-      </div>
-      <div class="modal-footer">
-         <button data-dismiss="modal" class="btn">关闭</button>
-      </div>
-   </div>
 </div>
 <!--/.fluid-container-->

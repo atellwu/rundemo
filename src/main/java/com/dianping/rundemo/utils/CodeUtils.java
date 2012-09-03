@@ -3,7 +3,6 @@ package com.dianping.rundemo.utils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 import com.dianping.rundemo.project.JavaCodeInfo;
 
 public class CodeUtils {
@@ -29,6 +28,8 @@ public class CodeUtils {
          }
          if (lineStart != NONE && lineEnd != NONE) {//找到一行
             String line = code.substring(lineStart, lineEnd);
+            lineStart = NONE;
+            lineEnd = NONE;
             line = line.trim();
             Matcher packegeMatch = PACKNAME.matcher(line);
             if (packegeMatch.matches()) {
@@ -45,18 +46,19 @@ public class CodeUtils {
             return javaCodeInfo;
          }
       }
-      //找不到
-      String errorMsg = "code error!";
-      if(javaCodeInfo.getPackageName() == null){
-         errorMsg += "\r\n\tcorrect package definition not find - this line must match: ^package\\s+([a-zA-Z_][a-zA-Z_0-9]*)([\\.][a-zA-Z_][a-zA-Z_0-9]*)*;.*$";
-      }
-      if(javaCodeInfo.getClassName() == null){
+      //找不到className，报错
+      if (javaCodeInfo.getClassName() == null) {
+         String errorMsg = "code error!";
          errorMsg += "\r\n\tcorrect public class name definition not find - this line must match: ^public\\s+class\\s+([a-zA-Z_][a-zA-Z_0-9]*)+\\s+.*$";
+         throw new IllegalArgumentException(errorMsg);
       }
-      throw new IllegalArgumentException(errorMsg);
+      //找不到packageName，设置为空字符串
+      if (javaCodeInfo.getPackageName() == null) {
+         javaCodeInfo.setPackageName("");
+      }
+      return javaCodeInfo;
    }
-   
-   
+
    public static void main(String[] args) {
       Matcher m2 = PACKNAME.matcher("package ass_.com;");
       System.out.println(m2.matches());
@@ -65,7 +67,9 @@ public class CodeUtils {
       Matcher m = CLASSNAME.matcher("public class s ");
       System.out.println(m.matches());
       System.out.println(m.group(1));
-      
-      System.out.println(CodeUtils.getCodeInfo("package com.dianping.rundemo.web;\n  public class Demo { \n    /**     * @param args     * @throws InterruptedException      */    public static void main(String[] args) throws InterruptedException {       int count = 0;       while (count++ < 50) {          System.out.println(count);          Thread.sleep(60);          System.out.println(\"--55555-----------\");       }    }  }"));
+
+      System.out
+            .println(CodeUtils
+                  .getCodeInfo("package com.dianping.rundemo.web;\n  public class Demo { \n    /**     * @param args     * @throws InterruptedException      */    public static void main(String[] args) throws InterruptedException {       int count = 0;       while (count++ < 50) {          System.out.println(count);          Thread.sleep(60);          System.out.println(\"--55555-----------\");       }    }  }"));
    }
 }
