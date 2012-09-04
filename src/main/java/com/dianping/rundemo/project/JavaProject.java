@@ -2,10 +2,14 @@ package com.dianping.rundemo.project;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -33,7 +37,7 @@ public class JavaProject {
 
    private boolean               isRunning;
 
-   public JavaProject(String app, String pageid) {
+   public JavaProject(String app, String pageid) throws IOException {
       AppProject appProject = ProjectContext.getAppProject(app);
       if (appProject == null) {
          throw new IllegalArgumentException("app project not exsit:" + app);
@@ -45,7 +49,41 @@ public class JavaProject {
       this.srcPath = dirPath + "src/";
       new File(binPath).mkdirs();
       new File(srcPath).mkdirs();
+      //复制resource文件到binPath
+      InputStream input = null;
+      try {
+         Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/copyRes.sh", app, pageid });
+         input = proc.getInputStream();
+         String output = IOUtils.toString(input);
+         if (!StringUtils.isBlank(output)) {
+            throw new IOException(output);
+         }
+      } finally {
+         IOUtils.closeQuietly(input);
+      }
 
+   }
+
+   public String[] loadResFileNameList() {
+      File binDir = new File(binPath);
+      String[] fileNames = binDir.list(new FilenameFilter() {
+         @Override
+         public boolean accept(File dir, String name) {
+            return !name.endsWith(".class");
+         }
+      });
+      Arrays.sort(fileNames);
+      return fileNames;
+   }
+
+   public String loadRes(String resFileName) throws FileNotFoundException, IOException {
+      File resFile = new File(binPath + resFileName);
+      return IOUtils.toString(new FileInputStream(resFile), "UTF-8");
+   }
+
+   public void saveRes(String resFileName, String res) throws FileNotFoundException, IOException {
+      File resFile = new File(binPath + resFileName);
+      IOUtils.write(res, new FileOutputStream(resFile), "UTF-8");
    }
 
    /**
@@ -115,7 +153,22 @@ public class JavaProject {
          Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/shutdown.sh", dirPath });
          input = proc.getInputStream();
          String output = IOUtils.toString(input);
-         if (StringUtils.isBlank(output)) {
+         if (!StringUtils.isBlank(output)) {
+            throw new IOException(output);
+         }
+      } finally {
+         IOUtils.closeQuietly(input);
+      }
+   }
+
+   public void delete() throws IOException {
+      InputStream input = null;
+      try {
+         Process proc = Runtime.getRuntime().exec(
+               new String[] { "/data/rundemo/deleteJavaProject.sh", appProject.getApp(), pageid });
+         input = proc.getInputStream();
+         String output = IOUtils.toString(input);
+         if (!StringUtils.isBlank(output)) {
             LOG.error(output);
          }
       } finally {

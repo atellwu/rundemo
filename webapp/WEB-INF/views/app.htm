@@ -27,10 +27,17 @@ body {
 }
 
 #pomEditor {
-    position: relative;
-    width: 100%;
-    height: 500px;
+	position: relative;
+	width: 100%;
+	height: 500px;
 }
+
+#resEditor {
+	position: relative;
+	width: 100%;
+	height: 400px;
+}
+
 #editor {
 	position: relative;
 	width: 100%;
@@ -49,6 +56,7 @@ body {
 	window.codeLastModifiedTime = new Date();
 	window.codeLastCompiledTime = 0;
 	window.tempCodeLastCompiledTime;
+	window.resModified = false;
 </script>
 </head>
 
@@ -109,19 +117,6 @@ body {
    <script src="${rc.contextPath}/javascripts/ace-src-min/ace.js"
       type="text/javascript" charset="utf-8"></script>
    <script type="text/javascript">
-				//editor
-				var editor = ace.edit("editor");
-				editor.setFontSize(14);
-				editor.setTheme("ace/theme/eclipse");
-				editor.getSession().setMode("ace/mode/java");
-				editor.on("change", rundemo_app.modifyCode);
-				window.editor = editor;
-				//
-				var pomEditor = ace.edit("pomEditor");
-				pomEditor.setFontSize(14);
-				pomEditor.setTheme("ace/theme/eclipse");
-				pomEditor.getSession().setMode("ace/mode/xml");
-				pomEditor.setReadOnly(true);
 				//pretty
 				//prettyPrint();
 			</script>

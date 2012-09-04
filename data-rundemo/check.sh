@@ -1,25 +1,27 @@
 #!/bin/bash
 # check
-# return true: if <pid_file> exsit, and <pid> is runnig
-# return false: if <pid_file> not exsit, and <pid> is runnig (rm <pid_file> if neccesery)
+# if <pid_file> exsit, and <pid> is runnig, looping.
+# if <pid_file> not exsit, and <pid> is runnig (rm <pid_file> if neccesery),return "done".
 running()
 {
-    [ -f $1 ] || return 1
-    PID=$(cat $1)
-    ps -p $PID >/dev/null 2>/dev/null || return 1
+    #[ -f $1 ] || return 1
+    ps -p $1 >/dev/null 2>/dev/null || return 1
     return 0
 }
+sleep 0.5s
 PID_FILE=${1}/pid
-if [ -f $PID_FILE ]
-  then            
-    if running $PID_FILE
-      then
-         echo "true"
-    else
-       # dead pid file - remove
-       rm -f $PID_FILE
-       echo "false"
-    fi
-else
-  echo "false"
+if [ -f $PID_FILE ]; then
+  PID=$(cat $PID_FILE)
+  while true; 
+    do       
+      if running $PID
+        then
+          sleep 0.5s
+      else
+        # dead pid file - remove
+        rm -f $PID_FILE
+        break
+      fi
+  done
 fi
+echo "done"

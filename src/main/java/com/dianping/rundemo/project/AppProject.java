@@ -40,7 +40,7 @@ public class AppProject {
       File javaFile = new File("/data/rundemo/appprojects/" + app + "/java/" + javaFileName);
       return IOUtils.toString(new FileInputStream(javaFile), "UTF-8");
    }
-   
+
    public String loadPom() throws FileNotFoundException, IOException {
       File pomFile = new File("/data/rundemo/appprojects/" + app + "/pom.xml");
       return IOUtils.toString(new FileInputStream(pomFile), "UTF-8");

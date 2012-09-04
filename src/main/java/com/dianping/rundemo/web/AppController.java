@@ -64,15 +64,60 @@ public class AppController {
 
    @RequestMapping(value = "/{app}/loadCode", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
    @ResponseBody
-   public Object loadCode(@PathVariable String app, String javaFileName) throws JsonGenerationException,
-         JsonMappingException, IOException {
+   public Object loadCode(@PathVariable String app, String javaFileName) {
       Map<String, Object> map = new HashMap<String, Object>();
       try {
          AppProject appProject = ProjectContext.getAppProject(app);
          String code = appProject.loadCode(javaFileName);
          map.put("code", code);
          map.put("success", true);
-      } catch (RuntimeException e) {
+      } catch (Exception e) {
+         StringBuilder error = new StringBuilder();
+         error.append(e.getMessage()).append("\n");
+         for (StackTraceElement element : e.getStackTrace()) {
+            error.append(element.toString()).append("\n");
+         }
+         map.put("success", false);
+         map.put("errorMsg", error.toString());
+      }
+      Gson gson = new Gson();
+      return gson.toJson(map);
+
+   }
+
+   @RequestMapping(value = "/{app}/loadRes", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+   @ResponseBody
+   public Object loadRes(@PathVariable String app, String pageid, String resFileName) {
+      Map<String, Object> map = new HashMap<String, Object>();
+      try {
+         JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
+         String res = javaProject.loadRes(resFileName);
+         map.put("res", res);
+         map.put("success", true);
+      } catch (Exception e) {
+         StringBuilder error = new StringBuilder();
+         error.append(e.getMessage()).append("\n");
+         for (StackTraceElement element : e.getStackTrace()) {
+            error.append(element.toString()).append("\n");
+         }
+         map.put("success", false);
+         map.put("errorMsg", error.toString());
+      }
+      Gson gson = new Gson();
+      return gson.toJson(map);
+
+   }
+
+   @RequestMapping(value = "/{app}/saveRes", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+   @ResponseBody
+   public Object saveRes(@PathVariable String app, String pageid, String resFileName, String res) {
+      Map<String, Object> map = new HashMap<String, Object>();
+      try {
+         JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
+         javaProject.saveRes(resFileName, res);
+         map.put("res", res);
+         map.put("success", true);
+      } catch (Exception e) {
          StringBuilder error = new StringBuilder();
          error.append(e.getMessage()).append("\n");
          for (StackTraceElement element : e.getStackTrace()) {
@@ -91,18 +136,19 @@ public class AppController {
          throws FileNotFoundException, IOException {
       Map<String, Object> map = new HashMap<String, Object>();
 
-      //TODO 加载app目录下的文件名，作为连接按钮显示
-      AppProject appProject = ProjectContext.getAppProject(app);
-      String[] javaFileNameList = appProject.loadJavaFileNameList();
-      String pom = appProject.loadPom();
-      map.put("pom", StringEscapeUtils.escapeXml(pom));
-      map.put("javaFileNameList", javaFileNameList);
-      map.put("app", app);
-
       //打开页面时，生成pageid，生成JavaProject
       String pageid = UUID.randomUUID().toString();
       JavaProject javaProject = new JavaProject(app, pageid);
       ProjectContext.putJavaProject(app, pageid, javaProject);
+
+      AppProject appProject = ProjectContext.getAppProject(app);
+      String[] javaFileNameList = appProject.loadJavaFileNameList();
+      String[] resFileNameList = javaProject.loadResFileNameList();
+      String pom = appProject.loadPom();
+      map.put("pom", StringEscapeUtils.escapeHtml(pom));
+      map.put("javaFileNameList", javaFileNameList);
+      map.put("resFileNameList", resFileNameList);
+      map.put("app", app);
 
       map.put("pageid", pageid);
       return new ModelAndView("app", map);
@@ -128,8 +174,7 @@ public class AppController {
 
    @RequestMapping(value = "/{app}/compile", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
    @ResponseBody
-   public Object compile(@PathVariable String app, String pageid, String content) throws JsonGenerationException,
-         JsonMappingException, IOException {
+   public Object compile(@PathVariable String app, String pageid, String content) {
       Map<String, Object> map = new HashMap<String, Object>();
       try {
          //获取JavaProject，然后编译
@@ -145,7 +190,7 @@ public class AppController {
          }
          map.put("className", className);
          map.put("success", true);
-      } catch (RuntimeException e) {
+      } catch (Exception e) {
          StringBuilder error = new StringBuilder();
          error.append(e.getMessage()).append("\n");
          for (StackTraceElement element : e.getStackTrace()) {
@@ -170,15 +215,14 @@ public class AppController {
     */
    @RequestMapping(value = "/{app}/run", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
    @ResponseBody
-   public Object run(@PathVariable String app, String pageid, String className) throws JsonGenerationException,
-         JsonMappingException, IOException {
+   public Object run(@PathVariable String app, String pageid, String className) {
       Map<String, Object> map = new HashMap<String, Object>();
       try {
          //获取JavaProject，然后编译
          JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
          javaProject.run(className);
          map.put("success", true);
-      } catch (RuntimeException e) {
+      } catch (Exception e) {
          StringBuilder error = new StringBuilder();
          error.append(e.getMessage()).append("\n");
          for (StackTraceElement element : e.getStackTrace()) {
@@ -211,8 +255,7 @@ public class AppController {
     */
    @RequestMapping(value = "/{app}/runConsole", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
    @ResponseBody
-   public Object runConsole(@PathVariable String app, String pageid) throws JsonGenerationException,
-         JsonMappingException, IOException {
+   public Object runConsole(@PathVariable String app, String pageid) {
       Map<String, Object> map = new HashMap<String, Object>();
       try {
          StringBuilder data = new StringBuilder();
@@ -252,7 +295,7 @@ public class AppController {
          map.put("content", data.toString());
          map.put("success", true);
 
-      } catch (RuntimeException e) {
+      } catch (Exception e) {
          StringBuilder error = new StringBuilder();
          error.append(e.getMessage()).append("\n");
          for (StackTraceElement element : e.getStackTrace()) {
@@ -268,15 +311,37 @@ public class AppController {
 
    @RequestMapping(value = "/{app}/shutdown", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
    @ResponseBody
-   public Object shutdown(@PathVariable String app, String pageid) throws JsonGenerationException,
-         JsonMappingException, IOException {
+   public Object shutdown(@PathVariable String app, String pageid) {
       Map<String, Object> map = new HashMap<String, Object>();
       try {
          //获取JavaProject，然后编译
          JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
          javaProject.shutdown();
          map.put("success", true);
-      } catch (RuntimeException e) {
+      } catch (Exception e) {
+         StringBuilder error = new StringBuilder();
+         error.append(e.getMessage()).append("\n");
+         for (StackTraceElement element : e.getStackTrace()) {
+            error.append(element.toString()).append("\n");
+         }
+         map.put("success", false);
+         map.put("errorMsg", error.toString());
+      }
+      Gson gson = new Gson();
+      return gson.toJson(map);
+
+   }
+
+   @RequestMapping(value = "/{app}/deleteJavaProject", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+   @ResponseBody
+   public Object deleteJavaProject(@PathVariable String app, String pageid) {
+      Map<String, Object> map = new HashMap<String, Object>();
+      try {
+         //获取JavaProject，然后编译
+         JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
+         javaProject.delete();
+         map.put("success", true);
+      } catch (Exception e) {
          StringBuilder error = new StringBuilder();
          error.append(e.getMessage()).append("\n");
          for (StackTraceElement element : e.getStackTrace()) {
