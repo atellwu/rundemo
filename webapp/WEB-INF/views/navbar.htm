@@ -10,9 +10,10 @@
                欢迎您， <a href="#" class="navbar-link">游侠</a>
             </p>
             <ul class="nav">
-               <li><a href="${rc.contextPath}/">首页</a></li>
-               <li class="active"><a href="${rc.contextPath}/swallow">Swallow</a></li>
-               <li><a href="${rc.contextPath}/lion">Lion</a></li>
+               #if(${app})
+               <li><a href="${rc.contextPath}/">所有应用</a></li>
+               <li class="active"><a
+                  href="${rc.contextPath}/${app}">${app}</a></li> #end
             </ul>
          </div>
          <!--/.nav-collapse -->

@@ -1,8 +1,6 @@
 package com.dianping.rundemo.web;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -12,7 +10,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -36,30 +33,14 @@ import com.google.gson.Gson;
 
 @Controller
 public class AppController {
+   @SuppressWarnings("unused")
    private static final Logger LOG = LoggerFactory.getLogger(AppController.class);
 
-   //初始化ProjectContext
-   static {
-      //扫描/data/rundemo/appprojects/目录，创建appprojects
-      File appprojectsDir = new File("/data/rundemo/appprojects/");
-      File[] appprojectDirs = appprojectsDir.listFiles();
-      for (File appprojectDir : appprojectDirs) {
-         String app = appprojectDir.getName();
-         File[] classpathFiles = appprojectDir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-               return "classpath".equals(name);
-            }
-         });
-         try {
-            File classpathFile = classpathFiles[0];
-            String classpath = FileUtils.readFileToString(classpathFile, "ISO-8859-1").trim();
-            AppProject appProject = new AppProject(app, classpath);
-            ProjectContext.putAppProject(app, appProject);
-         } catch (Exception e) {
-            LOG.error("error when load from /data/rundemo/appprojects/" + app, e);
-         }
-      }
+   @RequestMapping(value = "/")
+   public ModelAndView allApps(HttpServletRequest request, HttpServletResponse response) {
+      Map<String, Object> map = new HashMap<String, Object>();
+      map.put("allAppNames", ProjectContext.getAllAppNames());
+      return new ModelAndView("allApps", map);
    }
 
    @RequestMapping(value = "/{app}/loadCode", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
@@ -132,7 +113,7 @@ public class AppController {
    }
 
    @RequestMapping(value = "/{app}")
-   public ModelAndView java(@PathVariable String app, HttpServletRequest request, HttpServletResponse response)
+   public ModelAndView appIndex(@PathVariable String app, HttpServletRequest request, HttpServletResponse response)
          throws FileNotFoundException, IOException {
       Map<String, Object> map = new HashMap<String, Object>();
 
@@ -149,26 +130,8 @@ public class AppController {
       map.put("javaFileNameList", javaFileNameList);
       map.put("resFileNameList", resFileNameList);
       map.put("app", app);
-
+      map.put("allAppNames", ProjectContext.getAllAppNames());
       map.put("pageid", pageid);
-      return new ModelAndView("app", map);
-   }
-
-   @RequestMapping(value = "/{app}/pom")
-   public ModelAndView pom(@PathVariable String app, HttpServletRequest request, HttpServletResponse response) {
-      String path = "pom";
-      Map<String, Object> map = new HashMap<String, Object>();
-      map.put("app", app);
-      map.put("path", path);
-      return new ModelAndView("app", map);
-   }
-
-   @RequestMapping(value = "/{app}/res")
-   public ModelAndView res(@PathVariable String app, HttpServletRequest request, HttpServletResponse response) {
-      String path = "res";
-      Map<String, Object> map = new HashMap<String, Object>();
-      map.put("app", app);
-      map.put("path", path);
       return new ModelAndView("app", map);
    }
 
@@ -339,7 +302,7 @@ public class AppController {
       try {
          //获取JavaProject，然后编译
          JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
-         javaProject.delete();
+         javaProject.close();
          map.put("success", true);
       } catch (Exception e) {
          StringBuilder error = new StringBuilder();

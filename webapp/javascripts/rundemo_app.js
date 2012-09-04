@@ -27,7 +27,7 @@
 		},
 		"saveResDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError(data.errorMsg);// TODO title作为参数，如“保存失败”
+				rundemo_app.appError("保存resource资源文件时发生错误",data.errorMsg);// TODO title作为参数，如“保存失败”
 			} else {
 				window.resModified = false;
 			}
@@ -48,7 +48,7 @@
 		},
 		"loadResDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError(data.errorMsg);
+				rundemo_app.appError("加载resource资源文件时发生错误",data.errorMsg);
 			} else {
 				window.resEditor.setValue(data.res);
 				window.resEditor.moveCursorTo(0, 0);
@@ -70,7 +70,7 @@
 		},
 		"loadCodeDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError(data.errorMsg);
+				rundemo_app.appError("加载代码时发生错误",data.errorMsg);
 			} else {
 				window.editor.setValue(data.code);
 				window.editor.moveCursorTo(0, 0);
@@ -106,7 +106,7 @@
 		},
 		"compileDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError(data.errorMsg);
+				rundemo_app.appError("尝试编译时发生错误",data.errorMsg);
 			} else {
 				// 编译完成，设置className
 				w.className = data.className;
@@ -141,7 +141,7 @@
 		"runDone" : function(data) {
 			if (data.success == false) {
 				// 显示错误消息
-				rundemo_app.appError(data.errorMsg);
+				rundemo_app.appError("尝试运行时发生错误",data.errorMsg);
 				// 按钮变换
 				$('#runButton').show();
 				$('#shutdownButton').hide();
@@ -170,7 +170,7 @@
 		},
 		"runConsoleDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError(data.errorMsg);
+				rundemo_app.appError("访问控制台时发生错误",data.errorMsg);
 				// 按钮变换
 				$('#runButton').show();
 				$('#shutdownButton').hide();
@@ -201,7 +201,7 @@
 		},
 		"shutdownDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError(data.errorMsg);
+				rundemo_app.appError("关闭时发生错误",data.errorMsg);
 			}
 		},
 		"modifyCode" : function() {
@@ -222,7 +222,7 @@
 				});
 				newHash = newHash.substring(1);
 			} else {
-				newHash = "j=" + index;
+				newHash = "r=0&j=" + index;
 			}
 			window.location.hash = newHash;
 		},
@@ -241,22 +241,32 @@
 				});
 				newHash = newHash.substring(1);
 			} else {
-				newHash = "r=" + index;
+				newHash = "j=0&r=" + index;
 			}
 			window.location.hash = newHash;
 		},
 		"onHashChange" : function() {
 			var hash = window.location.hash;
-			if (hash.length > 0) {// 去掉#号
+			if (hash.length > 0) {
+				// 去掉#号
 				hash = hash.substring(1);
+				var j, r;
 				$.each(hash.split('&'), function(i, part) {
 					var keyValue = part.split('=');
 					if (keyValue[0] == 'j') {
+						j = keyValue[1];
 						rundemo_app.changeJavaCodeFile(keyValue[1]);
 					} else if (keyValue[0] == 'r') {
+						r = keyValue[1];
 						rundemo_app.changeResourceFile(keyValue[1]);
 					}
 				});
+				if (j == 0 && r == 0) {
+					window.location.hash = "";
+				}
+			} else {
+				rundemo_app.changeJavaCodeFile(0);
+				rundemo_app.changeResourceFile(0);
 			}
 		},
 		"changeJavaCodeFile" : function(index) {
@@ -298,15 +308,16 @@
 				dataType : "json"
 			});
 		},
-		"appError" : function(errorMsg) {
-			rundemo_app.alertError(errorMsg);
+		"appError" : function(title, errorMsg) {
+			rundemo_app.alertError(title, errorMsg);
 		},
 		"httpError" : function(xhr, textStatus, errorThrown) {
-			rundemo_app.alertError('error:' + textStatus + '(' + errorThrown
-					+ ')');
+			rundemo_app.alertError('网络错误', 'error! (status:' + textStatus
+					+ ',msg:' + errorThrown + ')');
 		},
-		"alertError" : function(errorMsg) {
+		"alertError" : function(title, errorMsg) {
 			// 显示错误消息
+			$('#errorMsg > div[class="modal-header"] > h3').text(title);
 			$('#errorMsg > div[class="modal-body"] > p').text(errorMsg);
 			$('#errorMsg').modal('show');
 		}

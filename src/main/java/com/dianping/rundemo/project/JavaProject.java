@@ -38,6 +38,10 @@ public class JavaProject {
    private boolean               isRunning;
 
    public JavaProject(String app, String pageid) throws IOException {
+      this(app, pageid, true);
+   }
+
+   public JavaProject(String app, String pageid, boolean initDir) throws IOException {
       AppProject appProject = ProjectContext.getAppProject(app);
       if (appProject == null) {
          throw new IllegalArgumentException("app project not exsit:" + app);
@@ -47,21 +51,22 @@ public class JavaProject {
       this.dirPath = "/data/rundemo/javaprojects/" + app + "/" + pageid + "/";
       this.binPath = dirPath + "bin/";
       this.srcPath = dirPath + "src/";
-      new File(binPath).mkdirs();
-      new File(srcPath).mkdirs();
-      //复制resource文件到binPath
-      InputStream input = null;
-      try {
-         Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/copyRes.sh", app, pageid });
-         input = proc.getInputStream();
-         String output = IOUtils.toString(input);
-         if (!StringUtils.isBlank(output)) {
-            throw new IOException(output);
+      if (initDir) {
+         new File(binPath).mkdirs();
+         new File(srcPath).mkdirs();
+         //复制resource文件到binPath
+         InputStream input = null;
+         try {
+            Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/copyRes.sh", app, pageid });
+            input = proc.getInputStream();
+            String output = IOUtils.toString(input);
+            if (!StringUtils.isBlank(output)) {
+               throw new IOException(output);
+            }
+         } finally {
+            IOUtils.closeQuietly(input);
          }
-      } finally {
-         IOUtils.closeQuietly(input);
       }
-
    }
 
    public String[] loadResFileNameList() {
@@ -161,7 +166,10 @@ public class JavaProject {
       }
    }
 
-   public void delete() throws IOException {
+   public void close() throws IOException {
+      //shutdown
+      this.shutdown();
+      //delete
       InputStream input = null;
       try {
          Process proc = Runtime.getRuntime().exec(

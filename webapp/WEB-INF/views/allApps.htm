@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+#parse("header.htm")
+<style type="text/css">
+.nav-pills>li>a {
+	border-radius: 5px 5px 5px 5px;
+	margin-bottom: 2px;
+	margin-top: 2px;
+	padding-bottom: 8px;
+	padding-top: 8px;
+	background-color: #CEECF5;
+};
+</style>
+<script>
+	//环境变量
+	window.contextpath = "${rc.contextPath}";
+	window.app = "${app}";
+</script>
+</head>
+<body>
+   #parse("navbar.htm")
+   <div class="container"
+      style="margin-left: 0px; width: 100%; height: 500px">
+      <div class="hero-unit"
+         style="background-color: #EFFBF8; margin: 0 auto;margin-top:20px;height: 260px;width: 70%">
+         <h1>Run Demo!</h1>
+         <p>可运行的demo平台</p>
+         <p style="margin-top:50px;">
+            <a style="margin-right:20px" class="btn btn-primary btn-large">创建应用 »</a> 或
+             <span style="color:#5882FA;">尝试以下应用 »</span>
+         </p>
+         <div style="margin-top:20px;margin-left:160px;">
+            <ul class="nav nav-pills">
+               #set($show = false)
+               #set($max = 20)
+               #foreach(${appItem} in ${allAppNames})
+                 #if($velocityCount < $max)
+                   <li><a style="margin-left:10px" href="${rc.contextPath}/${appItem}">${appItem}</a></li>
+                 #else
+                   #set($show = true)
+                 #end
+               #end
+               #if($show)
+               <li class="dropdown"><a class="dropdown-toggle"
+                  data-toggle="dropdown" href="#"> 更多应用 <b
+                     class="caret"></b></a>
+                     <ul class="dropdown-menu">
+                #foreach(${appItem} in ${allAppNames})
+                  #if($velocityCount >= $max)
+                   <li><a style="" href="${rc.contextPath}/${appItem}">${appItem}</a></li>
+                  #end
+                #end
+                </ul>
+                </li>
+               #end
+            </ul>
+         </div>
+      </div>
+   </div>
+
+   <!-- 页脚 -->
+   <footer
+      style="background-color: #F5F5F5; border-top: 1px solid #E5E5E5; height: 200px">
+      <p
+         style="margin: 0 auto; margin-top: 20px; margin-bottom: 0px; width: 200px">&copy;
+         dianping.com 2012</p>
+   </footer>
+
+   <!-- Le javascript
+    ================================================== -->
+   <!-- Placed at the end of the document so the pages load faster -->
+   <script type="text/javascript"
+      src="${rc.contextPath}/javascripts/bootstrap/jquery-1.7.2.js"></script>
+   <script type="text/javascript"
+      src="${rc.contextPath}/javascripts/bootstrap/bootstrap.js"></script>
+
+</body>
+</html>
