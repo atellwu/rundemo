@@ -1,3 +1,9 @@
 #!/bin/bash
-javac -d ${1} -cp ${2} ${3} 2>&1
-echo "[info]compile ${4} done."
+dest=$1
+classpath=$2
+app=$3
+pageid=$4
+javaFileName=$5
+javac -d ${dest} -cp ${classpath} -sourcepath /data/rundemo/appprojects/${app}/src/main/java/ /data/rundemo/javaprojects/${app}/${pageid}/src/${javaFileName} 2>&1
+echo "[info]compile ${javaFileName} done."
+

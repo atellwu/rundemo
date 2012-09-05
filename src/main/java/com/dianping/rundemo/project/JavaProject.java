@@ -118,12 +118,12 @@ public class JavaProject {
       } finally {
          IOUtils.closeQuietly(writer);
       }
-      //编译（javac -d <output_dir> -cp <classpath> xx.java）
+      //编译
       InputStream input = null;
       try {
          Process proc = Runtime.getRuntime().exec(
-               new String[] { "/data/rundemo/compile.sh", binPath, appProject.getClasspath(), srcPath + filename,
-                     filename });
+               new String[] { "/data/rundemo/compile.sh", binPath, appProject.getClasspath(), appProject.getApp(),
+                     pageid, filename });
          input = proc.getInputStream();
          return IOUtils.toString(input);
       } finally {
