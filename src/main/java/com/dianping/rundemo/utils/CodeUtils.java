@@ -10,6 +10,12 @@ import org.apache.commons.io.FileUtils;
 import com.dianping.rundemo.project.JavaCodeInfo;
 import com.dianping.rundemo.project.JavaFileInfo;
 
+/**
+ * 
+ * TODO Comment of CodeUtils
+ * @author wukezhu
+ * @rundemo_name 代码解析工具的例子
+ */
 public class CodeUtils {
 
    private final static int     NONE         = -1;
