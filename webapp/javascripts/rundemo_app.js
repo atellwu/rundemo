@@ -55,9 +55,9 @@
 				window.resModified = false;
 			}
 		},
-		"loadCode" : function(javaFileName) {
+		"loadCode" : function(javaFilePath) {
 			var param = new Object();
-			param.javaFileName = javaFileName;
+			param.javaFilePath = javaFilePath;
 			var url = w.contextpath + '/' + w.app + '/loadCode';
 			$.ajax({
 				type : 'POST',
@@ -280,7 +280,7 @@
 				var newLi = $("#javaCodeTab > li:eq(" + index + ")");
 				newLi.addClass("active");
 				// 重新加载code
-				rundemo_app.loadCode(newLi.children("a").text());
+				rundemo_app.loadCode(newLi.children("a").attr("filePath"));
 			}
 		},
 		"changeResourceFile" : function(index) {

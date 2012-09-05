@@ -10,7 +10,8 @@
 	padding-bottom: 12px;
 	padding-top: 12px;
 	background-color: #CEECF5;
-};
+}
+;
 </style>
 <script>
 	//环境变量
@@ -23,39 +24,78 @@
    <div class="container"
       style="margin-left: 0px; width: 100%; height: 500px">
       <div class="hero-unit"
-         style="background-color: #EFFBF8; margin: 0 auto;margin-top:20px;height: 260px;width: 70%">
-         <h1>Run Demo!</h1>
+         style="background-color: #EFFBF8; margin: 0 auto; margin-top: 20px; height: 260px; width: 70%">
+         <h1>Run the demo!</h1>
          <p>一个可实时运行的demo平台，您可以在查看应用的demo的同时，执行这些demo，看到运行结果。同时可以修改代码，也可以马上看到修改后的效果！</p>
-         <p style="margin-top:50px;">
-            <a style="margin-right:20px" class="btn btn-primary btn-large">创建应用 »</a>
-             <span style="font-size:14px;">或</span><span style="margin-left:10px;color:#006DCC;">尝试以下应用 »</span>
+         <p style="margin-top: 50px;">
+            <a href="#createAppModal" role="button" class="btn btn-info"
+               data-toggle="modal" style="margin-right: 10px">创建应用 »</a>
+            <span style="font-size: 14px;">或</span><span
+               style="margin-left: 10px; font-size: 16px; color: #006DCC;">尝试以下应用
+               »</span>
          </p>
-         <div style="margin-top:20px;margin-left:160px;">
+         <div style="margin-top: 20px; margin-left: 160px;">
             <ul class="nav nav-pills">
-               #set($show = false)
-               #set($max = 20)
-               #foreach(${appItem} in ${allAppNames})
-                 #if($velocityCount < $max)
-                   <li><a style="margin-left:10px" href="${rc.contextPath}/${appItem}">${appItem}</a></li>
-                 #else
-                   #set($show = true)
-                 #end
-               #end
-               #if($show)
+               #set($show = false) #set($max = 20) #foreach(${appItem}
+               in ${allAppNames}) #if($velocityCount < $max)
+               <li><a style="margin-left: 10px"
+                  href="${rc.contextPath}/${appItem}">${appItem}</a></li>
+               #else #set($show = true) #end #end #if($show)
                <li class="dropdown"><a class="dropdown-toggle"
                   data-toggle="dropdown" href="#"> 更多应用 <b
                      class="caret"></b></a>
-                     <ul class="dropdown-menu">
-                #foreach(${appItem} in ${allAppNames})
-                  #if($velocityCount >= $max)
-                   <li><a style="" href="${rc.contextPath}/${appItem}">${appItem}</a></li>
-                  #end
-                #end
-                </ul>
-                </li>
-               #end
+                  <ul class="dropdown-menu">
+                     #foreach(${appItem} in ${allAppNames})
+                     #if($velocityCount >= $max)
+                     <li><a style=""
+                        href="${rc.contextPath}/${appItem}">${appItem}</a></li>
+                     #end #end
+                  </ul></li> #end
             </ul>
          </div>
+      </div>
+   </div>
+
+   <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog"
+      tabindex="-1" class="modal hide fade" id="createAppModal"
+      style="display: none;">
+      <div class="modal-header">
+         <button aria-hidden="true" data-dismiss="modal" class="close"
+            type="button">×</button>
+         <h3>创建应用</h3>
+      </div>
+      <div class="modal-body">
+         <form method="post" class="form-horizontal" action="${rc.contextPath}/create">
+            <div class="control-group">
+               <label class="control-label">应用名称</label>
+               <div class="controls">
+                  <input type="text" name="app" size="20"
+                     placeholder="由字母，数字和下划线组成">
+               </div>
+            </div>
+            <div class="control-group">
+               <label class="control-label">Git地址</label>
+               <div class="controls">
+                  <input class="input-xlarge" type="text" name="gitUrl"
+                     placeholder="例如 git://">
+               </div>
+            </div>
+            <div class="control-group">
+               <label class="control-label">Git子目录</label>
+               <div class="controls">
+                  <input class="input-xlarge" type="text" name="subpath"
+                     placeholder="可选，如example">
+               </div>
+            </div>
+            <div class="control-group">
+               <div class="controls">
+                  <button type="submit" class="btn btn-success"> 创建 </button>
+               </div>
+            </div>
+         </form>
+      </div>
+      <div class="modal-footer">
+         <button data-dismiss="modal" class="btn">取消</button>
       </div>
    </div>
 

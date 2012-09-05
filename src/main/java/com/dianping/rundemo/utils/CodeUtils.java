@@ -1,16 +1,24 @@
 package com.dianping.rundemo.utils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
+
 import com.dianping.rundemo.project.JavaCodeInfo;
+import com.dianping.rundemo.project.JavaFileInfo;
 
 public class CodeUtils {
 
-   private final static int     NONE      = -1;
-   private static final Pattern PACKNAME  = Pattern
-                                                .compile("^package\\s+([a-zA-Z_][a-zA-Z_0-9]*([\\.][a-zA-Z_][a-zA-Z_0-9]*)*);.*$");
-   private static final Pattern CLASSNAME = Pattern.compile("^public\\s+class\\s+([a-zA-Z_][a-zA-Z_0-9]*)+\\s+.*$");
+   private final static int     NONE         = -1;
+   private static final Pattern PACKNAME     = Pattern
+                                                   .compile("^package\\s+([a-zA-Z_][a-zA-Z_0-9]*([\\.][a-zA-Z_][a-zA-Z_0-9]*)*);.*$");
+   private static final Pattern CLASSNAME    = Pattern.compile("^public\\s+class\\s+([a-zA-Z_][a-zA-Z_0-9]*)+\\s+.*$");
+
+   private static final Pattern RUNDEMO_NAME = Pattern.compile("^\\s*\\*\\s*@rundemo_name\\s+(.*)$");
+   private static final Pattern RUNDEMO_DESC = Pattern.compile("^\\s*\\*\\s*@rundemo_desc\\s+(.*)$");
 
    public static JavaCodeInfo getCodeInfo(String code) {
       JavaCodeInfo javaCodeInfo = new JavaCodeInfo();
@@ -59,7 +67,53 @@ public class CodeUtils {
       return javaCodeInfo;
    }
 
-   public static void main(String[] args) {
+   public static JavaFileInfo getJavaFileInfo(File file, String app) throws IOException {
+      JavaFileInfo javaFileInfo = new JavaFileInfo();
+      //path
+      String path = file.getPath().replace("/data/rundemo/appprojects/" + app + "/", "");
+      javaFileInfo.setPath(path);
+      //name,desc
+      String code = FileUtils.readFileToString(file, "UTF-8");
+      boolean waitingStart = true;
+      int lineStart = NONE, lineEnd = NONE;
+      for (int i = 0; i < code.length(); i++) {
+         char c = code.charAt(i);
+         if (waitingStart && c != '\r' && c != '\n') {//找到行首
+            lineStart = i;
+            waitingStart = false;
+         } else if (!waitingStart && (c == '\r' || c == '\n')) {//找到行尾
+            lineEnd = i;
+            waitingStart = true;
+         }
+         if (lineStart != NONE && lineEnd != NONE) {//找到一行
+            String line = code.substring(lineStart, lineEnd);
+            lineStart = NONE;
+            lineEnd = NONE;
+            line = line.trim();
+            Matcher nameMatch = RUNDEMO_NAME.matcher(line);
+            if (nameMatch.matches()) {
+               String displayName = nameMatch.group(1);
+               javaFileInfo.setDisplayName(displayName);
+            }
+            Matcher descMatch = RUNDEMO_DESC.matcher(line);
+            if (descMatch.matches()) {
+               String desc = descMatch.group(1);
+               javaFileInfo.setDesc(desc);
+            }
+         }
+         if (javaFileInfo.getDisplayName() != null && javaFileInfo.getDesc() != null) {//都找到了
+            return javaFileInfo;
+         }
+      }
+      //找不到name，使用文件名
+      if (javaFileInfo.getDisplayName() == null) {
+         javaFileInfo.setDisplayName(file.getName());
+      }
+      return javaFileInfo;
+   }
+
+   public static void main(String[] args) throws IOException {
+      //
       Matcher m2 = PACKNAME.matcher("package ass_.com;");
       System.out.println(m2.matches());
       System.out.println(m2.group(1));
@@ -71,5 +125,16 @@ public class CodeUtils {
       System.out
             .println(CodeUtils
                   .getCodeInfo("package com.dianping.rundemo.web;\n  public class Demo { \n    /**     * @param args     * @throws InterruptedException      */    public static void main(String[] args) throws InterruptedException {       int count = 0;       while (count++ < 50) {          System.out.println(count);          Thread.sleep(60);          System.out.println(\"--55555-----------\");       }    }  }"));
+
+      //
+//      Pattern DEMO_DOC = Pattern.compile("^\\s*\\*\\s*@demo\\s+(.*)$");
+//      Matcher mm = DEMO_DOC.matcher(" * @demo: daiplayName");
+//      System.out.println(mm.matches());
+//      System.out.println(mm.group(1));
+//
+//      Matcher mm = DEMO_DOC.matcher(" * @demo_desc daiplayName");
+//      System.out.println(mm.matches());
+//      System.out.println(mm.group(1));
+      System.out.println(CodeUtils.getJavaFileInfo(new File("/data/rundemo/appprojects/swallow-example/src/main/java/com/dianping/swallow/example/consumer/DurableConsumerExample.java"), "swallow-example"));
    }
 }

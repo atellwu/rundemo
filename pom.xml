@@ -102,7 +102,7 @@
       <artifactId>commons-lang</artifactId>
       <version>2.4</version>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
@@ -111,6 +111,11 @@
       <groupId>commons-digester</groupId>
       <artifactId>commons-digester</artifactId>
       <version>1.8</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>12.0</version>
     </dependency>
     <!-- Spring -->
     <dependency>
@@ -155,11 +160,8 @@
       <artifactId>velocity</artifactId>
       <version>1.7</version>
     </dependency>
-    <!-- <dependency>
-      <groupId>velocity-tools</groupId>
-      <artifactId>velocity-tools-view</artifactId>
-      <version>1.4</version>
-    </dependency>-->
+    <!-- <dependency> <groupId>velocity-tools</groupId> <artifactId>velocity-tools-view</artifactId> 
+      <version>1.4</version> </dependency> -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>

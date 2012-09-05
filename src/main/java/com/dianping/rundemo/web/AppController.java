@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.rundemo.project.AppProject;
 import com.dianping.rundemo.project.JavaCodeInfo;
+import com.dianping.rundemo.project.JavaFileInfo;
 import com.dianping.rundemo.project.JavaProject;
 import com.dianping.rundemo.project.ProjectContext;
 import com.dianping.rundemo.utils.CodeUtils;
@@ -45,11 +47,11 @@ public class AppController {
 
    @RequestMapping(value = "/{app}/loadCode", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
    @ResponseBody
-   public Object loadCode(@PathVariable String app, String javaFileName) {
+   public Object loadJavaCode(@PathVariable String app, String javaFilePath) {
       Map<String, Object> map = new HashMap<String, Object>();
       try {
          AppProject appProject = ProjectContext.getAppProject(app);
-         String code = appProject.loadCode(javaFileName);
+         String code = appProject.loadCode(javaFilePath);
          map.put("code", code);
          map.put("success", true);
       } catch (Exception e) {
@@ -123,11 +125,11 @@ public class AppController {
       ProjectContext.putJavaProject(app, pageid, javaProject);
 
       AppProject appProject = ProjectContext.getAppProject(app);
-      String[] javaFileNameList = appProject.loadJavaFileNameList();
+      List<JavaFileInfo> javaFileInfoList = appProject.loadJavaFileNameList();
       String[] resFileNameList = javaProject.loadResFileNameList();
       String pom = appProject.loadPom();
       map.put("pom", StringEscapeUtils.escapeHtml(pom));
-      map.put("javaFileNameList", javaFileNameList);
+      map.put("javaFileInfoList", javaFileInfoList);
       map.put("resFileNameList", resFileNameList);
       map.put("app", app);
       map.put("allAppNames", ProjectContext.getAllAppNames());

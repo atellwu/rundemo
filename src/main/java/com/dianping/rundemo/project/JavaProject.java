@@ -2,6 +2,7 @@ package com.dianping.rundemo.project;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -52,20 +54,31 @@ public class JavaProject {
       this.binPath = dirPath + "bin/";
       this.srcPath = dirPath + "src/";
       if (initDir) {
-         new File(binPath).mkdirs();
+         //初始化javaprojects/{app}下的src和bin文件夹
+         File binPathFileDir = new File(binPath);
+         binPathFileDir.mkdirs();
          new File(srcPath).mkdirs();
          //复制resource文件到binPath
-         InputStream input = null;
-         try {
-            Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/copyRes.sh", app, pageid });
-            input = proc.getInputStream();
-            String output = IOUtils.toString(input);
-            if (!StringUtils.isBlank(output)) {
-               throw new IOException(output);
+         File srcPathDir = new File("/data/rundemo/appprojects/" + app + "/src/main/resources/");
+         srcPathDir.mkdirs();
+         FileUtils.copyDirectory(srcPathDir, binPathFileDir, new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+               return pathname.isFile();
             }
-         } finally {
-            IOUtils.closeQuietly(input);
-         }
+         });
+         //         
+         //         InputStream input = null;
+         //         try {
+         //            Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/copyRes.sh", app, pageid });
+         //            input = proc.getInputStream();
+         //            String output = IOUtils.toString(input);
+         //            if (!StringUtils.isBlank(output)) {
+         //               throw new IOException(output);
+         //            }
+         //         } finally {
+         //            IOUtils.closeQuietly(input);
+         //         }
       }
    }
 

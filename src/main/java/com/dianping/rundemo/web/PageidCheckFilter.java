@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class PageidCheckFilter extends HttpServlet implements Filter {
-   private FilterConfig filterConfig;
+   private static final long serialVersionUID = -5201822405857049066L;
+   private FilterConfig      filterConfig;
 
    // Handle the passed-in FilterConfig
    public void init(FilterConfig filterConfig) throws ServletException {

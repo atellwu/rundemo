@@ -3,11 +3,17 @@ package com.dianping.rundemo.project;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+
+import com.dianping.rundemo.utils.CodeUtils;
 
 public class AppProject {
 
@@ -31,13 +37,13 @@ public class AppProject {
    /**
     * 从本地load文件
     * 
-    * @param javaFileName
+    * @param javaFilePath
     * @return
     * @throws IOException
     * @throws FileNotFoundException
     */
-   public String loadCode(String javaFileName) throws FileNotFoundException, IOException {
-      File javaFile = new File("/data/rundemo/appprojects/" + app + "/java/" + javaFileName);
+   public String loadCode(String javaFilePath) throws FileNotFoundException, IOException {
+      File javaFile = new File("/data/rundemo/appprojects/" + app + "/" + javaFilePath);
       return IOUtils.toString(new FileInputStream(javaFile), "UTF-8");
    }
 
@@ -51,22 +57,40 @@ public class AppProject {
     * 
     * @param javaFileName
     * @return
+    * @throws IOException
     */
-   public String[] loadJavaFileNameList() {
-      File appprojectsDir = new File("/data/rundemo/appprojects/" + app + "/java/");
-      String[] fileNames = appprojectsDir.list(new FilenameFilter() {
-         @Override
-         public boolean accept(File dir, String name) {
-            return !name.endsWith(".desc");
+   public List<JavaFileInfo> loadJavaFileNameList() throws IOException {
+      List<JavaFileInfo> list = new ArrayList<JavaFileInfo>();
+      File appprojectsDir = new File("/data/rundemo/appprojects/" + app + "/src/main/java/");
+      Collection<File> files = FileUtils.listFiles(appprojectsDir, null, true);
+      if (files.size() > 0) {
+         for (File f : files) {
+            JavaFileInfo javaFileInfo = parseJavaFileInfo(f);
+            list.add(javaFileInfo);
+         }
+      }
+      Collections.sort(list, new Comparator<JavaFileInfo>() {
+         public int compare(JavaFileInfo o1, JavaFileInfo o2) {
+            return o1.getDisplayName().compareTo(o2.getDisplayName());
          }
       });
-      Arrays.sort(fileNames);
-      return fileNames;
+      return list;
+   }
+
+   /**
+    * 从File中解析出path,displayName,desc
+    */
+   private JavaFileInfo parseJavaFileInfo(File file) throws IOException {
+      return CodeUtils.getJavaFileInfo(file, app);
    }
 
    @Override
    public String toString() {
       return "AppProject [app=" + app + ", classpath=" + classpath + "]";
+   }
+
+   public static void main(String[] args) {
+
    }
 
 }
