@@ -22,10 +22,14 @@
 <body>
    #parse("navbar.htm")
    <div class="container"
-      style="margin-left: 0px; width: 100%; height: 500px">
+      style="margin-left: 0px; width: 100%;  margin-bottom: 50px;height: 500px">
       <div class="hero-unit"
-         style="background-color: #EFFBF8; margin: 0 auto; margin-top: 20px; height: 260px; width: 70%">
-         <h1>Run the demo!</h1>
+         style="background-color: #EFFBF8;margin: 0 auto; margin-top: 10px; height: 400px; width: 70%">
+         <div style="margin: 0 auto;margin-top:-50px;margin-bottom:20px;">
+         <h1 style="height:200px;width:600px;background: url('${rc.contextPath}/images/big-logo.png') no-repeat scroll 0 0 transparent;"></h1>
+            <!-- <img alt="" style=""
+               src="${rc.contextPath}/images/big-logo.png"> -->
+         </div>
          <p>一个可实时运行的demo平台，您可以在查看应用的demo的同时，执行这些demo，看到运行结果。同时可以修改代码，也可以马上看到修改后的效果！</p>
          <p style="margin-top: 50px;">
             <a href="#createAppModal" role="button" class="btn btn-info"
@@ -65,7 +69,8 @@
          <h3>创建应用</h3>
       </div>
       <div class="modal-body">
-         <form method="post" class="form-horizontal" action="${rc.contextPath}/create">
+         <form method="post" class="form-horizontal"
+            action="${rc.contextPath}/create">
             <div class="control-group">
                <label class="control-label">应用名称</label>
                <div class="controls">
@@ -89,7 +94,8 @@
             </div>
             <div class="control-group">
                <div class="controls">
-                  <button type="submit" class="btn btn-success"> 创建 </button>
+                  <button type="submit" class="btn btn-success">
+                     创建</button>
                </div>
             </div>
          </form>
@@ -99,13 +105,7 @@
       </div>
    </div>
 
-   <!-- 页脚 -->
-   <footer
-      style="background-color: #F5F5F5; border-top: 1px solid #E5E5E5; height: 200px">
-      <p
-         style="margin: 0 auto; margin-top: 20px; margin-bottom: 0px; width: 200px">&copy;
-         dianping.com 2012</p>
-   </footer>
+   #parse("foot.htm")
 
    <!-- Le javascript
     ================================================== -->
