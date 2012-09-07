@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
@@ -35,8 +36,7 @@ public class JavaProject {
 
    private final String          srcPath;
 
-   private InputStream           runProcessInputStream;
-
+   private Process               proc;
    private boolean               isRunning;
 
    public JavaProject(String app, String pageid) throws IOException {
@@ -67,18 +67,6 @@ public class JavaProject {
                return pathname.isFile();
             }
          });
-         //         
-         //         InputStream input = null;
-         //         try {
-         //            Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/copyRes.sh", app, pageid });
-         //            input = proc.getInputStream();
-         //            String output = IOUtils.toString(input);
-         //            if (!StringUtils.isBlank(output)) {
-         //               throw new IOException(output);
-         //            }
-         //         } finally {
-         //            IOUtils.closeQuietly(input);
-         //         }
       }
    }
 
@@ -138,50 +126,44 @@ public class JavaProject {
     * @throws IOException
     */
    public void run(String filename) throws IOException {
-      //（java -cp ${1}:${2} ${3} ）
-      Process proc = Runtime.getRuntime().exec(
-            new String[] { "/data/rundemo/run.sh", binPath, appProject.getClasspath(), filename, dirPath });
-      if (this.runProcessInputStream != null) {
-         IOUtils.closeQuietly(this.runProcessInputStream);
+      //关闭当前进程
+      if (this.proc != null) {
+         this.proc.destroy();
       }
-      this.runProcessInputStream = proc.getInputStream();
+      //（java -cp ${1}:${2} ${3} ）
+      this.proc = Runtime.getRuntime().exec(
+            new String[] { "/data/rundemo/run.sh", binPath, appProject.getClasspath(), filename, dirPath });
       this.isRunning = true;
       //启动监测pid进程是否关闭的线程，如果关闭，则移除pid和processInputStream
-      Runnable checkTask = new Runnable() {
+      Runnable checkRunTask = new Runnable() {
          @Override
          public void run() {
+            //java终端在前台运行的方案
             try {
-               Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/check.sh", dirPath });
-               //本想使用run.sh的proc.waitFor()来阻塞并且等待返回则认为run结束，但实际run使用&，导致run的终端一下子就结束的了，proc.waitFor()不会阻塞。
-               proc.waitFor();//已经关闭(此处不能关闭runProcessInputStream，因为还需要读完，在读完时关闭)
+               proc.waitFor();
                JavaProject.this.isRunning = false;
-            } catch (IOException e) {
-               LOG.error(e.getMessage(), e);
+               proc.destroy();
+               LOG.info("proc[app=" + appProject.getApp() + ",pageid=" + pageid + "] done");
             } catch (InterruptedException e) {
                LOG.error(e.getMessage(), e);
             }
          }
       };
-      executor.execute(checkTask);
+      executor.execute(checkRunTask);
    }
 
    public void shutdown() throws IOException {
-      InputStream input = null;
-      try {
-         Process proc = Runtime.getRuntime().exec(new String[] { "/data/rundemo/shutdown.sh", dirPath });
-         input = proc.getInputStream();
-         String output = IOUtils.toString(input);
-         if (!StringUtils.isBlank(output)) {
-            throw new IOException(output);
-         }
-      } finally {
-         IOUtils.closeQuietly(input);
+      //执行destroy，进行关闭
+      if (this.proc != null) {
+         this.proc.destroy();
       }
    }
 
    public void close() throws IOException {
-      //shutdown
-      this.shutdown();
+      //关闭当前进程
+      if (this.proc != null) {
+         this.proc.destroy();
+      }
       //delete
       InputStream input = null;
       try {
@@ -198,7 +180,17 @@ public class JavaProject {
    }
 
    public InputStream getRunProcessInputStream() {
-      return runProcessInputStream;
+      if (this.proc != null) {
+         return this.proc.getInputStream();
+      }
+      return null;
+   }
+
+   public OutputStream getRunProcessOutputStream() {
+      if (this.proc != null) {
+         return this.proc.getOutputStream();
+      }
+      return null;
    }
 
    public AppProject getAppProject() {

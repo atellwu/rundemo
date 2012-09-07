@@ -27,7 +27,8 @@
 		},
 		"saveResDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError("保存resource资源文件时发生错误",data.errorMsg);// TODO title作为参数，如“保存失败”
+				rundemo_app.appError("保存resource资源文件时发生错误", data.errorMsg);// TODO
+				// title作为参数，如“保存失败”
 			} else {
 				window.resModified = false;
 			}
@@ -48,7 +49,7 @@
 		},
 		"loadResDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError("加载resource资源文件时发生错误",data.errorMsg);
+				rundemo_app.appError("加载resource资源文件时发生错误", data.errorMsg);
 			} else {
 				window.resEditor.setValue(data.res);
 				window.resEditor.moveCursorTo(0, 0);
@@ -70,7 +71,7 @@
 		},
 		"loadCodeDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError("加载代码时发生错误",data.errorMsg);
+				rundemo_app.appError("加载代码时发生错误", data.errorMsg);
 			} else {
 				window.editor.setValue(data.code);
 				window.editor.moveCursorTo(0, 0);
@@ -106,7 +107,7 @@
 		},
 		"compileDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError("尝试编译时发生错误",data.errorMsg);
+				rundemo_app.appError("尝试编译时发生错误", data.errorMsg);
 			} else {
 				// 编译完成，设置className
 				w.className = data.className;
@@ -141,7 +142,7 @@
 		"runDone" : function(data) {
 			if (data.success == false) {
 				// 显示错误消息
-				rundemo_app.appError("尝试运行时发生错误",data.errorMsg);
+				rundemo_app.appError("尝试运行时发生错误", data.errorMsg);
 				// 按钮变换
 				$('#runButton').show();
 				$('#shutdownButton').hide();
@@ -170,7 +171,7 @@
 		},
 		"runConsoleDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError("访问控制台时发生错误",data.errorMsg);
+				rundemo_app.appError("访问控制台时发生错误", data.errorMsg);
 				// 按钮变换
 				$('#runButton').show();
 				$('#shutdownButton').hide();
@@ -201,7 +202,7 @@
 		},
 		"shutdownDone" : function(data) {
 			if (data.success == false) {
-				rundemo_app.appError("关闭时发生错误",data.errorMsg);
+				rundemo_app.appError("关闭时发生错误", data.errorMsg);
 			}
 		},
 		"modifyCode" : function() {
@@ -295,6 +296,29 @@
 				newLi.addClass("active");
 				// 重新加载code
 				rundemo_app.loadRes(newLi.children("a").text());
+			}
+		},
+		"input" : function(event) {
+			if (event.keyCode == 13) {//enter，发送input内容
+				var param = new Object();
+				param.pageid = w.pageid;
+				param.input = $("#consoleInput").val();
+				var url = w.contextpath + '/' + w.app + '/input';
+				$.ajax({
+					type : 'POST',
+					url : url,
+					data : param,
+					dataType : "json",
+					success : rundemo_app.inputDone,
+					error : rundemo_app.httpError
+				});
+			}
+		},
+		"inputDone" : function(data) {
+			if (data.success == false) {
+				rundemo_app.appError("输入控制台时发生错误", data.errorMsg);
+			} else {
+				$("#consoleInput").val("");
 			}
 		},
 		"onunload" : function() {

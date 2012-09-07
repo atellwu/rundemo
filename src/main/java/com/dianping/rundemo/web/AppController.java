@@ -3,6 +3,7 @@ package com.dianping.rundemo.web;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,6 @@ import com.google.gson.Gson;
 
 @Controller
 public class AppController {
-   @SuppressWarnings("unused")
    private static final Logger LOG = LoggerFactory.getLogger(AppController.class);
 
    @RequestMapping(value = "/")
@@ -233,19 +233,24 @@ public class AppController {
             int count = 0;
             int available;
             while (count++ < 300) {
-               if (!javaProject.isRunning()) {//如果已经不在运行，则读完直到-1
-                  data.append(IOUtils.toString(processInputStream));
-                  IOUtils.closeQuietly(processInputStream);
+               if (!javaProject.isRunning()) {//如果已经不在运行，则停止
+                  //                  data.append(IOUtils.toString(processInputStream));
+                  //                  IOUtils.closeQuietly(processInputStream);
                   status = "done";
                   break;
                } else {//如果已经还在运行，则尝试读一部分
                   available = processInputStream.available();
                   if (available > 0) {
                      byte[] bytes = new byte[available];
-                     processInputStream.read(bytes);
+                     try {
+                        processInputStream.read(bytes);
+                     } catch (IOException e) {//在任何异常时停止进程(如果已经不在运行，也会抛异常)
+                        status = "done";
+                        javaProject.shutdown();
+                     }
                      data.append(new String(bytes));
                      break;
-                  } else {//如果一直没有数据，最多会等待20s
+                  } else {//如果一直没有数据，最多会等待30s
                      try {
                         Thread.sleep(100);
                      } catch (InterruptedException e) {
@@ -272,6 +277,32 @@ public class AppController {
       Gson gson = new Gson();
       return gson.toJson(map);
 
+   }
+
+   @RequestMapping(value = "/{app}/input", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+   @ResponseBody
+   public Object input(@PathVariable String app, String pageid, String input) {
+      Map<String, Object> map = new HashMap<String, Object>();
+      try {
+         //获取JavaProject，然后编译
+         JavaProject javaProject = ProjectContext.getJavaProject(app, pageid);
+         OutputStream output = javaProject.getRunProcessOutputStream();
+         if (output != null) {
+            IOUtils.write(input + IOUtils.LINE_SEPARATOR_UNIX, output, "UTF-8");
+            output.flush();
+         }
+         map.put("success", true);
+      } catch (Exception e) {
+         StringBuilder error = new StringBuilder();
+         error.append(e.getMessage()).append("\n");
+         for (StackTraceElement element : e.getStackTrace()) {
+            error.append(element.toString()).append("\n");
+         }
+         map.put("success", false);
+         map.put("errorMsg", error.toString());
+      }
+      Gson gson = new Gson();
+      return gson.toJson(map);
    }
 
    @RequestMapping(value = "/{app}/shutdown", method = RequestMethod.POST, produces = "application/json; charset=utf-8")

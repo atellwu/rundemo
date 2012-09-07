@@ -1,6 +1,10 @@
+import java.io.*;
+
+import org.apache.commons.io.IOUtils;
+
 /**
- * 
  * TODO Comment of Demo
+ * 
  * @author wukezhu
  * @rundemo_name 简单的demo
  */
@@ -8,14 +12,23 @@ public class Demo {
 
    /**
     * @param args
-    * @throws InterruptedException 
+    * @throws InterruptedException
+    * @throws IOException
     */
-   public static void main(String[] args) throws InterruptedException {
-      int count = 0;
-      while (count++ < 50) {
-         System.out.println(count);
-         Thread.sleep(100);
+   public static void main(String[] args) throws IOException {
+      String CurLine = ""; // Line read from standard in
+
+      System.out.println("Enter a line of text (type 'quit' to exit): ");
+      InputStreamReader converter = new InputStreamReader(System.in);
+
+      BufferedReader in = new BufferedReader(converter);
+
+      while (!(CurLine.equals("quit"))) {
+         CurLine = in.readLine();
+
+         if (!(CurLine.equals("quit"))) {
+            System.out.println("You typed: " + CurLine);
+         }
       }
    }
-
 }
