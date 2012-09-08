@@ -232,34 +232,36 @@ public class AppController {
          } else {
             int count = 0;
             int available;
-            while (count++ < 300) {
-               if (!javaProject.isRunning()) {//如果已经不在运行，则停止
-                  //                  data.append(IOUtils.toString(processInputStream));
-                  //                  IOUtils.closeQuietly(processInputStream);
-                  status = "done";
-                  break;
-               } else {//如果已经还在运行，则尝试读一部分
-                  available = processInputStream.available();
-                  if (available > 0) {
-                     byte[] bytes = new byte[available];
-                     try {
-                        processInputStream.read(bytes);
-                     } catch (IOException e) {//在任何异常时停止进程(如果已经不在运行，也会抛异常)
-                        status = "done";
-                        javaProject.shutdown();
-                     }
-                     data.append(new String(bytes));
+            try {
+               while (count++ < 300) {
+                  if (!javaProject.isRunning()) {//如果已经不在运行，则停止
+                     data.append(IOUtils.toString(processInputStream));
+                     status = "done";
+                     javaProject.shutdown();
                      break;
-                  } else {//如果一直没有数据，最多会等待30s
-                     try {
-                        Thread.sleep(100);
-                     } catch (InterruptedException e) {
+                  } else {//如果已经还在运行，则尝试读一部分
+                     available = processInputStream.available();
+                     if (available > 0) {
+                        byte[] bytes = new byte[available];
+                        processInputStream.read(bytes);
+                        data.append(new String(bytes));
                         break;
+                     } else {//如果一直没有数据，最多会等待30s
+                        try {
+                           Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                           status = "done";
+                           javaProject.shutdown();
+                           break;
+                        }
                      }
                   }
                }
-
+            } catch (IOException e) {//在任何异常时停止进程(如果已经不在运行，也会抛异常)
+               status = "done";
+               javaProject.shutdown();
             }
+
          }
          map.put("status", status);
          map.put("content", data.toString());
@@ -291,6 +293,8 @@ public class AppController {
             IOUtils.write(input + IOUtils.LINE_SEPARATOR_UNIX, output, "UTF-8");
             output.flush();
          }
+         map.put("success", true);
+      } catch (IOException e) {
          map.put("success", true);
       } catch (Exception e) {
          StringBuilder error = new StringBuilder();

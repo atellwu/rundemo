@@ -127,12 +127,11 @@ public class JavaProject {
     */
    public void run(String filename) throws IOException {
       //关闭当前进程
-      if (this.proc != null) {
-         this.proc.destroy();
-      }
+      this.shutdown();
       //（java -cp ${1}:${2} ${3} ）
-      this.proc = Runtime.getRuntime().exec(
-            new String[] { "/data/rundemo/run.sh", binPath, appProject.getClasspath(), filename, dirPath });
+      this.proc = Runtime.getRuntime()
+            .exec(new String[] { "/data/rundemo/run.sh", binPath, appProject.getClasspath(), filename, this.pageid,
+                  dirPath });
       this.isRunning = true;
       //启动监测pid进程是否关闭的线程，如果关闭，则移除pid和processInputStream
       Runnable checkRunTask = new Runnable() {
@@ -142,7 +141,6 @@ public class JavaProject {
             try {
                proc.waitFor();
                JavaProject.this.isRunning = false;
-               proc.destroy();
                LOG.info("proc[app=" + appProject.getApp() + ",pageid=" + pageid + "] done");
             } catch (InterruptedException e) {
                LOG.error(e.getMessage(), e);
@@ -152,18 +150,32 @@ public class JavaProject {
       executor.execute(checkRunTask);
    }
 
+   /**
+    * @deprecated proc.destroy()不可用的
+    */
+   public void shutdownOld() throws IOException {
+      //执行destroy，进行关闭
+      if (this.proc != null) {
+         System.out.println(proc);
+         this.proc.destroy();
+
+      }
+   }
+
    public void shutdown() throws IOException {
+      //执行kill脚本，正式关闭
+      Runtime.getRuntime().exec(new String[] { "/data/rundemo/shutdownByProcessName.sh", this.pageid });
       //执行destroy，进行关闭
       if (this.proc != null) {
          this.proc.destroy();
       }
+      //
+      JavaProject.this.isRunning = false;
    }
 
    public void close() throws IOException {
       //关闭当前进程
-      if (this.proc != null) {
-         this.proc.destroy();
-      }
+      this.shutdown();
       //delete
       InputStream input = null;
       try {
