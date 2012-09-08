@@ -177,7 +177,7 @@
 				$('#shutdownButton').hide();
 			} else {
 				// 显示到编译控制台
-				$('#console').append(data.content);
+				$('#console').text($('#console').text() + data.content);// append()和html()一样不做转义，所以使用text()
 				$("#console").scrollTop($("#console")[0].scrollHeight);
 				if (data.status == 'continue') {// 继续运行
 					rundemo_app.runConsole();
@@ -299,7 +299,7 @@
 			}
 		},
 		"input" : function(event) {
-			if (event.keyCode == 13) {//enter，发送input内容
+			if (event.keyCode == 13) {// enter，发送input内容
 				var param = new Object();
 				param.pageid = w.pageid;
 				param.input = $("#consoleInput").val();

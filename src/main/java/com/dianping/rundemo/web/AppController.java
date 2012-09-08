@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +35,7 @@ import com.google.gson.Gson;
 
 @Controller
 public class AppController {
+   @SuppressWarnings("unused")
    private static final Logger LOG = LoggerFactory.getLogger(AppController.class);
 
    @RequestMapping(value = "/")
@@ -128,7 +128,7 @@ public class AppController {
       List<JavaFileInfo> javaFileInfoList = appProject.loadJavaFileNameList();
       String[] resFileNameList = javaProject.loadResFileNameList();
       String pom = appProject.loadPom();
-      map.put("pom", StringEscapeUtils.escapeHtml(pom));
+      map.put("pom", (pom));
       map.put("javaFileInfoList", javaFileInfoList);
       map.put("resFileNameList", resFileNameList);
       map.put("app", app);
@@ -272,7 +272,7 @@ public class AppController {
             error.append(element.toString()).append("\n");
          }
          map.put("success", false);
-         map.put("errorMsg", error.toString());
+         map.put("errorMsg", (error.toString()));
       }
       Gson gson = new Gson();
       return gson.toJson(map);
@@ -353,6 +353,7 @@ public class AppController {
 
    public static void main(String[] args) throws IOException {
       System.out.println(UUID.randomUUID().toString());
+      System.out.println("<p>中文");
    }
 
    static void print(byte[] bytes) {
