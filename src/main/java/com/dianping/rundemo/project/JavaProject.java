@@ -164,7 +164,8 @@ public class JavaProject {
 
    public void shutdown() throws IOException {
       //执行kill脚本，正式关闭
-      Runtime.getRuntime().exec(new String[] { "/data/rundemo/shutdownByProcessName.sh", this.pageid });
+      Process p = Runtime.getRuntime().exec(new String[] { "/data/rundemo/shutdownByProcessName.sh", this.pageid });
+      System.out.println("------------"+IOUtils.toString(p.getInputStream()));
       //执行destroy，进行关闭
       if (this.proc != null) {
          this.proc.destroy();

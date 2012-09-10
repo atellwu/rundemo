@@ -327,6 +327,7 @@
 			var url = w.contextpath + '/' + w.app + '/deleteJavaProject';
 			$.ajax({
 				type : 'POST',
+				async: false,
 				url : url,
 				data : param,
 				dataType : "json"
