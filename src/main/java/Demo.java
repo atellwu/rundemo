@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
  * TODO Comment of Demo
  * 
  * @author wukezhu
- * @rundemo_name 简单的demo
+ * @rundemo_name 输入输出的简单demo
  */
 public class Demo {
 
