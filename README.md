@@ -1,4 +1,4 @@
 rundemo
 =======
 
-通过web演示demo的平台
+通过web演示java例子的平台
