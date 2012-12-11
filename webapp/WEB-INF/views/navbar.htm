@@ -6,9 +6,13 @@
          </a> <a class="brand" href="${rc.contextPath}/">RunDemo</a>
          <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
-               <!-- 欢迎您， <a href="#" class="navbar-link">游侠</a>  -->
-               <a class="navbar-link" href="${rc.contextPath}/"><img alt="" style="height:36px"
-               src="${rc.contextPath}/images/small-logo.png"></a>
+               #if($username)
+               <a href="#" class="navbar-link">$username</a>
+               #else
+               <a href="https://open.t.qq.com/cgi-bin/oauth2/authorize?client_id=801285448&response_type=code&redirect_uri=http://dianping3216.com:8080/rundemo/logined" class="navbar-link">QQ登录</a>
+               #end
+               <!-- <a class="navbar-link" href="${rc.contextPath}/"><img alt="" style="height:36px"
+               src="${rc.contextPath}/images/small-logo.png"></a>  -->
             </p>
             
             <ul class="nav">
