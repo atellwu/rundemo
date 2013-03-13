@@ -104,6 +104,14 @@
                      placeholder="可选，如 example">
                </div>
             </div>
+            <div id="mavenOpt" style="display:none" class="control-group">
+               <label class="control-label" style="color: #696969">maven命令附加参数
+                  (可选)</label>
+               <div class="controls">
+                  <input class="input-large" type="text" name="mavenOpt"
+                     placeholder="可选，如 -Denv=qa">
+               </div>
+            </div>
             <div class="control-group" style="margin-top:40px">
                <div class="controls">
                   <button type="submit" class="btn btn-success">
@@ -133,6 +141,7 @@
 function advance(){
 	$("#branch").toggle();
 	$("#subdir").toggle();
+	$("#mavenOpt").toggle();
 }				
 			</script>
 
