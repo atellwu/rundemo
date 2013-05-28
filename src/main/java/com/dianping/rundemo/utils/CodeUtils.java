@@ -22,7 +22,7 @@ public class CodeUtils {
     private final static int NONE = -1;
     private static final Pattern PACKNAME = Pattern
             .compile("^package\\s+([a-zA-Z_][a-zA-Z_0-9]*([\\.][a-zA-Z_][a-zA-Z_0-9]*)*);.*$");
-    private static final Pattern CLASSNAME = Pattern.compile("^public\\s+class\\s+([a-zA-Z_][a-zA-Z_0-9]*)+\\s+.*$");
+    private static final Pattern CLASSNAME = Pattern.compile("^public\\s+(class|enum)\\s+([a-zA-Z_][a-zA-Z_0-9]*)+\\s+.*$");
 
     private static final Pattern RUNDEMO_NAME = Pattern.compile("^\\s*\\*\\s*@rundemo_name\\s+(.*)$");
     private static final Pattern RUNDEMO_DESC = Pattern.compile("^\\s*\\*\\s*@rundemo_desc\\s+(.*)$");
@@ -53,7 +53,7 @@ public class CodeUtils {
                 }
                 Matcher classNameMatch = CLASSNAME.matcher(line);
                 if (classNameMatch.matches()) {
-                    String className = classNameMatch.group(1);
+                    String className = classNameMatch.group(2);
                     javaCodeInfo.setClassName(className);
                 }
             }
@@ -127,7 +127,11 @@ public class CodeUtils {
 
         Matcher m = CLASSNAME.matcher("public class s ");
         System.out.println(m.matches());
-        System.out.println(m.group(1));
+        System.out.println(m.group(2));
+        
+        m = CLASSNAME.matcher("public enum s ");
+        System.out.println(m.matches());
+        System.out.println(m.group(2));
 
         System.out
                 .println(CodeUtils
