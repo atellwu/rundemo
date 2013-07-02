@@ -1,0 +1,2 @@
+根据数据库表自动生成java：mvn org.mybatis.generator:mybatis-generator-maven-plugin:1.3.1:generate
+ mvn org.mybatis.generator:mybatis-generator-maven-plugin:1.3.2:generate
