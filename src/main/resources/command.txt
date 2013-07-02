@@ -1,2 +1,39 @@
 根据数据库表自动生成java：mvn org.mybatis.generator:mybatis-generator-maven-plugin:1.3.1:generate
  mvn org.mybatis.generator:mybatis-generator-maven-plugin:1.3.2:generate
+ 
+ 
+  <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>3.2.2.RELEASE</version>
+        </dependency>
+        <!-- 数据库 -->
+        <dependency>
+            <groupId>c3p0</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.18</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.0.6</version>
+        </dependency>
+        <dependency>
+            <!-- 这是mybatis的pom中的可选依赖，我们依赖mybatis时是不会把它包括进来的，但这样，我奇怪的遇到org.apache.ibatis.session.Configuration.setLazyLoadingEnabled(boolean)抛出异常 
+                所以此处显式地引进，注意此时不能再把<optional>true</optional>带上了，否则它还是不会被打包进去war。 -->
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>2.2.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>1.0.1</version>
+            <!-- 1.0.2版本会导致Spring的PropertyPlaceholderConfigurer失效，见http://code.google.com/p/mybatis/issues/detail?id=414 -->
+        </dependency>
