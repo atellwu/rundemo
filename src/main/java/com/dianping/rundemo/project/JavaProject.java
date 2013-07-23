@@ -24,22 +24,22 @@ import org.slf4j.LoggerFactory;
 import com.dianping.rundemo.config.Config;
 
 public class JavaProject {
-    private static final Logger LOG = LoggerFactory.getLogger(JavaProject.class);
+    private static final Logger   LOG      = LoggerFactory.getLogger(JavaProject.class);
 
     private static final Executor executor = Executors.newCachedThreadPool();
 
-    private final AppProject appProject;
+    private final AppProject      appProject;
 
-    private final String pageid;
+    private final String          pageid;
 
-    private final String dirPath;
+    private final String          dirPath;
 
-    private final String binPath;
+    private final String          binPath;
 
-    private final String srcPath;
+    private final String          srcPath;
 
-    private Process proc;
-    private boolean isRunning;
+    private Process               proc;
+    private boolean               isRunning;
 
     public JavaProject(String app, String pageid) throws IOException {
         this(app, pageid, true);
@@ -66,7 +66,8 @@ public class JavaProject {
             FileUtils.copyDirectory(srcPathDir, binPathFileDir, new FileFilter() {
                 @Override
                 public boolean accept(File pathname) {
-                    return pathname.isFile();
+                    //                    return pathname.isFile();
+                    return true;//文件夹也可以
                 }
             });
         }
@@ -86,7 +87,10 @@ public class JavaProject {
 
     public String loadRes(String resFileName) throws FileNotFoundException, IOException {
         File resFile = new File(binPath + resFileName);
-        return IOUtils.toString(new FileInputStream(resFile), "UTF-8");
+        if (resFile.isFile()) {
+            return IOUtils.toString(new FileInputStream(resFile), "UTF-8");
+        }
+        return "";
     }
 
     public void saveRes(String resFileName, String res) throws FileNotFoundException, IOException {
@@ -112,8 +116,8 @@ public class JavaProject {
         InputStream input = null;
         try {
             Process proc = Runtime.getRuntime().exec(
-                    new String[] { Config.shellDir + "/compile.sh", binPath, appProject.getClasspath(), appProject.getApp(),
-                            pageid, filename });
+                    new String[] { Config.shellDir + "/compile.sh", binPath, appProject.getClasspath(),
+                            appProject.getApp(), pageid, filename });
             input = proc.getInputStream();
             return IOUtils.toString(input);
         } finally {
@@ -132,7 +136,8 @@ public class JavaProject {
         this.shutdown();
         //（java -cp ${1}:${2} ${3} ）
         this.proc = Runtime.getRuntime().exec(
-                new String[] { Config.shellDir + "/run.sh", binPath, appProject.getClasspath(), filename, this.pageid, dirPath });
+                new String[] { Config.shellDir + "/run.sh", binPath, appProject.getClasspath(), filename, this.pageid,
+                        dirPath });
         this.isRunning = true;
         //启动监测pid进程是否关闭的线程，如果关闭，则移除pid和processInputStream
         Runnable checkRunTask = new Runnable() {
@@ -165,7 +170,8 @@ public class JavaProject {
 
     public void shutdown() throws IOException {
         //执行kill脚本，正式关闭
-        Process p = Runtime.getRuntime().exec(new String[] { Config.shellDir + "/shutdownByProcessName.sh", this.pageid });
+        Process p = Runtime.getRuntime().exec(
+                new String[] { Config.shellDir + "/shutdownByProcessName.sh", this.pageid });
         System.out.println("------------" + IOUtils.toString(p.getInputStream()));
         //执行destroy，进行关闭
         if (this.proc != null) {
@@ -221,8 +227,8 @@ public class JavaProject {
 
     @Override
     public String toString() {
-        return "JavaProject [appProject=" + appProject + ", pageid=" + pageid + ", dirPath=" + dirPath + ", binPath=" + binPath
-                + ", srcPath=" + srcPath + ", isRunning=" + isRunning + "]";
+        return "JavaProject [appProject=" + appProject + ", pageid=" + pageid + ", dirPath=" + dirPath + ", binPath="
+                + binPath + ", srcPath=" + srcPath + ", isRunning=" + isRunning + "]";
     }
 
     public static void main(String[] args) throws IOException {
