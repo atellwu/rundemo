@@ -30,19 +30,19 @@ Swallow 是什么:
       }
 
 
-1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。
+1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了生产者的所有属性及其默认值。
 
 ![图片君匆匆加载中。。。](https://github.com/lmdyyh/rundemo/raw/master/picture/producer_attr.png "Producer属性")
 
 2.如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。
 
-![图片君匆匆加载中。。。](https://github.com/lmdyyh/rundemo/raw/master/picture/producer.png "配置属性及其setter函数")
+![图片君匆匆加载中。。。](https://github.com/lmdyyh/rundemo/raw/master/picture/producer_method.png "函数sendMessage")
 
 3.设置好发送端属性后就可以对生产者对象进行构造。ProducerFactoryImpl实现了ProducerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createProducer会返回ProducerImpl实例，而ProducerImpl自身实现了接口Producer。作为生产者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地。
 
 4.Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。
 
-![图片君匆匆加载中。。。](https://github.com/lmdyyh/rundemo/raw/master/picture/producer_method.png "函数sendMessage")
+![图片君匆匆加载中。。。](https://github.com/lmdyyh/rundemo/raw/master/picture/producer.png "配置属性及其setter函数")
 
 
 ## 使用swallow接收消息
