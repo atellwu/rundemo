@@ -40,7 +40,10 @@ Swallow 是什么:
 
 3.设置好发送端属性后就可以对生产者对象进行构造。ProducerFactoryImpl实现了ProducerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createProducer会返回ProducerImpl实例，而ProducerImpl自身实现了接口Producer。作为生产者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地。
 
-4.Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。
+4.Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。对于需要发送的消息，如果是String类型，则直接发送；如果是其他类型则会被序列化为json字符串进行传输。开发时需要注意：
+
+* 请确保content对象的类型具有默认构造方法。
+* 尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
 
 ![图片君匆匆加载中。。。](https://github.com/lmdyyh/rundemo/raw/master/picture/producer.png "配置属性及其setter函数")
 
