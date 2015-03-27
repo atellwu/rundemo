@@ -34,6 +34,13 @@ Swallow 是什么:
 
 ![图片君匆匆加载中。。。](https://github.com/lmdyyh/rundemo/raw/master/picture/producer_attr.png "Producer属性")
 
+* mode表示producer表示工作模式。
+* asyncRetryTimes表示异步模式下发送失败重试次数。
+* syncRetryTimes表示同步模式下发送失败重试次数。
+* zipped表示是否对待发送消息进行压缩。
+* threadPoolSize表示异步模式时，线程池大小。
+* sendMsgLeftLastSession表示异步模式时，是否重启续传。
+
 2.如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。
 
 ![图片君匆匆加载中。。。](https://github.com/lmdyyh/rundemo/raw/master/picture/producer_method.png "函数sendMessage")
@@ -71,6 +78,22 @@ Swallow 是什么:
         
      }
 
+
+1.使用swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成。由于ConsumerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了消费者的所有属性及其默认值。
+
+![图片君匆匆加载中。。。](https://github.com/lmdyyh/rundemo/raw/master/picture/consumer_attr.png "Consumer属性")
+
+* threadPoolSize表示consumer处理消息的线程池线程数，默认为1。注意，如果设置成多线程，那么会有多线程同时接收消息，这样的话接收的消息就无法保证其先后顺序。
+* messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
+* consumerType表示consumer的类型，包括2种类型：
+
+1.AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。（注意：只是尽量保证，而非绝对保证。）
+2.NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
+
+* delayBaseOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。
+* delayUpperboundOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。
+* retryCountOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，最多重试的次数。
+* startMessageId表示当需要在建立连接的时候指定读取消息的位置，可以设置该参数指定 。
 
 # swallow常见问题以及处理
 ##
