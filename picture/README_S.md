@@ -87,8 +87,8 @@ Swallow 是什么:
 * messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
 * consumerType表示consumer的类型，包括2种类型：
 
-1.AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。（注意：只是尽量保证，而非绝对保证。）
-2.NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
+    1.AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。（注意：只是尽量保证，而非绝对保证。）
+    2.NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
 
 * delayBaseOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。
 * delayUpperboundOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。
