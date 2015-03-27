@@ -17,16 +17,16 @@ Swallow 是什么:
 
       public class SyncProducerExample {
           public static void main(String[] args) throws Exception {
-	      ProducerConfig config = new ProducerConfig();  //(1)
-	      config.setMode(ProducerMode.SYNC_MODE);  (2)
-	      Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  (3)
-	      for (int i = 0; i < 10; i++) {
-	          String msg = "消息-" + i;
-	          p.sendMessage(msg);  (4)
-	          System.out.println("Sended msg:" + msg);
-	          Thread.sleep(500);
-	      }
-	  }
+              ProducerConfig config = new ProducerConfig();  //(1)
+              config.setMode(ProducerMode.SYNC_MODE);  //(2)
+              Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
+              for (int i = 0; i < 10; i++) {
+              String msg = "消息-" + i;
+                  p.sendMessage(msg);  //(4)
+                  System.out.println("Sended msg:" + msg);
+                  Thread.sleep(500);
+              }
+          }
       }
 
 
@@ -54,19 +54,19 @@ Swallow 是什么:
      public class DurableConsumerExample {
     
         public static void main(String[] args) {
-            ConsumerConfig config = new ConsumerConfig(); (1)
+            ConsumerConfig config = new ConsumerConfig();  //(1)
             //以下根据自己情况而定，默认是不需要配的
-            config.setThreadPoolSize(1); (2)
+            config.setThreadPoolSize(1);  //(2)
             
-            Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config); (3)
-            c.setListener(new MessageListener() { (4)
+            Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config);  //(3)
+            c.setListener(new MessageListener() {  //(4)
             
                 @Override
                 public void onMessage(Message msg) {
                     System.out.println(msg.getContent());
                 }
             });
-            c.start(); (5)
+            c.start();  //(5)
         }
         
      }
