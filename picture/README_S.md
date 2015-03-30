@@ -9,6 +9,15 @@ Swallow 是什么:
 * Swallow的发布/订阅模型。消息由Producer发布，ProducerServer负责接收并存储消息到DB。ConsumerServer负责从DB获取消息，并推送给Consumer。
 * Swallow支持集群订阅者。在集群中，使用相同ConsumerId(例如Consumer A)的Consumer，将会视作同一个Consumer（同一个Consumer消费的Message将不会重复）。例如，假设一个有2台机器(主机1和主机2)的集群，ConsumerId都是“Consumer-A”，那么同一则Message，将要么被“主机1”获取，要么被“主机2”获取，不会被两者均获取。
 
+# swallow重要概念解释
+
+* Producer表示生产消息的主体，将消息发送到目的地Destination。
+* Consumer表示消费消息的主体，从Destination中获取消息。
+* Destination表示消息的目的地，也就是消息在swallow中驻留的地方。swallow中定义了两种目的地topic和queue，目前只实现了topic。
+* 同步模式表示消息发送成功或者超时才返回。
+* 异步模式表示不管消息是否发送成功都立即返回。
+* 消息持久化表示消息会持久化到磁盘或者文件，server重启后消息不会丢失。非持久化与之相反，server重启后消息会丢失。
+
 # swallow系统接入流程
 ## 申请topic
 # swallow使用说明
@@ -109,5 +118,6 @@ Swallow 是什么:
 || 1900 || -10 || 25 ||
 || 1910 || -15 || 30 ||
 || 1920 || -10 || 32 ||
+
 # swallow常见问题以及处理
 ##
