@@ -2,7 +2,7 @@
 
 [TOC]
 
-# swallow基础概念
+# swallow介绍
 
 Swallow 是什么:
 * Swallow是一个基于Topic的异步消息传送系统。Swallow使用发布/订阅消息的传送模型，消息发布者指定Topic并发送消息到Swallow消息服务器，消息订阅者则指定Topic并从Swallow消息服务器订阅消息。
@@ -19,8 +19,11 @@ Swallow 是什么:
 * 消息持久化表示消息会持久化到磁盘或者文件，server重启后消息不会丢失。非持久化与之相反，server重启后消息会丢失。
 
 # swallow系统接入流程
+
 ## 申请topic
+
 # swallow使用说明
+
 ## 使用swallow发送消息
 
 
