@@ -30,8 +30,8 @@
 
 	<pre><code>
 	public class SyncProducerExample{
-                  	public static void main(String[] args) throws Exception {
- 	       		ProducerConfig config = new ProducerConfig();  //(1)
+		public static void main(String[] args) throws Exception {
+ 	       		producerConfig config = new ProducerConfig();  //(1)
 	       		config.setMode(ProducerMode.SYNC_MODE);  //(2)
 	       		Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
 	       		for (int i = 0; i < 10; i++) {
@@ -98,9 +98,9 @@
 * threadPoolSize表示consumer处理消息的线程池线程数，默认为1。注意，如果设置成多线程，那么会有多线程同时接收消息，这样的话接收的消息就无法保证其先后顺序。
 * messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
 * consumerType表示consumer的类型，包括2种类型：
-     
-	a.AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。（注意：只是尽量保证，而非绝对保证。）
-	b.NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
+ 
+ 	a. AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。(注意：只是尽量保证，而非绝对保证。)
+	b. NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
           
 * delayBaseOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。
 * delayUpperboundOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。
