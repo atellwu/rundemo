@@ -35,11 +35,11 @@
 	       		config.setMode(ProducerMode.SYNC_MODE);  //(2)
 	       		Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
 	       		for (int i = 0; i < 10; i++) {
-	            	         		String msg = "消息-" + i;
-		         		p.sendMessage(msg);  //(4)
-		         		System.out.println("Sended msg:" + msg);
-		         		Thread.sleep(500);
-	                	}
+	       			String msg = "消息-" + i;
+	       			p.sendMessage(msg);  //(4)
+	       			System.out.println("Sended msg:" + msg);
+	       			Thread.sleep(500);
+	       		}
                       	}
                 }
                 </code></pre>
