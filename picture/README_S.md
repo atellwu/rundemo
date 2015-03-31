@@ -30,7 +30,7 @@
 
 	<pre><code>
 	public class SyncProducerExample{
-                       public static void main(String[] args) throws Exception {
+                        public static void main(String[] args) throws Exception {
  	       	ProducerConfig config = new ProducerConfig();  //(1)
 	       	config.setMode(ProducerMode.SYNC_MODE);  //(2)
 	       	Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
@@ -72,49 +72,50 @@
 
 * 使用swallow接收消息
 
-
+	<pre><code>
 	public class DurableConsumerExample {
-	   public static void main(String[] args) {
-	      ConsumerConfig config = new ConsumerConfig();  //(1)
-	      //以下根据自己情况而定，默认是不需要配的
-	      config.setThreadPoolSize(1);  //(2)
-	      Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config);  //(3)
-	      c.setListener(new MessageListener() {  //(4)
-	         @Override
-	         public void onMessage(Message msg) {
-	            System.out.println(msg.getContent());
-	         }
-	      });
-	      c.start();  //(5)
-	   }
+	   	public static void main(String[] args) {
+	      		ConsumerConfig config = new ConsumerConfig();  //(1)
+	      		//以下根据自己情况而定，默认是不需要配的
+	      		config.setThreadPoolSize(1);  //(2)
+	      		Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config);  //(3)
+	      		c.setListener(new MessageListener() {  //(4)
+	         			@Override
+	         			public void onMessage(Message msg) {
+	            				System.out.println(msg.getContent());
+	        			 }
+	      		});
+	      		c.start();  //(5)
+	   	}
 	}
+	</code></pre>
 
 
-     1.使用swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成。由于ConsumerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了消费者的所有属性及其默认值。
+1.使用swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成。由于ConsumerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了消费者的所有属性及其默认值。
      
-     ![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/11.png "Consumer属性")
+![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/11.png "Consumer属性")
      
-     * threadPoolSize表示consumer处理消息的线程池线程数，默认为1。注意，如果设置成多线程，那么会有多线程同时接收消息，这样的话接收的消息就无法保证其先后顺序。
-     * messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
-     * consumerType表示consumer的类型，包括2种类型：
+	* threadPoolSize表示consumer处理消息的线程池线程数，默认为1。注意，如果设置成多线程，那么会有多线程同时接收消息，这样的话接收的消息就无法保证其先后顺序。
+     	* messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
+     	* consumerType表示consumer的类型，包括2种类型：
      
-          a.AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。（注意：只是尽量保证，而非绝对保证。）
-          b.NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
+          		a.AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。（注意：只是尽量保证，而非绝对保证。）
+          		b.NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
           
-     * delayBaseOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。
-     * delayUpperboundOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。
-     * retryCountOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，最多重试的次数。
-     * startMessageId表示当需要在建立连接的时候指定读取消息的位置，可以设置该参数指定 。
+     	* delayBaseOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。
+     	* delayUpperboundOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。
+     	* retryCountOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，最多重试的次数。
+     	* startMessageId表示当需要在建立连接的时候指定读取消息的位置，可以设置该参数指定 。
       
-     2.如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。
+2.如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。
 
-     ![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/12.png "消费者配置函数")
+![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/12.png "消费者配置函数")
      
-     3.设置好接收端属性后就可以对消费者对象进行构造。ConsumerFactoryImpl实现了ConsumerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createConsumer会返回ConsumerImpl实例，而ConsumerImpl自身实现了接口Consumer。作为消费者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地，该名字需要与所感兴趣的生产者指定的目的地名称一致。
+3.设置好接收端属性后就可以对消费者对象进行构造。ConsumerFactoryImpl实现了ConsumerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createConsumer会返回ConsumerImpl实例，而ConsumerImpl自身实现了接口Consumer。作为消费者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地，该名字需要与所感兴趣的生产者指定的目的地名称一致。
      
-     4.Consumer唯一定义了异步接受消息的方法setListener,该方法需要一个实现MessageListener接口的实例作为参数。MessageListener接口唯一定义了onMessage(Message msg)方法，客户端只需要实现该方法，将消息处理逻辑写入其中即可。
-     
-     5.调用start()方法启动客户端程序。程序内部会使用Netty框架实现网络通信过程。
+4.Consumer唯一定义了异步接受消息的方法setListener,该方法需要一个实现MessageListener接口的实例作为参数。MessageListener接口唯一定义了onMessage(Message msg)方法，客户端只需要实现该方法，将消息处理逻辑写入其中即可。
+
+5.调用start()方法启动客户端程序。程序内部会使用Netty框架实现网络通信过程。
      
 * * * 
 
