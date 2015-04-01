@@ -24,10 +24,11 @@
 
 * 申请topic
 
-### 4. Swallow使用说明
+### 5. Swallow使用说明
 
-* 使用swallow发送消息
+* ####使用swallow发送消息
 
+* #####
 	<pre><code>
 	public class SyncProducerExample{
 		public static void main(String[] args) throws Exception {
@@ -164,7 +165,7 @@
 	* 正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，`此时请联系swallow团队成员`。
 
 
-<table>
+<table class="table table-bordered table-striped table-condensed">
    <tr>
       <td>&#26102;&#38388; &#22320;&#28857; &#20154;&#29289;</td>
    </tr>
@@ -176,7 +177,3 @@
    </tr>
 </table>
 
-|| *Year* || *Temperature (low)* || *Temperature (high)* ||
-|| 1900 || -10 || 25 ||
-|| 1910 || -15 || 30 ||
-|| 1920 || -10 || 32 ||
