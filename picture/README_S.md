@@ -49,27 +49,37 @@
  
  1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下列出了生产者的所有属性及其默认值。
 
- <table class="table table-bordered table-striped table-condensed" style="table-layout:fixed;">
+ <table class="table table-bordered table-striped table-condensed" >
    <tr>
-      <th width="90%">&#23646;&#24615; &#40664;&#35748;&#20540;</th>
+      <td>&#23646;&#24615;</td>
+      <td> &#40664;&#35748;&#20540;</td>
    </tr>
    <tr>
-      <td>mode DEFAULT_PRODUCER_MODE=ProducerMode.ASYNC_MODE</td>
+      <td>mode </td>
+      <td>DEFAULT_PRODUCER_MODE=ProducerMode.ASYNC_MODE</td>
    </tr>
    <tr>
-      <td>asyncRetryTimes DEFAULT_ASYNC_RETRY_TIMES=10</td>
+      <td>asyncRetryTimes </td>
+      <td>DEFAULT_ASYNC_RETRY_TIMES=10</td>
    </tr>
    <tr>
-      <td>syncRetryTimes DEFAULT_SYNC_RETRY_TIMES=0</td>
+      <td>syncRetryTimes </td>
+      <td>DEFAULT_SYNC_RETRY_TIMES=0</td>
    </tr>
    <tr>
-      <td>zipped DEFAULT_ZIPPED=false</td>
+      <td>zipped </td>
+      <td>DEFAULT_ZIPPED=false</td>
    </tr>
    <tr>
-      <td>threadPoolSize DEFAULT_THREADPOOL_SIZE=1</td>
+      <td>threadPoolSize </td>
+      <td>DEFAULT_THREADPOOL_SIZE=1</td>
    </tr>
    <tr>
-      <td>sendMsgLeftLastSession DEFAULT_SEND_MSG_LEFT_LAST_SESSION=true</td>
+      <td>sendMsgLeftLastSession </td>
+      <td>DEFAULT_SEND_MSG_LEFT_LAST_SESSION=true</td>
+   </tr>
+   <tr>
+      <td></td>
    </tr>
 </table>
 
