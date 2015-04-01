@@ -15,14 +15,24 @@
 * Consumer表示消费消息的主体，从Destination中获取消息。
 * Destination表示消息的目的地，也就是消息在swallow中驻留的地方。swallow中定义了两种目的地topic和queue，目前只实现了topic。
 * 同步模式表示消息发送成功或者超时才返回。
-* 异步模式表示不管消息是否发送成功都立即返回。
+* 异步模式表示不管消息是否发送成功都立即返回。ASYNC_MODE的时候，生产者发送消息时，先把消费存储到本地文件，另外的线程将文件的消息读取出来发送到server，这种方式调用方的send方法返回的比Sync模式快，但是目前运行情况不是很稳定，有出现丢失消息的情况。所以推荐使用sync模式，sync模式是直接将消息发给server，保证消息能发送成功。
 * 消息持久化表示消息会持久化到磁盘或者文件，server重启后消息不会丢失。非持久化与之相反，server重启后消息会丢失。
 
 ## 3. Swallow可用系统
 
 ## 4. Swallow系统接入流程
 
-* 申请topic
+### 申请topic
+
+如果有新的topic，联系 `孟文超/宋通`(邮件： wenchao.meng@dianping.com, tong.song@dianping.com )，联系时，请邮件里告知：
+    `申请人所在业务部门`： （例如：支付中心业务部门 ）<br>
+    `使用swallow解决的业务场景是什么`： （例如：订单支付成功后，使用swallow通知xxx付款成功的消息 ）<br>
+    `Topic名称`：   (例如，dp_action)，不能包含点(.)，建议只使用字母和下划线。长度不超过25个字符。<br>
+    `生产者业务名，以及负责人姓名`：  (例如，pay-order, 林俊杰)<br>
+    `消费者业务名，以及负责人姓名`：  (例如，mobile-api, 陆经天)<br>
+    `计划上线时间`<br>
+    `每天大概的消息量`：  (例如，5万条 ， 请注意不要写错，比如每日100万消息，应该写“100万”，不要写错成"100") <br>
+    `待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。`<br>
 
 ## 5. Swallow使用说明
 
@@ -51,6 +61,7 @@
 * ##### Maven pox.xml中添加依赖
 
 	<pre><code>
+	
 	&lt;dependency>
             		&lt;groupId>org.springframework&lt;/groupId>
             		&lt;artifactId>spring-beans&lt;/artifactId>
