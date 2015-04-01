@@ -34,7 +34,7 @@
  	       		producerConfig config = new ProducerConfig();  //(1)
 	       		config.setMode(ProducerMode.SYNC_MODE);  //(2)
 	       		Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
-	       		for (int i = 0; i < 10; i++) {
+	       		for (int i = 0; i &lt 10; i++) {
 	       			String msg = "消息-" + i;
 	       			p.sendMessage(msg);  //(4)
 	       			System.out.println("Sended msg:" + msg);
@@ -162,3 +162,16 @@
 	* 在`CAT`上观察`Producer对应项目`的transaction，找到`MsgProduced`以及`MsgProduceTried`这两个Type，`MsgProduced`的数量表示`程序产生的消息数量`，`MsgProduceTried`表示Swallow的`producer client尝试发送给producer server的次数`，如果这两个数量相差过大，说明存在异常。
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/7.png)
 	* 正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，`此时请联系swallow团队成员`。
+
+
+<table>
+   <tr>
+      <td>&#26102;&#38388; &#22320;&#28857; &#20154;&#29289;</td>
+   </tr>
+   <tr>
+      <td>3&#26376;5&#26085; &#21271;&#20140; &#23002;&#26126;</td>
+   </tr>
+   <tr>
+      <td>3&#26376;7&#26085; &#19978;&#28023; &#38889;&#23506; </td>
+   </tr>
+</table>
