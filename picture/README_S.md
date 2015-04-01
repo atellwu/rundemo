@@ -47,8 +47,82 @@
                 </code></pre>
 
 * #####b.Spring中配置实现
+	<pre><code>
+	&lt;dependency>
+            		<groupId>org.springframework</groupId>
+            		<artifactId>spring-beans</artifactId>
+            		<version>3.0.5.RELEASE</version>
+        	&lt;/dependency>
+        	&lt;dependency>
+            		&lt;groupId>org.springframework</groupId>
+            		&lt;artifactId>spring-context</artifactId>
+            		&lt;version>3.0.5.RELEASE</version>
+        	&lt;/dependency>
+        	&lt;dependency>
+            		&lt;groupId>org.springframework</groupId>
+            		&lt;artifactId>spring-core</artifactId>
+            		&lt;version>3.0.5.RELEASE</version>
+        	&lt;/dependency>
+	&lt;dependency>
+ 		&lt;groupId>com.dianping.swallow</groupId>
+ 		&lt;artifactId>swallow-producerclient</artifactId>
+ 		&lt;version>0.6.5</version> 
+	&lt;/dependency>
+	&lt;!-- lion -->
+	&lt;dependency>
+		 &lt;groupId>com.dianping.lion</groupId>
+		 &lt;artifactId>lion-client</artifactId>
+		 &lt;version>0.3.1-SNAPSHOT</version>
+	&lt;/dependency>
+	&lt;dependency>
+		 &lt;groupId>com.dianping.lion</groupId>
+		 &lt;artifactId>lion-dev</artifactId>
+		 &lt;version>1.0.0</version>
+	&lt;/dependency>
+	&lt;!-- 监控 -->
+	&lt;dependency>
+		 &lt;groupId>com.dianping.cat</groupId>
+		 &lt;artifactId>cat-core</artifactId>
+		 &lt;version>0.4.1</version>
+	&lt;/dependency>
+	&lt;dependency>
+		 &lt;groupId>com.dianping.hawk</groupId>
+		 &lt;artifactId>hawk-client</artifactId>
+		 &lt;version>0.7.1</version>
+	&lt;/dependency>
+	&lt;!-- 远程调用Pigeon -->
+	&lt;dependency>
+		 &lt;groupId>com.dianping.dpsf</groupId>
+		 &lt;artifactId>dpsf-net</artifactId>
+		 &lt;version>1.9.1-SNAPSHOT</version>
+	&lt;/dependency>
  
- 1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下表列出了生产者的所有属性及其默认值。
+ 	<pre><code>
+	&lt;bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
+
+	&lt;bean id="producerClient" factory-bean="producerFactory" factory-method="createProducer">
+		&lt;constructor-arg>
+			&lt;ref bean="destination" />
+		&lt;/constructor-arg>
+		&lt;constructor-arg>
+			&lt;ref bean="producerConfig" />
+		&lt;/constructor-arg>
+	&lt;/bean>
+
+	&lt;bean id="destination" class="com.dianping.swallow.common.message.Destination" factory-method="topic">
+		&lt;constructor-arg value="example" />
+	&lt;/bean>
+
+	&lt;bean id="producerConfig" class="com.dianping.swallow.producer.ProducerConfig">
+		&lt;property name="mode" value="SYNC_MODE" />
+		&lt;property name="syncRetryTimes" value="5" />
+		&lt;property name="zipped" value="false" />
+		&lt;property name="threadPoolSize" value="5" />
+		&lt;property name="sendMsgLeftLastSession" value="false" />
+	&lt;/bean>
+	</code></pre>
+
+ 1. 使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下表列出了生产者的所有属性及其默认值。
 
 <table class="table table-bordered table-striped table-condensed" >
    <tr>
@@ -246,8 +320,8 @@
 * messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
 * consumerType表示consumer的类型，包括2种类型：
  
-a. AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。(注意：只是尽量保证，而非绝对保证。)
-b. NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
+> AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。(注意：只是尽量保证，而非绝对保证。)
+> NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
           
 * delayBaseOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。
 * delayUpperboundOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。
