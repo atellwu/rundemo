@@ -49,10 +49,11 @@
  
  1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下列出了生产者的所有属性及其默认值。
 
+
  <table class="table table-bordered table-striped table-condensed" >
    <tr>
-      <th>&#23646;&#24615;</th>
-      <th> &#40664;&#35748;&#20540;</th>
+      <td>&#23646;&#24615;</td>
+      <td> &#40664;&#35748;&#20540;</td>
    </tr>
    <tr>
       <td>mode </td>
@@ -80,6 +81,7 @@
    </tr>
 </table>
 
+
  	* mode表示producer表示工作模式。
  	* asyncRetryTimes表示异步模式下发送失败重试次数。
  	* syncRetryTimes表示同步模式下发送失败重试次数。
@@ -91,8 +93,8 @@
      
 <table class= "table table-bordered table-striped table-condensed">
    <tr>
-      <th>&#26041;&#27861; </th>
-      <th>&#25551;&#36848;</th>
+      <td>&#26041;&#27861; </td>
+      <td>&#25551;&#36848;</td>
    </tr>
    <tr>
       <td>String getFilequeueBaseDir() </td>
@@ -159,7 +161,28 @@
  	a.请确保content对象的类型具有默认构造方法。
  	b.尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
       
-![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/10.png "配置属性及其setter函数")
+<table class= "table table-bordered table-striped table-condensed">
+   <tr>
+      <td>&#26041;&#27861;</td>
+      <td>&#25551;&#36848;</td>
+   </tr>
+   <tr>
+      <td>String sendMessage(Object content)</td>
+      <td>content&#20026;&#21457;&#36865;&#30340;&#28040;&#24687;</td>
+   </tr>
+   <tr>
+      <td>String sendMessage(Object content,String messageType) </td>
+      <td>messageType&#29992;&#20110;&#25351;&#23450;&#36807;&#28388;&#30340;&#28040;&#24687;&#31867;&#22411;</td>
+   </tr>
+   <tr>
+      <td>String sendMessage(Object content, Map<String,String> properties)</td>
+      <td>properties&#25351;&#23450;&#28040;&#24687;&#23646;&#24615;</td>
+   </tr>
+   <tr>
+      <td>String sendMessage(Object content, Map<String, String> properties, String messageType)</td>
+      <td>&#21516;&#26102;&#25351;&#23450;&#36807;&#28388;&#30340;&#28040;&#24687;&#31867;&#22411;&#21644;&#28040;&#24687;&#23646;&#24615;</td>
+   </tr>
+</table>
 
 
 * 使用swallow接收消息
@@ -185,7 +208,40 @@
 
 1.使用swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成。由于ConsumerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了消费者的所有属性及其默认值。
      
-![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/11.png "Consumer属性")
+<table  class= "table table-bordered table-striped table-condensed">
+   <tr>
+      <td>&#23646;&#24615;</td>
+      <td>&#40664;&#35748;&#20540;</td>
+   </tr>
+   <tr>
+      <td>threadPoolSize </td>
+      <td>1</td>
+   </tr>
+   <tr>
+      <td>messageFilter</td>
+      <td>MessageFilter.AllMatchFilter</td>
+   </tr>
+   <tr>
+      <td>consumerType</td>
+      <td>ConsumerType.DURABLE_AT_LEAST_ONCE</td>
+   </tr>
+   <tr>
+      <td>delayBaseOnBackoutMessageException</td>
+      <td>100ms</td>
+   </tr>
+   <tr>
+      <td>delayUpperboundOnBackoutMessageException</td>
+      <td>3000ms</td>
+   </tr>
+   <tr>
+      <td>retryCountOnBackoutMessageException</td>
+      <td>5</td>
+   </tr>
+   <tr>
+      <td>startMessageId</td>
+      <td>-1</td>
+   </tr>
+</table>
      
 * threadPoolSize表示consumer处理消息的线程池线程数，默认为1。注意，如果设置成多线程，那么会有多线程同时接收消息，这样的话接收的消息就无法保证其先后顺序。
 * messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
@@ -201,7 +257,68 @@
       
 2.如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。
 
-![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/12.png "消费者配置函数")
+<table class= "table table-bordered table-striped table-condensed">
+   <tr>
+      <td>&#26041;&#27861;</td>
+      <td>&#25551;&#36848;</td>
+   </tr>
+   <tr>
+      <td>int getThreadPoolSize()</td>
+      <td>&#36820;&#22238;consumer&#22788;&#29702;&#28040;&#24687;&#30340;&#32447;&#31243;&#27744;&#32447;&#31243;&#25968;</td>
+   </tr>
+   <tr>
+      <td>void setThreadPoolSize(int)</td>
+      <td>&#35774;&#32622;consumer&#22788;&#29702;&#28040;&#24687;&#30340;&#32447;&#31243;&#27744;&#32447;&#31243;&#25968;</td>
+   </tr>
+   <tr>
+      <td>MessageFilter getMessageFilter()</td>
+      <td>&#36820;&#22238;&#28040;&#24687;&#36807;&#28388;&#26041;&#24335;</td>
+   </tr>
+   <tr>
+      <td>void setMessageFilter(MessageFilter)</td>
+      <td>&#36820;&#22238;&#28040;&#24687;&#36807;&#28388;&#26041;&#24335;</td>
+   </tr>
+   <tr>
+      <td>ConsumerType getConsumerType()</td>
+      <td>&#36820;&#22238;&#28040;&#36153;&#32773;&#31867;&#22411;</td>
+   </tr>
+   <tr>
+      <td>void setConsumerType(ConsumerType)</td>
+      <td>&#35774;&#32622;&#28040;&#36153;&#32773;&#31867;&#22411;</td>
+   </tr>
+   <tr>
+      <td>int getDelayBaseOnBackoutMessageException()</td>
+      <td>&#36820;&#22238;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#23567;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
+   </tr>
+   <tr>
+      <td>void setDelayBaseOnBackoutMessageException(int)</td>
+      <td>&#35774;&#32622;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#23567;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
+   </tr>
+   <tr>
+      <td> int getDelayUpperboundOnBackoutMessageException()</td>
+      <td>&#36820;&#22238;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#22823;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
+   </tr>
+   <tr>
+      <td>void setDelayUpperboundOnBackoutMessageException(int)</td>
+      <td>&#35774;&#32622;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#22823;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
+   </tr>
+   <tr>
+      <td>int getRetryCountOnBackoutMessageException()</td>
+      <td>&#36820;&#22238;&#26368;&#22810;&#37325;&#35797;&#30340;&#27425;&#25968;</td>
+   </tr>
+   <tr>
+      <td>void setRetryCountOnBackoutMessageException(int)</td>
+      <td>&#35774;&#32622;&#26368;&#22810;&#37325;&#35797;&#30340;&#27425;&#25968;</td>
+   </tr>
+   <tr>
+      <td>long getStartMessageId()</td>
+      <td>&#36820;&#22238;&#35835;&#21462;&#28040;&#24687;&#30340;&#20301;&#32622;</td>
+   </tr>
+   <tr>
+      <td>void setStartMessageId(long)</td>
+      <td>&#35774;&#32622;&#35835;&#21462;&#28040;&#24687;&#30340;&#20301;&#32622;</td>
+   </tr>
+</table>
      
 3.设置好接收端属性后就可以对消费者对象进行构造。ConsumerFactoryImpl实现了ConsumerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createConsumer会返回ConsumerImpl实例，而ConsumerImpl自身实现了接口Consumer。作为消费者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地，该名字需要与所感兴趣的生产者指定的目的地名称一致。
      
