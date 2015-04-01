@@ -299,19 +299,19 @@
 
 	<pre><code>
 	public class DurableConsumerExample {
-	   	public static void main(String[] args) {
-	      		ConsumerConfig config = new ConsumerConfig();  //(1)
-	      		//以下根据自己情况而定，默认是不需要配的
-	      		config.setThreadPoolSize(1);  //(2)
-	      		Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config);  //(3)
-	      		c.setListener(new MessageListener() {  //(4)
-	         			@Override
-	         			public void onMessage(Message msg) {
-	            				System.out.println(msg.getContent());
-	        			 }
-	      		});
-	      		c.start();  //(5)
-	   	}
+		public static void main(String[] args) {
+			ConsumerConfig config = new ConsumerConfig();  //(1)
+			//以下根据自己情况而定，默认是不需要配的
+			config.setThreadPoolSize(1);  //(2)
+			Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config);  //(3)
+			c.setListener(new MessageListener() {  //(4)
+				@Override
+				public void onMessage(Message msg) {
+					System.out.println(msg.getContent());
+				}
+			});
+			c.start();  //(5)
+		}
 	}
 	</code></pre>
 
