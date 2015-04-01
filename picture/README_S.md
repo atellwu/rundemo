@@ -81,12 +81,12 @@
    </tr>
 </table>
 
- 	*mode表示producer表示工作模式。
- 	*asyncRetryTimes表示异步模式下发送失败重试次数。
- 	*syncRetryTimes表示同步模式下发送失败重试次数。
- 	*zipped表示是否对待发送消息进行压缩。当消息量很大时可以设置此标志，将消息压缩后再发送。
- 	*threadPoolSize表示异步模式时，线程池大小。
- 	*sendMsgLeftLastSession表示异步模式时，是否重启续传。
+ * mode表示producer表示工作模式。
+ * asyncRetryTimes表示异步模式下发送失败重试次数。
+ * syncRetryTimes表示同步模式下发送失败重试次数。
+ * zipped表示是否对待发送消息进行压缩。当消息量很大时可以设置此标志，将消息压缩后再发送。
+ * threadPoolSize表示异步模式时，线程池大小。
+ * sendMsgLeftLastSession表示异步模式时，是否重启续传。
 
  2.如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。
      
@@ -157,8 +157,8 @@
      
  4.Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。对于需要发送的消息，如果是String类型，则直接发送；如果是其他类型则会被序列化为json字符串进行传输。开发时需要注意：
  
- 	*a. 请确保content对象的类型具有默认构造方法。
- 	*b. 尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
+ a. 请确保content对象的类型具有默认构造方法。
+ b. 尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
  
 <table class= "table table-bordered table-striped table-condensed">
    <tr>
@@ -246,8 +246,8 @@
 * messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
 * consumerType表示consumer的类型，包括2种类型：
  
- 	a. AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。(注意：只是尽量保证，而非绝对保证。)
-	b. NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
+a. AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。(注意：只是尽量保证，而非绝对保证。)
+b. NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
           
 * delayBaseOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。
 * delayUpperboundOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。
