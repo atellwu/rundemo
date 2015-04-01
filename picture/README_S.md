@@ -158,8 +158,8 @@
      
  4.Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。对于需要发送的消息，如果是String类型，则直接发送；如果是其他类型则会被序列化为json字符串进行传输。开发时需要注意：
  
- 	a.请确保content对象的类型具有默认构造方法。
- 	b.尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
+ 	a. 请确保content对象的类型具有默认构造方法。
+ 	b. 尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
  
 
 <table class= "table table-bordered table-striped table-condensed">
