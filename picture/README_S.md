@@ -49,10 +49,10 @@
  
  1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下列出了生产者的所有属性及其默认值。
 
- <table class="table table-striped table-condensed" >
+ <table class="table table-bordered table-striped table-condensed" >
    <tr>
-      <td>&#23646;&#24615;</td>
-      <td> &#40664;&#35748;&#20540;</td>
+      <th>&#23646;&#24615;</th>
+      <th> &#40664;&#35748;&#20540;</th>
    </tr>
    <tr>
       <td>mode </td>
@@ -78,9 +78,6 @@
       <td>sendMsgLeftLastSession </td>
       <td>DEFAULT_SEND_MSG_LEFT_LAST_SESSION=true</td>
    </tr>
-   <tr>
-      <td></td>
-   </tr>
 </table>
 
  	* mode表示producer表示工作模式。
@@ -92,10 +89,10 @@
 
  2.如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。
      
-<table class= "table  table-striped table-condensed">
+<table class= "table table-bordered table-striped table-condensed">
    <tr>
-      <td>&#26041;&#27861; </td>
-      <td>&#25551;&#36848;</td>
+      <th>&#26041;&#27861; </th>
+      <th>&#25551;&#36848;</th>
    </tr>
    <tr>
       <td>String getFilequeueBaseDir() </td>
@@ -152,12 +149,6 @@
    <tr>
       <td>void setSyncRetryTimes(int) </td>
       <td>&#35774;&#32622;&#21516;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
-   </tr>
-   <tr>
-      <td></td>
-   </tr>
-   <tr>
-      <td></td>
    </tr>
 </table>
      
