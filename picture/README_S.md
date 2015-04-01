@@ -24,7 +24,7 @@
 
 ### 申请topic
 
-如果有新的topic，联系 `孟文超/宋通`(邮件： wenchao.meng@dianping.com, tong.song@dianping.com )，联系时，请邮件里告知：
+如果有新的topic，联系 `孟文超/宋通`(邮件： wenchao.meng@dianping.com, tong.song@dianping.com )，联系时，请邮件里告知：<br>
     `申请人所在业务部门`： （例如：支付中心业务部门 ）<br>
     `使用swallow解决的业务场景是什么`： （例如：订单支付成功后，使用swallow通知xxx付款成功的消息 ）<br>
     `Topic名称`：   (例如，dp_action)，不能包含点(.)，建议只使用字母和下划线。长度不超过25个字符。<br>
