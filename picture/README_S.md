@@ -2,14 +2,14 @@
 
 * * * 
 
-### 1. Swallow基础概念
+## 1. Swallow基础概念
 
 * Swallow 是什么:
 	* Swallow是一个`基于Topic的异步消息传送系统`。Swallow使用`发布/订阅消息`的传送模型，`消息发布者`指定Topic并发送消息到Swallow消息服务器,`消息订阅者`则指定Topic并从Swallow消息服务器订阅消息。
 	* Swallow的发布/订阅模型。消息由Producer发布，ProducerServer负责接收并存储消息到DB。ConsumerServer负责从DB获取消息，并推送给Consumer。
 	* Swallow`支持集群订阅者`。在集群中，使用相同ConsumerId(例如Consumer A)的Consumer，将会视作同一个Consumer（同一个Consumer消费的Message将不会重复）。例如，假设一个有2台机器(主机1和主机2)的集群，ConsumerId都是“Consumer-A”，那么`同一则Message，将要么被“主机1”获取，要么被“主机2”获取，不会被两者均获取`。
 
-### 2. swallow名词解释
+## 2. swallow名词解释
 
 * Producer表示生产消息的主体，将消息发送到目的地Destination。
 * Consumer表示消费消息的主体，从Destination中获取消息。
@@ -18,19 +18,19 @@
 * 异步模式表示不管消息是否发送成功都立即返回。
 * 消息持久化表示消息会持久化到磁盘或者文件，server重启后消息不会丢失。非持久化与之相反，server重启后消息会丢失。
 
-### 3. Swallow可用系统
+## 3. Swallow可用系统
 
-### 4. Swallow系统接入流程
+## 4. Swallow系统接入流程
 
 * 申请topic
 
-### 5. Swallow使用说明
+## 5. Swallow使用说明
 
-* ####使用swallow发送消息
+* ### 1. 使用swallow发送消息
 
-* #####a.纯代码实现
+* #### a. 纯代码实现
 
-	<pre><code>
+	<code>
 	public class SyncProducerExample{
 		public static void main(String[] args) throws Exception {
  	       		producerConfig config = new ProducerConfig();  //(1)
@@ -44,11 +44,11 @@
 	       		}
                       	}
                 }
-                </code></pre>
+                </code>
 
-* #####b.Spring中配置实现
+* #### b. Spring中配置实现
 
-* ######Maven添加依赖
+* ##### Maven添加依赖
 
 	<pre><code>
 	&lt;dependency>
@@ -101,7 +101,7 @@
 	&lt;/dependency>
 	</code></pre>
  
-* ######Spring配置文件
+* ##### Spring配置文件
 
  	<pre><code>
 	&lt;bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
@@ -128,7 +128,7 @@
 	&lt;/bean>
 	</code></pre>
 
- 1. 使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下表列出了生产者的所有属性及其默认值。
+1. 使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下表列出了生产者的所有属性及其默认值。
 
 <table class="table table-bordered table-striped table-condensed" >
    <tr>
@@ -168,7 +168,7 @@
  * threadPoolSize表示异步模式时，线程池大小。
  * sendMsgLeftLastSession表示异步模式时，是否重启续传。
 
- 2.如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。
+ 2. 如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。
      
 <table class= "table table-bordered table-striped table-condensed">
    <tr>
@@ -233,9 +233,9 @@
    </tr>
 </table>
      
- 3.设置好发送端属性后就可以对生产者对象进行构造。ProducerFactoryImpl实现了ProducerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createProducer会返回ProducerImpl实例，而ProducerImpl自身实现了接口Producer。作为生产者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地。
+ 3. 设置好发送端属性后就可以对生产者对象进行构造。ProducerFactoryImpl实现了ProducerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createProducer会返回ProducerImpl实例，而ProducerImpl自身实现了接口Producer。作为生产者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地。
      
- 4.Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。对于需要发送的消息，如果是String类型，则直接发送；如果是其他类型则会被序列化为json字符串进行传输。开发时需要注意：
+ 4. Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。对于需要发送的消息，如果是String类型，则直接发送；如果是其他类型则会被序列化为json字符串进行传输。开发时需要注意：
  
  a. 请确保content对象的类型具有默认构造方法。
  b. 尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
@@ -407,9 +407,9 @@
      
 * * * 
 
-### 5. Swallow常见问题以及处理
+## 5. Swallow常见问题以及处理
 
-* #### a. 如何查看我的消费是否有延迟、延迟多少条消息？
+* ### a. 如何查看我的消费是否有延迟、延迟多少条消息？
 	* 从[CAT](http://cat.dp/)中查看`Swallow`项目的`Transaction`，可以获得相应的信息（[传送门](http://cat.dp/cat/r/t?op=view&domain=Swallow)）。
 	* 以dp\_action这个topic为例（`仅作示例，具体到自己的topic，请做相应变通`），先找到`In:dp_action`这个type：
 	![Swallow Transaction In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/1.png)
@@ -421,19 +421,19 @@
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/4.png)
 	* 对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp\_action的数量），`如果消费的消息总量小于生产的消息总量，那么消费是有延迟的`。
 
-* #### b. 如何查看我的Consumer消费一条消息的平均时间？
+* ### b. 如何查看我的Consumer消费一条消息的平均时间？
 	* 从[CAT](http://cat.dp/)中查看`Consumer ID对应项目`的Transaction，找到`MsgConsumed`和`MsgConsumeTried`这两个type：
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/5.png)
 	* `MsgConsumed`表示`consumer server给这个consumer推送的消息数量`，`MsgConsumeTried`表示`consumer尝试消费消息的次数`，如果存在失败重试，则MsgConsumeTried数量可能会比MsgConsumed更多。
 	* 右边的三列可以看出`consumer调用onMessage回调函数耗费的最小、最大以及平均时间`，如果consumer消费状况一直良好，突然某个时刻开始有消费延时，可以观察一下这里的平均时间是不是比之前更高，如果平均消费时间比正常情况高出很多，可能会造成消费延时。
 
-* #### c. 我的Consumer有延时，该怎么确认问题所在？
+* ### c. 我的Consumer有延时，该怎么确认问题所在？
 	* 首先观察consumer的`平均消费时间`是否存在异常，如果consumer的平均消费时间`比正常情况高出许多`，说明onMessage回调函数依赖的服务存在问题，可以考虑_最近的代码变更_，或询问_依赖的服务_是否存在故障。
 	* 如果consumer的`平均消费时间一直很高`，说明consumer的消费线程数太少，可以考虑`修改配置文件增加消费线程数`，或者`扩容应用增加消费机`。
 	* 在cat中观察consumer的problem，`如果swallow相关异常过多，请及时联系swallow团队成员`。
 	* 如果consumer的平均消费时间`一直正常、没有发生突变`，则有可能是swallow的consumer server负载较高或存在其他故障，`此时请及时联系swallow团队成员`。
 
-* #### d. 我的Consumer堵了，该怎么确认问题所在？
+* ### d. 我的Consumer堵了，该怎么确认问题所在？
 	* 首先`确认consumer是否已经正确启动`：
 		* 增加一些`健康监测页面`或其他机制以判断consumer是否正确启动。
 		* 查看自己`应用日志`以及/data/applogs/tomcat/`catalina.out`日志，确认没有影响应用正常启动的异常出现。
@@ -445,7 +445,7 @@
 		![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/6.png)
 		* 如果consumer的线程block在onMessage方法内，说明onMessage方法内调用存在异常情况，可能原因`包括但不限于``死循环`、`等待IO`、`死锁`、`数据库操作`、`依赖的服务超时`等情况，请仔细检查这些情况，`修复并重启consumer`即可。
 		* 如果consumer的线程不存在block现象，`请及时联系swallow团队成员`。
-* #### e. 如何确认我的Producer正常工作？
+* ### e. 如何确认我的Producer正常工作？
 	* 首先确认生产者是否正常启动，判别方法跟[问题4](#q4)中第一点类似，增加检测页面，确保日志中没有影响正常启动的异常出现。
 	* 在`CAT`上观察`Producer对应项目`的transaction，找到`MsgProduced`以及`MsgProduceTried`这两个Type，`MsgProduced`的数量表示`程序产生的消息数量`，`MsgProduceTried`表示Swallow的`producer client尝试发送给producer server的次数`，如果这两个数量相差过大，说明存在异常。
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/7.png)
