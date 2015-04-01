@@ -28,7 +28,8 @@
 
 * ####使用swallow发送消息
 
-* #####
+* #####a.纯代码实现
+
 	<pre><code>
 	public class SyncProducerExample{
 		public static void main(String[] args) throws Exception {
@@ -53,7 +54,7 @@
  	* mode表示producer表示工作模式。
  	* asyncRetryTimes表示异步模式下发送失败重试次数。
  	* syncRetryTimes表示同步模式下发送失败重试次数。
- 	* zipped表示是否对待发送消息进行压缩。
+ 	* zipped表示是否对待发送消息进行压缩。当消息量很大时可以设置此标志，将消息压缩后再发送。
  	* threadPoolSize表示异步模式时，线程池大小。
  	* sendMsgLeftLastSession表示异步模式时，是否重启续传。
 
@@ -165,15 +166,26 @@
 	* 正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，`此时请联系swallow团队成员`。
 
 
-<table class="table table-bordered table-striped table-condensed">
+<table>
    <tr>
-      <td>&#26102;&#38388; &#22320;&#28857; &#20154;&#29289;</td>
+      <td>&#23646;&#24615; &#40664;&#35748;&#20540;</td>
    </tr>
    <tr>
-      <td>3&#26376;5&#26085; &#21271;&#20140; &#23002;&#26126;</td>
+      <td>mode DEFAULT_PRODUCER_MODE=ProducerMode.ASYNC_MODE</td>
    </tr>
    <tr>
-      <td>3&#26376;7&#26085; &#19978;&#28023; &#38889;&#23506; </td>
+      <td>asyncRetryTimes DEFAULT_ASYNC_RETRY_TIMES=10</td>
+   </tr>
+   <tr>
+      <td>syncRetryTimes DEFAULT_SYNC_RETRY_TIMES=0</td>
+   </tr>
+   <tr>
+      <td>zipped DEFAULT_ZIPPED=false</td>
+   </tr>
+   <tr>
+      <td>threadPoolSize DEFAULT_THREADPOOL_SIZE=1</td>
+   </tr>
+   <tr>
+      <td>sendMsgLeftLastSession DEFAULT_SEND_MSG_LEFT_LAST_SESSION=true</td>
    </tr>
 </table>
-
