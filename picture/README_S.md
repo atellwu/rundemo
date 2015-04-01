@@ -47,6 +47,9 @@
                 </code></pre>
 
 * #####b.Spring中配置实现
+
+* ######Maven添加依赖
+
 	<pre><code>
 	&lt;dependency>
             		&lt;groupId>org.springframework&lt;/groupId>
@@ -98,6 +101,7 @@
 	&lt;/dependency>
 	</code></pre>
  
+* ######Spring配置文件
 
  	<pre><code>
 	&lt;bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
