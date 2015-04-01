@@ -49,56 +49,56 @@
 * #####b.Spring中配置实现
 	<pre><code>
 	&lt;dependency>
-            		&lt;groupId>org.springframework</groupId>
-            		&lt;artifactId>spring-beans</artifactId>
-            		&lt;version>3.0.5.RELEASE</version>
+            		&lt;groupId>org.springframework&lt;/groupId>
+            		&lt;artifactId>spring-beans&lt;/artifactId>
+            		&lt;version>3.0.5.RELEASE&lt;/version>
         	&lt;/dependency>
         	&lt;dependency>
-            		&lt;groupId>org.springframework</groupId>
-            		&lt;artifactId>spring-context</artifactId>
-            		&lt;version>3.0.5.RELEASE</version>
+            		&lt;groupId>org.springframework&lt;/groupId>
+            		&lt;artifactId>spring-context&lt;/artifactId>
+            		&lt;version>3.0.5.RELEASE&lt;/version>
         	&lt;/dependency>
         	&lt;dependency>
-            		&lt;groupId>org.springframework</groupId>
-            		&lt;artifactId>spring-core</artifactId>
-            		&lt;version>3.0.5.RELEASE</version>
+            		&lt;groupId>org.springframework&lt;/groupId>
+            		&lt;artifactId>spring-core&lt;/artifactId>
+            		&lt;version>3.0.5.RELEASE&lt;/version>
         	&lt;/dependency>
 	&lt;dependency>
- 		&lt;groupId>com.dianping.swallow</groupId>
- 		&lt;artifactId>swallow-producerclient</artifactId>
- 		&lt;version>0.6.5</version> 
+ 		&lt;groupId>com.dianping.swallow&lt;/groupId>
+ 		&lt;artifactId>swallow-producerclient&lt;/artifactId>
+ 		&lt;version>0.6.5&lt;/version> 
 	&lt;/dependency>
 	&lt;!-- lion -->
 	&lt;dependency>
-		 &lt;groupId>com.dianping.lion</groupId>
-		 &lt;artifactId>lion-client</artifactId>
-		 &lt;version>0.3.1-SNAPSHOT</version>
+		 &lt;groupId>com.dianping.lion&lt;/groupId>
+		 &lt;artifactId>lion-client&lt;/artifactId>
+		 &lt;version>0.3.1-SNAPSHOT&lt;/version>
 	&lt;/dependency>
 	&lt;dependency>
-		 &lt;groupId>com.dianping.lion</groupId>
-		 &lt;artifactId>lion-dev</artifactId>
-		 &lt;version>1.0.0</version>
+		 &lt;groupId>com.dianping.lion&lt;/groupId>
+		 &lt;artifactId>lion-dev&lt;/artifactId>
+		 &lt;version>1.0.0&lt;/version>
 	&lt;/dependency>
 	&lt;!-- 监控 -->
 	&lt;dependency>
-		 &lt;groupId>com.dianping.cat</groupId>
-		 &lt;artifactId>cat-core</artifactId>
-		 &lt;version>0.4.1</version>
+		 &lt;groupId>com.dianping.cat&lt;/groupId>
+		 &lt;artifactId>cat-core&lt;/artifactId>
+		 &lt;version>0.4.1&lt;/version>
 	&lt;/dependency>
 	&lt;dependency>
-		 &lt;groupId>com.dianping.hawk</groupId>
-		 &lt;artifactId>hawk-client</artifactId>
-		 &lt;version>0.7.1</version>
+		 &lt;groupId>com.dianping.hawk&lt;/groupId>
+		 &lt;artifactId>hawk-client&lt;/artifactId>
+		 &lt;version>0.7.1&lt;/version>
 	&lt;/dependency>
 	&lt;!-- 远程调用Pigeon -->
 	&lt;dependency>
-		 &lt;groupId>com.dianping.dpsf</groupId>
-		 &lt;artifactId>dpsf-net</artifactId>
-		 &lt;version>1.9.1-SNAPSHOT</version>
+		 &lt;groupId>com.dianping.dpsf&lt;/groupId>
+		 &lt;artifactId>dpsf-net&lt;/artifactId>
+		 &lt;version>1.9.1-SNAPSHOT&lt;/version>
 	&lt;/dependency>
 	</code></pre>
  
- 
+
  	<pre><code>
 	&lt;bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
 
