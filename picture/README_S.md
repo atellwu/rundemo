@@ -43,7 +43,7 @@
 	<pre><code>
 	public class SyncProducerExample{
 		public static void main(String[] args) throws Exception {
- 	       		producerConfig config = new ProducerConfig();  //(1)
+			producerConfig config = new ProducerConfig();  //(1)
 	       		config.setMode(ProducerMode.SYNC_MODE);  //(2)
 	       		Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
 	       		for (int i = 0; i &lt; 10; i++) {
@@ -51,32 +51,31 @@
 	       			p.sendMessage(msg);  //(4)
 	       			System.out.println("Sended msg:" + msg);
 	       			Thread.sleep(500);
-	       		}
-                      	}
-                }
+			}
+		}
+	}
                 </code></pre>
 
 * #### Spring中配置实现
 
 * ##### Maven pox.xml中添加依赖
 
-	<pre><code>
-	
+	<pre><code>	
 	&lt;dependency>
-            		&lt;groupId>org.springframework&lt;/groupId>
-            		&lt;artifactId>spring-beans&lt;/artifactId>
-            		&lt;version>3.0.5.RELEASE&lt;/version>
-        	&lt;/dependency>
-        	&lt;dependency>
-            		&lt;groupId>org.springframework&lt;/groupId>
-            		&lt;artifactId>spring-context&lt;/artifactId>
-            		&lt;version>3.0.5.RELEASE&lt;/version>
-        	&lt;/dependency>
-        	&lt;dependency>
-            		&lt;groupId>org.springframework&lt;/groupId>
-            		&lt;artifactId>spring-core&lt;/artifactId>
-            		&lt;version>3.0.5.RELEASE&lt;/version>
-        	&lt;/dependency>
+		&lt;groupId>org.springframework&lt;/groupId>
+		&lt;artifactId>spring-beans&lt;/artifactId>
+		&lt;version>3.0.5.RELEASE&lt;/version>
+	&lt;/dependency>
+	&lt;dependency>
+		&lt;groupId>org.springframework&lt;/groupId>
+		&lt;artifactId>spring-context&lt;/artifactId>
+		&lt;version>3.0.5.RELEASE&lt;/version>
+	&lt;/dependency>
+	&lt;dependency>
+		&lt;groupId>org.springframework&lt;/groupId>
+		&lt;artifactId>spring-core&lt;/artifactId>
+		&lt;version>3.0.5.RELEASE&lt;/version>
+	&lt;/dependency>
 	&lt;dependency>
  		&lt;groupId>com.dianping.swallow&lt;/groupId>
  		&lt;artifactId>swallow-producerclient&lt;/artifactId>
@@ -155,8 +154,8 @@
 	         			System.out.println(producer.sendMessage("Hello world.") + "hello");
 	      		} catch (SendFailedException e) {
 	         			e.printStackTrace();
-	      		}
-	   	}
+			}
+		}	
 	}
 	</code></pre>
  
