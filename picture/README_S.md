@@ -47,9 +47,31 @@
                 </code></pre>
 
  
- 1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了生产者的所有属性及其默认值。
+ 1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下列出了生产者的所有属性及其默认值。
 
- ![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/8.png "Producer属性")
+ <table class="table table-bordered table-striped table-condensed">
+   <tr>
+      <td>&#23646;&#24615; &#40664;&#35748;&#20540;</td>
+   </tr>
+   <tr>
+      <td>mode DEFAULT_PRODUCER_MODE=ProducerMode.ASYNC_MODE</td>
+   </tr>
+   <tr>
+      <td>asyncRetryTimes DEFAULT_ASYNC_RETRY_TIMES=10</td>
+   </tr>
+   <tr>
+      <td>syncRetryTimes DEFAULT_SYNC_RETRY_TIMES=0</td>
+   </tr>
+   <tr>
+      <td>zipped DEFAULT_ZIPPED=false</td>
+   </tr>
+   <tr>
+      <td>threadPoolSize DEFAULT_THREADPOOL_SIZE=1</td>
+   </tr>
+   <tr>
+      <td>sendMsgLeftLastSession DEFAULT_SEND_MSG_LEFT_LAST_SESSION=true</td>
+   </tr>
+</table>
 
  	* mode表示producer表示工作模式。
  	* asyncRetryTimes表示异步模式下发送失败重试次数。
@@ -60,7 +82,53 @@
 
  2.如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。
      
- ![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/9.png "函数sendMessage")
+<table class= "table table-bordered table-striped table-condensed">
+   <tr>
+      <td>&#26041;&#27861; &#25551;&#36848;</td>
+   </tr>
+   <tr>
+      <td>String getFilequeueBaseDir() &#36820;&#22238;&#25991;&#20214;&#38431;&#21015;&#36335;&#24452;</td>
+   </tr>
+   <tr>
+      <td>void setFilequeueBaseDir(String) &#35774;&#32622;&#25991;&#20214;&#38431;&#21015;&#36335;&#24452;</td>
+   </tr>
+   <tr>
+      <td>ProducerMode getMode() &#36820;&#22238;&#29983;&#20135;&#32773;&#27169;&#24335;</td>
+   </tr>
+   <tr>
+      <td>void setMode(ProducerMode) &#35774;&#32622;&#29983;&#20135;&#32773;&#27169;&#24335;</td>
+   </tr>
+   <tr>
+      <td>int getAsyncRetryTimes() &#36820;&#22238;&#24322;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
+   </tr>
+   <tr>
+      <td>void setAsyncRetryTimes(int) &#35774;&#32622;&#24322;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
+   </tr>
+   <tr>
+      <td>boolean isZipped() &#26159;&#21542;&#23558;&#28040;&#24687;&#21387;&#32553;&#20256;&#36755;</td>
+   </tr>
+   <tr>
+      <td>void setZipped(boolean) &#35774;&#32622;&#28040;&#24687;&#21387;&#32553;&#20256;&#36755;</td>
+   </tr>
+   <tr>
+      <td>int getThreadPoolSize() &#36820;&#22238;&#24322;&#27493;&#27169;&#24335;&#19979;&#32447;&#31243;&#27744;&#22823;&#23567;</td>
+   </tr>
+   <tr>
+      <td>void setThreadPoolSize() &#35774;&#32622;&#24322;&#27493;&#27169;&#24335;&#19979;&#32447;&#31243;&#27744;&#22823;&#23567;</td>
+   </tr>
+   <tr>
+      <td>boolean isSendMsgLeftLastSession() &#26159;&#21542;&#23558;&#28040;&#24687;&#26029;&#28857;&#32493;&#20256;</td>
+   </tr>
+   <tr>
+      <td>void setSendMsgLeftLastSession(boolean) &#35774;&#32622;&#28040;&#24687;&#26029;&#28857;&#32493;&#20256;</td>
+   </tr>
+   <tr>
+      <td>int getSyncRetryTimes() &#36820;&#22238;&#21516;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
+   </tr>
+   <tr>
+      <td>void setSyncRetryTimes(int) &#35774;&#32622;&#21516;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
+   </tr>
+</table>
      
  3.设置好发送端属性后就可以对生产者对象进行构造。ProducerFactoryImpl实现了ProducerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createProducer会返回ProducerImpl实例，而ProducerImpl自身实现了接口Producer。作为生产者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地。
      
@@ -166,26 +234,4 @@
 	* 正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，`此时请联系swallow团队成员`。
 
 
-<table>
-   <tr>
-      <td>&#23646;&#24615; &#40664;&#35748;&#20540;</td>
-   </tr>
-   <tr>
-      <td>mode DEFAULT_PRODUCER_MODE=ProducerMode.ASYNC_MODE</td>
-   </tr>
-   <tr>
-      <td>asyncRetryTimes DEFAULT_ASYNC_RETRY_TIMES=10</td>
-   </tr>
-   <tr>
-      <td>syncRetryTimes DEFAULT_SYNC_RETRY_TIMES=0</td>
-   </tr>
-   <tr>
-      <td>zipped DEFAULT_ZIPPED=false</td>
-   </tr>
-   <tr>
-      <td>threadPoolSize DEFAULT_THREADPOOL_SIZE=1</td>
-   </tr>
-   <tr>
-      <td>sendMsgLeftLastSession DEFAULT_SEND_MSG_LEFT_LAST_SESSION=true</td>
-   </tr>
-</table>
+
