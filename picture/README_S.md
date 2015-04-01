@@ -193,12 +193,13 @@
    </tr>
 </table>
 
- < mode表示producer表示工作模式。
- < asyncRetryTimes表示异步模式下发送失败重试次数。
- < syncRetryTimes表示同步模式下发送失败重试次数。
- < zipped表示是否对待发送消息进行压缩。当消息量很大时可以设置此标志，将消息压缩后再发送。
- < threadPoolSize表示异步模式时，线程池大小。
- < sendMsgLeftLastSession表示异步模式时，是否重启续传。
+
+ 	* mode表示producer表示工作模式。<br>
+	* asyncRetryTimes表示异步模式下发送失败重试次数。<br>
+ 	* syncRetryTimes表示同步模式下发送失败重试次数。<br>
+ 	* zipped表示是否对待发送消息进行压缩。当消息量很大时可以设置此标志，将消息压缩后再发送。<br>
+ 	* threadPoolSize表示异步模式时，线程池大小。<br>
+ 	* sendMsgLeftLastSession表示异步模式时，是否重启续传。<br>
 
  * 如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。
      
@@ -354,7 +355,7 @@
    </tr>
 </table>
      
-* threadPoolSize表示consumer处理消息的线程池线程数，默认为1。注意，如果设置成多线程，那么会有多线程同时接收消息，这样的话接收的消息就无法保证其先后顺序。
+* threadPoolSize表示consumer处理消息的线程池线程数，默认为1。Consumer接收到消息时，会调用用户实现的MessageListener.onMessage()。默认情况下，Consumer内部使用单线程来 调用MessageListener.onMessage()，即Consumer会单线程地调用onMessage()，只有onMessage()执 行完并响应给服务器(即发送ack给服务器)，服务器在收到ack后，才会推送下一个消息过来。如果希望并行地处理更多消息，可以通过设置threadPoolSize，实现多线程（本地有threadPoolSize个线程调用onMessage()，同事服务器也可以在未收到threadPoolSize个ack的情况下继续推送消息)，能提高接收消息的速度，但是如此一来，消息的先后顺序则无法保证。
 * messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
 * consumerType表示consumer的类型，包括2种类型：
  
