@@ -34,7 +34,7 @@
  	       		producerConfig config = new ProducerConfig();  //(1)
 	       		config.setMode(ProducerMode.SYNC_MODE);  //(2)
 	       		Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
-	       		for (int i = 0; i &lt 10; i++) {
+	       		for (int i = 0; i < 10; i++) {
 	       			String msg = "消息-" + i;
 	       			p.sendMessage(msg);  //(4)
 	       			System.out.println("Sended msg:" + msg);
@@ -175,3 +175,8 @@
       <td>3&#26376;7&#26085; &#19978;&#28023; &#38889;&#23506; </td>
    </tr>
 </table>
+
+|| *Year* || *Temperature (low)* || *Temperature (high)* ||
+|| 1900 || -10 || 25 ||
+|| 1910 || -15 || 30 ||
+|| 1920 || -10 || 32 ||
