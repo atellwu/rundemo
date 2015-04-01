@@ -1,6 +1,6 @@
 # Swallow使用说明
 
-* * * 
+[ TOC ]
 
 ## 1. Swallow基础概念
 
@@ -30,7 +30,7 @@
 
 * #### a. 纯代码实现
 
-	<code>
+	<pre><code>
 	public class SyncProducerExample{
 		public static void main(String[] args) throws Exception {
  	       		producerConfig config = new ProducerConfig();  //(1)
@@ -44,11 +44,11 @@
 	       		}
                       	}
                 }
-                </code>
+                </code></pre>
 
 * #### b. Spring中配置实现
 
-* ##### Maven添加依赖
+* ##### Maven pox.xml中添加依赖
 
 	<pre><code>
 	&lt;dependency>
@@ -100,8 +100,8 @@
 		 &lt;version>1.9.1-SNAPSHOT&lt;/version>
 	&lt;/dependency>
 	</code></pre>
- 
-* ##### Spring配置文件
+
+* ##### Spring配置文件applicationContext-producer.xml配置相关bean
 
  	<pre><code>
 	&lt;bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
@@ -128,6 +128,27 @@
 	&lt;/bean>
 	</code></pre>
 
+* ##### Spring代码
+
+	<pre><code>
+	import org.springframework.context.ApplicationContext;
+	import org.springframework.context.support.ClassPathXmlApplicationContext;
+	import com.dianping.swallow.common.producer.exceptions.SendFailedException;
+	import com.dianping.swallow.producer.Producer;
+
+	public class ProducerSpring {
+	   	public static void main(String[] args) {
+	      		ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-producer.xml" });
+	      		Producer producer = (Producer) ctx.getBean("producerClient");
+	      		try {
+	         			System.out.println(producer.sendMessage("Hello world.") + "hello");
+	      		} catch (SendFailedException e) {
+	         			e.printStackTrace();
+	      		}
+	   	}
+	}
+	</code></pre>
+ 
 1. 使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下表列出了生产者的所有属性及其默认值。
 
 <table class="table table-bordered table-striped table-condensed" >
@@ -237,7 +258,7 @@
      
  4. Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。对于需要发送的消息，如果是String类型，则直接发送；如果是其他类型则会被序列化为json字符串进行传输。开发时需要注意：
  
- a. 请确保content对象的类型具有默认构造方法。
+ a. 请确保content对象的类型具有默认构造方法。<br>
  b. 尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
  
 <table class= "table table-bordered table-striped table-condensed">
