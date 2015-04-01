@@ -49,9 +49,9 @@
 * #####b.Spring中配置实现
 	<pre><code>
 	&lt;dependency>
-            		<groupId>org.springframework</groupId>
-            		<artifactId>spring-beans</artifactId>
-            		<version>3.0.5.RELEASE</version>
+            		&lt;groupId>org.springframework</groupId>
+            		&lt;artifactId>spring-beans</artifactId>
+            		&lt;version>3.0.5.RELEASE</version>
         	&lt;/dependency>
         	&lt;dependency>
             		&lt;groupId>org.springframework</groupId>
@@ -96,6 +96,8 @@
 		 &lt;artifactId>dpsf-net</artifactId>
 		 &lt;version>1.9.1-SNAPSHOT</version>
 	&lt;/dependency>
+	</code></pre>
+ 
  
  	<pre><code>
 	&lt;bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
