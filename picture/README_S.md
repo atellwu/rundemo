@@ -18,7 +18,27 @@
 * 异步模式表示不管消息是否发送成功都立即返回。ASYNC_MODE的时候，生产者发送消息时，先把消费存储到本地文件，另外的线程将文件的消息读取出来发送到server，这种方式调用方的send方法返回的比Sync模式快，但是目前运行情况不是很稳定，有出现丢失消息的情况。所以推荐使用sync模式，sync模式是直接将消息发给server，保证消息能发送成功。
 * 消息持久化表示消息会持久化到磁盘或者文件，server重启后消息不会丢失。非持久化与之相反，server重启后消息会丢失。
 
-## 3. Swallow可用系统
+## 3. Swallow生产者和消费者模拟平台
+
+### 模拟生产者
+
+* 生产者可以向某个topic发送一条消息
+
+	* [dev环境](http://192.168.8.21:7070/rundemo/swallow-dev-067#r=0&j=17)
+	* [alpha环境](http://192.168.8.21:7070/rundemo/swallow-alpha-067#r=0&j=17)
+	* [qa环境](http://192.168.8.21:7070/rundemo/swallow-qa-067#r=0&j=17)
+
+* (1). 在代码编辑框内，修改“Destination.topic("example")”为“Destination.topic("<你的topic名称>")”)。
+* (2). 点击右边绿色run按钮。
+* (3). 在右边紫色控制台下方，输入消息的内容，按回车，即可发送。
+
+### 模拟消费者
+
+* 消费者接收消息  (在代码编辑框内，修改“Destination.topic("example")”为“Destination.topic("<你的topic名称>")”)，点击“run”，即可启动消费者。
+
+	* [dev环境](http://192.168.8.21:7070/rundemo/swallow-dev#r=0&j=10  )
+	* [qa环境](http://192.168.8.21:7070/rundemo/swallow-qa#r=0&j=10)
+	* [alpha环境](http://192.168.8.21:7070/rundemo/swallow-alpha#r=0&j=10 )
 
 ## 4. Swallow系统接入流程
 
@@ -180,7 +200,7 @@ public class SyncProducerExample{
 	* asyncRetryTimes表示异步模式下发送失败重试次数。
  	* syncRetryTimes表示同步模式下发送失败重试次数。
  	* zipped表示是否对待发送消息进行压缩。当消息量很大时可以设置此标志，将消息压缩后再发送。
- 	* threadPoolSize表示异步模式时，线程池大小。
+ 	* threadPoolSize表示异步模式时，线程池大小。默认值是1，如果设置成多线程，那么会有多个线程同时从FileQueue获取消息并发送，这样的话发送的消息就无法保证其先后顺序。
  	* sendMsgLeftLastSession表示异步模式时，是否重启续传。
 
 <table class="table table-bordered table-striped table-condensed" >
