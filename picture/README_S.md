@@ -2,14 +2,14 @@
 
 [ TOC ]
 
-## 1. Swallow基础概念
+## Swallow基础概念
 
 * Swallow 是什么:
 	* Swallow是一个`基于Topic的异步消息传送系统`。Swallow使用`发布/订阅消息`的传送模型，`消息发布者`指定Topic并发送消息到Swallow消息服务器,`消息订阅者`则指定Topic并从Swallow消息服务器订阅消息。
 	* Swallow的发布/订阅模型。消息由Producer发布，ProducerServer负责接收并存储消息到DB。ConsumerServer负责从DB获取消息，并推送给Consumer。
 	* Swallow`支持集群订阅者`。在集群中，使用相同ConsumerId(例如Consumer A)的Consumer，将会视作同一个Consumer（同一个Consumer消费的Message将不会重复）。例如，假设一个有2台机器(主机1和主机2)的集群，ConsumerId都是“Consumer-A”，那么`同一则Message，将要么被“主机1”获取，要么被“主机2”获取，不会被两者均获取`。
 
-## 2. swallow名词解释
+## swallow名词解释
 
 * Producer表示生产消息的主体，将消息发送到目的地Destination。
 * Consumer表示消费消息的主体，从Destination中获取消息。
@@ -18,11 +18,11 @@
 * 异步模式表示不管消息是否发送成功都立即返回。ASYNC_MODE的时候，生产者发送消息时，先把消费存储到本地文件，另外的线程将文件的消息读取出来发送到server，这种方式调用方的send方法返回的比Sync模式快，但是目前运行情况不是很稳定，有出现丢失消息的情况。所以推荐使用sync模式，sync模式是直接将消息发给server，保证消息能发送成功。
 * 消息持久化表示消息会持久化到磁盘或者文件，server重启后消息不会丢失。非持久化与之相反，server重启后消息会丢失。
 
-## 3. Swallow生产者和消费者模拟平台
+## Swallow生产者和消费者模拟平台
 
 ### 模拟生产者
 
-* 生产者可以向某个topic发送一条消息
+* 生产者可以向某个topic发送一条消息。
 
 	* [dev环境](http://192.168.8.21:7070/rundemo/swallow-dev-067#r=0&j=17)
 	* [alpha环境](http://192.168.8.21:7070/rundemo/swallow-alpha-067#r=0&j=17)
@@ -40,7 +40,7 @@
 	* [qa环境](http://192.168.8.21:7070/rundemo/swallow-qa#r=0&j=10)
 	* [alpha环境](http://192.168.8.21:7070/rundemo/swallow-alpha#r=0&j=10 )
 
-## 4. Swallow系统接入流程
+## Swallow系统接入流程
 
 ### 申请topic
 
@@ -54,13 +54,13 @@
     `每天大概的消息量`：  (例如，5万条 ， 请注意不要写错，比如每日100万消息，应该写“100万”，不要写错成"100") <br>
     `待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。`<br>
 
-## 5. Swallow使用说明
+## Swallow使用说明
 
-* ### 1. 使用swallow发送消息
+* ### 使用swallow发送消息
 
-* #### a. Spring中配置实现
+* #### Spring中配置实现
 
-* ##### 1. Maven pox.xml中添加依赖
+* ##### Maven pox.xml中添加依赖
 
 <pre><code>
 &lt;properties>
@@ -120,7 +120,7 @@
 * env可选的值包括dev（开发环境），alpha和beta（都是测试环境）。
 * swallow-producerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.6.5版本。
 
-* ##### 2. Spring配置文件applicationContext-producer.xml配置相关bean
+* ##### Spring配置文件applicationContext-producer.xml配置相关bean
 
 <pre><code>
 &lt;bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
@@ -147,7 +147,7 @@
 &lt;/bean>
 </code></pre>
 
-* ##### 3. Spring代码
+* ##### Spring代码
 
 <pre><code>
 import org.springframework.context.ApplicationContext;
@@ -168,7 +168,7 @@ public class ProducerSpring {
 }
 </code></pre>
 
-* #### b. 生产者端纯代码实现
+* #### 生产者端纯代码实现
 
 * 纯代码实现与使用Spring配置bean有一样的效果。
 
@@ -330,11 +330,11 @@ public class SyncProducerExample{
 </table>
 
 
-* ### 2. 使用swallow接收消息
+* ### 使用swallow接收消息
 
-* #### a. Spring中配置实现
+* #### Spring中配置实现
 
-* ##### 1. Maven pox.xml中添加依赖
+* ##### Maven pox.xml中添加依赖
 
 <pre><code>
 &lt;properties>
@@ -388,7 +388,7 @@ public class SyncProducerExample{
 * env可选的值包括dev（开发环境），alpha和beta（都是测试环境）。
 * swallow-consumerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.6.5版本。
 
-* ##### 2. Spring配置文件applicationContext-consumer.xml配置相关bean
+* ##### Spring配置文件applicationContext-consumer.xml配置相关bean
 
 <pre><code>
 &lt;!-- 消费者工厂类 -->
@@ -445,7 +445,7 @@ public class MessageListenerImpl implements MessageListener {
 }
 </code></pre>
 
-* ##### 3. Spring代码
+* ##### Spring代码
 
 <pre><code>
 package com.dianping.swallow.example.consumer.spring;
@@ -465,7 +465,7 @@ public class TestConsumer {
 }
 </code></pre>
 
-* #### b. 消费者端纯代码实现
+* #### 消费者端纯代码实现
 
 <pre><code>
 public class DurableConsumerExample {
@@ -607,11 +607,10 @@ public class DurableConsumerExample {
 
 * (5). 调用start()方法启动客户端程序。程序内部会使用Netty框架实现网络通信过程。
      
-* * * 
 
-## 5. Swallow常见问题以及处理
+## Swallow常见问题以及处理
 
-* ### a. 如何查看我的消费是否有延迟、延迟多少条消息？
+* ### 如何查看我的消费是否有延迟、延迟多少条消息？
 	* 从[CAT](http://cat.dp/)中查看`Swallow`项目的`Transaction`，可以获得相应的信息（[传送门](http://cat.dp/cat/r/t?op=view&domain=Swallow)）。
 	* 以dp\_action这个topic为例（`仅作示例，具体到自己的topic，请做相应变通`），先找到`In:dp_action`这个type：
 	![Swallow Transaction In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/1.png)
@@ -623,19 +622,19 @@ public class DurableConsumerExample {
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/4.png)
 	* 对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp\_action的数量），`如果消费的消息总量小于生产的消息总量，那么消费是有延迟的`。
 
-* ### b. 如何查看我的Consumer消费一条消息的平均时间？
+* ### 如何查看我的Consumer消费一条消息的平均时间？
 	* 从[CAT](http://cat.dp/)中查看`Consumer ID对应项目`的Transaction，找到`MsgConsumed`和`MsgConsumeTried`这两个type：
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/5.png)
 	* `MsgConsumed`表示`consumer server给这个consumer推送的消息数量`，`MsgConsumeTried`表示`consumer尝试消费消息的次数`，如果存在失败重试，则MsgConsumeTried数量可能会比MsgConsumed更多。
 	* 右边的三列可以看出`consumer调用onMessage回调函数耗费的最小、最大以及平均时间`，如果consumer消费状况一直良好，突然某个时刻开始有消费延时，可以观察一下这里的平均时间是不是比之前更高，如果平均消费时间比正常情况高出很多，可能会造成消费延时。
 
-* ### c. 我的Consumer有延时，该怎么确认问题所在？
+* ### 我的Consumer有延时，该怎么确认问题所在？
 	* 首先观察consumer的`平均消费时间`是否存在异常，如果consumer的平均消费时间`比正常情况高出许多`，说明onMessage回调函数依赖的服务存在问题，可以考虑_最近的代码变更_，或询问_依赖的服务_是否存在故障。
 	* 如果consumer的`平均消费时间一直很高`，说明consumer的消费线程数太少，可以考虑`修改配置文件增加消费线程数`，或者`扩容应用增加消费机`。
 	* 在cat中观察consumer的problem，`如果swallow相关异常过多，请及时联系swallow团队成员`。
 	* 如果consumer的平均消费时间`一直正常、没有发生突变`，则有可能是swallow的consumer server负载较高或存在其他故障，`此时请及时联系swallow团队成员`。
 
-* ### d. 我的Consumer堵了，该怎么确认问题所在？
+* ### 我的Consumer堵了，该怎么确认问题所在？
 	* 首先`确认consumer是否已经正确启动`：
 		* 增加一些`健康监测页面`或其他机制以判断consumer是否正确启动。
 		* 查看自己`应用日志`以及/data/applogs/tomcat/`catalina.out`日志，确认没有影响应用正常启动的异常出现。
@@ -647,7 +646,7 @@ public class DurableConsumerExample {
 		![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/6.png)
 		* 如果consumer的线程block在onMessage方法内，说明onMessage方法内调用存在异常情况，可能原因`包括但不限于``死循环`、`等待IO`、`死锁`、`数据库操作`、`依赖的服务超时`等情况，请仔细检查这些情况，`修复并重启consumer`即可。
 		* 如果consumer的线程不存在block现象，`请及时联系swallow团队成员`。
-* ### e. 如何确认我的Producer正常工作？
+* ### 如何确认我的Producer正常工作？
 	* 首先确认生产者是否正常启动，判别方法跟[问题4](#q4)中第一点类似，增加检测页面，确保日志中没有影响正常启动的异常出现。
 	* 在`CAT`上观察`Producer对应项目`的transaction，找到`MsgProduced`以及`MsgProduceTried`这两个Type，`MsgProduced`的数量表示`程序产生的消息数量`，`MsgProduceTried`表示Swallow的`producer client尝试发送给producer server的次数`，如果这两个数量相差过大，说明存在异常。
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/7.png)
