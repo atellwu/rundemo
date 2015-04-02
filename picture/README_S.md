@@ -36,31 +36,41 @@
 
 ## 5. Swallow使用说明
 
-* ### 使用swallow发送消息
+* ### 1. 使用swallow发送消息
 
-* #### 纯代码实现
+* #### a. 纯代码实现
 
 	<pre><code>
 	public class SyncProducerExample{
 		public static void main(String[] args) throws Exception {
 			producerConfig config = new ProducerConfig();  //(1)
-	       		config.setMode(ProducerMode.SYNC_MODE);  //(2)
-	       		Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
-	       		for (int i = 0; i &lt; 10; i++) {
-	       			String msg = "消息-" + i;
-	       			p.sendMessage(msg);  //(4)
-	       			System.out.println("Sended msg:" + msg);
-	       			Thread.sleep(500);
+			//以下设置的值与默认配置一致，可以省略
+			config.setMode(ProducerMode.SYNC_MODE);  //(2)
+			config.setSyncRetryTimes(0);
+			config.setZipped(false);
+			config.setThreadPoolSize(5);
+			config.setSendMsgLeftLastSession(false);
+
+			Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
+			for (int i = 0; i &lt; 10; i++) {
+				String msg = "消息-" + i;
+				p.sendMessage(msg);  //(4)
+				System.out.println("Sended msg:" + msg);
+				Thread.sleep(500);
 			}
 		}
 	}
-                </code></pre>
+	</code></pre>
 
-* #### Spring中配置实现
+* #### b. Spring中配置实现
 
-* ##### Maven pox.xml中添加依赖
+* ##### 1. Maven pox.xml中添加依赖
 
-	<pre><code>	
+	<pre><code>
+	&lt;properties>
+		&lt;env>dev&lt;/env>
+	&lt;/properties>		
+
 	&lt;dependency>
 		&lt;groupId>org.springframework&lt;/groupId>
 		&lt;artifactId>spring-beans&lt;/artifactId>
@@ -77,9 +87,9 @@
 		&lt;version>3.0.5.RELEASE&lt;/version>
 	&lt;/dependency>
 	&lt;dependency>
- 		&lt;groupId>com.dianping.swallow&lt;/groupId>
- 		&lt;artifactId>swallow-producerclient&lt;/artifactId>
- 		&lt;version>0.6.5&lt;/version> 
+			&lt;groupId>com.dianping.swallow&lt;/groupId>
+			&lt;artifactId>swallow-producerclient&lt;/artifactId>
+			&lt;version>0.6.5&lt;/version> 
 	&lt;/dependency>
 	&lt;!-- lion -->
 	&lt;dependency>
@@ -89,7 +99,7 @@
 	&lt;/dependency>
 	&lt;dependency>
 		 &lt;groupId>com.dianping.lion&lt;/groupId>
-		 &lt;artifactId>lion-dev&lt;/artifactId>
+		 &lt;artifactId>lion-${env}&lt;/artifactId>
 		 &lt;version>1.0.0&lt;/version>
 	&lt;/dependency>
 	&lt;!-- 监控 -->
@@ -111,9 +121,9 @@
 	&lt;/dependency>
 	</code></pre>
 
-* ##### Spring配置文件applicationContext-producer.xml配置相关bean
+* ##### 2. Spring配置文件applicationContext-producer.xml配置相关bean
 
- 	<pre><code>
+	<pre><code>
 	&lt;bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
 
 	&lt;bean id="producerClient" factory-bean="producerFactory" factory-method="createProducer">
@@ -131,14 +141,14 @@
 
 	&lt;bean id="producerConfig" class="com.dianping.swallow.producer.ProducerConfig">
 		&lt;property name="mode" value="SYNC_MODE" />
-		&lt;property name="syncRetryTimes" value="5" />
+		&lt;property name="syncRetryTimes" value="0" />
 		&lt;property name="zipped" value="false" />
 		&lt;property name="threadPoolSize" value="5" />
 		&lt;property name="sendMsgLeftLastSession" value="false" />
 	&lt;/bean>
 	</code></pre>
 
-* ##### Spring代码
+* ##### 3. Spring代码
 
 	<pre><code>
 	import org.springframework.context.ApplicationContext;
@@ -147,17 +157,19 @@
 	import com.dianping.swallow.producer.Producer;
 
 	public class ProducerSpring {
-	   	public static void main(String[] args) {
-	      		ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-producer.xml" });
-	      		Producer producer = (Producer) ctx.getBean("producerClient");
-	      		try {
-	         			System.out.println(producer.sendMessage("Hello world.") + "hello");
-	      		} catch (SendFailedException e) {
-	         			e.printStackTrace();
+		public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-producer.xml" });
+		Producer producer = (Producer) ctx.getBean("producerClient");
+			try {
+				System.out.println(producer.sendMessage("Hello world.") + "hello");
+			} catch (SendFailedException e) {
+				e.printStackTrace();
 			}
 		}	
 	}
 	</code></pre>
+
+* 纯代码实现与使用Spring配置bean有一样的效果。
  
 * 使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下表列出了生产者的所有属性及其默认值。
 
@@ -168,101 +180,101 @@
  	* threadPoolSize表示异步模式时，线程池大小。
  	* sendMsgLeftLastSession表示异步模式时，是否重启续传。
 
-<table class="table table-bordered table-striped table-condensed" >
-   <tr>
-      <td>&#23646;&#24615;</td>
-      <td> &#40664;&#35748;&#20540;</td>
-   </tr>
-   <tr>
-      <td>mode </td>
-      <td>DEFAULT_PRODUCER_MODE=ProducerMode.ASYNC_MODE</td>
-   </tr>
-   <tr>
-      <td>asyncRetryTimes </td>
-      <td>DEFAULT_ASYNC_RETRY_TIMES=10</td>
-   </tr>
-   <tr>
-      <td>syncRetryTimes </td>
-      <td>DEFAULT_SYNC_RETRY_TIMES=0</td>
-   </tr>
-   <tr>
-      <td>zipped </td>
-      <td>DEFAULT_ZIPPED=false</td>
-   </tr>
-   <tr>
-      <td>threadPoolSize </td>
-      <td>DEFAULT_THREADPOOL_SIZE=1</td>
-   </tr>
-   <tr>
-      <td>sendMsgLeftLastSession </td>
-      <td>DEFAULT_SEND_MSG_LEFT_LAST_SESSION=true</td>
-   </tr>
-</table>
+	<table class="table table-bordered table-striped table-condensed" >
+	   <tr>
+	      <td>&#23646;&#24615;</td>
+	      <td> &#40664;&#35748;&#20540;</td>
+	   </tr>
+	   <tr>
+	      <td>mode </td>
+	      <td>DEFAULT_PRODUCER_MODE=ProducerMode.ASYNC_MODE</td>
+	   </tr>
+	   <tr>
+	      <td>asyncRetryTimes </td>
+	      <td>DEFAULT_ASYNC_RETRY_TIMES=10</td>
+	   </tr>
+	   <tr>
+	      <td>syncRetryTimes </td>
+	      <td>DEFAULT_SYNC_RETRY_TIMES=0</td>
+	   </tr>
+	   <tr>
+	      <td>zipped </td>
+	      <td>DEFAULT_ZIPPED=false</td>
+	   </tr>
+	   <tr>
+	      <td>threadPoolSize </td>
+	      <td>DEFAULT_THREADPOOL_SIZE=1</td>
+	   </tr>
+	   <tr>
+	      <td>sendMsgLeftLastSession </td>
+	      <td>DEFAULT_SEND_MSG_LEFT_LAST_SESSION=true</td>
+	   </tr>
+	</table>
 
  * 如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。
      
-<table class= "table table-bordered table-striped table-condensed">
-   <tr>
-      <td>&#26041;&#27861; </td>
-      <td>&#25551;&#36848;</td>
-   </tr>
-   <tr>
-      <td>String getFilequeueBaseDir() </td>
-      <td>&#36820;&#22238;&#25991;&#20214;&#38431;&#21015;&#36335;&#24452;</td>
-   </tr>
-   <tr>
-      <td>void setFilequeueBaseDir(String) </td>
-      <td>&#35774;&#32622;&#25991;&#20214;&#38431;&#21015;&#36335;&#24452;</td>
-   </tr>
-   <tr>
-      <td>ProducerMode getMode() </td>
-      <td>&#36820;&#22238;&#29983;&#20135;&#32773;&#27169;&#24335;</td>
-   </tr>
-   <tr>
-      <td>void setMode(ProducerMode) </td>
-      <td>&#35774;&#32622;&#29983;&#20135;&#32773;&#27169;&#24335;</td>
-   </tr>
-   <tr>
-      <td>int getAsyncRetryTimes() </td>
-      <td>&#36820;&#22238;&#24322;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
-   </tr>
-   <tr>
-      <td>void setAsyncRetryTimes(int) </td>
-      <td>&#35774;&#32622;&#24322;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
-   </tr>
-   <tr>
-      <td>boolean isZipped() </td>
-      <td>&#26159;&#21542;&#23558;&#28040;&#24687;&#21387;&#32553;&#20256;&#36755;</td>
-   </tr>
-   <tr>
-      <td>void setZipped(boolean) </td>
-      <td>&#35774;&#32622;&#28040;&#24687;&#21387;&#32553;&#20256;&#36755;</td>
-   </tr>
-   <tr>
-      <td>int getThreadPoolSize() </td>
-      <td>&#36820;&#22238;&#24322;&#27493;&#27169;&#24335;&#19979;&#32447;&#31243;&#27744;&#22823;&#23567;</td>
-   </tr>
-   <tr>
-      <td>void setThreadPoolSize() </td>
-      <td>&#35774;&#32622;&#24322;&#27493;&#27169;&#24335;&#19979;&#32447;&#31243;&#27744;&#22823;&#23567;</td>
-   </tr>
-   <tr>
-      <td>boolean isSendMsgLeftLastSession() </td>
-      <td>&#26159;&#21542;&#23558;&#28040;&#24687;&#26029;&#28857;&#32493;&#20256;</td>
-   </tr>
-   <tr>
-      <td>void setSendMsgLeftLastSession(boolean) </td>
-      <td>&#35774;&#32622;&#28040;&#24687;&#26029;&#28857;&#32493;&#20256;</td>
-   </tr>
-   <tr>
-      <td>int getSyncRetryTimes() </td>
-      <td>&#36820;&#22238;&#21516;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
-   </tr>
-   <tr>
-      <td>void setSyncRetryTimes(int) </td>
-      <td>&#35774;&#32622;&#21516;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
-   </tr>
-</table>
+	<table class= "table table-bordered table-striped table-condensed">
+	   <tr>
+	      <td>&#26041;&#27861; </td>
+	      <td>&#25551;&#36848;</td>
+	   </tr>
+	   <tr>
+	      <td>String getFilequeueBaseDir() </td>
+	      <td>&#36820;&#22238;&#25991;&#20214;&#38431;&#21015;&#36335;&#24452;</td>
+	   </tr>
+	   <tr>
+	      <td>void setFilequeueBaseDir(String) </td>
+	      <td>&#35774;&#32622;&#25991;&#20214;&#38431;&#21015;&#36335;&#24452;</td>
+	   </tr>
+	   <tr>
+	      <td>ProducerMode getMode() </td>
+	      <td>&#36820;&#22238;&#29983;&#20135;&#32773;&#27169;&#24335;</td>
+	   </tr>
+	   <tr>
+	      <td>void setMode(ProducerMode) </td>
+	      <td>&#35774;&#32622;&#29983;&#20135;&#32773;&#27169;&#24335;</td>
+	   </tr>
+	   <tr>
+	      <td>int getAsyncRetryTimes() </td>
+	      <td>&#36820;&#22238;&#24322;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
+	   </tr>
+	   <tr>
+	      <td>void setAsyncRetryTimes(int) </td>
+	      <td>&#35774;&#32622;&#24322;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
+	   </tr>
+	   <tr>
+	      <td>boolean isZipped() </td>
+	      <td>&#26159;&#21542;&#23558;&#28040;&#24687;&#21387;&#32553;&#20256;&#36755;</td>
+	   </tr>
+	   <tr>
+	      <td>void setZipped(boolean) </td>
+	      <td>&#35774;&#32622;&#28040;&#24687;&#21387;&#32553;&#20256;&#36755;</td>
+	   </tr>
+	   <tr>
+	      <td>int getThreadPoolSize() </td>
+	      <td>&#36820;&#22238;&#24322;&#27493;&#27169;&#24335;&#19979;&#32447;&#31243;&#27744;&#22823;&#23567;</td>
+	   </tr>
+	   <tr>
+	      <td>void setThreadPoolSize() </td>
+	      <td>&#35774;&#32622;&#24322;&#27493;&#27169;&#24335;&#19979;&#32447;&#31243;&#27744;&#22823;&#23567;</td>
+	   </tr>
+	   <tr>
+	      <td>boolean isSendMsgLeftLastSession() </td>
+	      <td>&#26159;&#21542;&#23558;&#28040;&#24687;&#26029;&#28857;&#32493;&#20256;</td>
+	   </tr>
+	   <tr>
+	      <td>void setSendMsgLeftLastSession(boolean) </td>
+	      <td>&#35774;&#32622;&#28040;&#24687;&#26029;&#28857;&#32493;&#20256;</td>
+	   </tr>
+	   <tr>
+	      <td>int getSyncRetryTimes() </td>
+	      <td>&#36820;&#22238;&#21516;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
+	   </tr>
+	   <tr>
+	      <td>void setSyncRetryTimes(int) </td>
+	      <td>&#35774;&#32622;&#21516;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
+	   </tr>
+	</table>
      
  * 设置好发送端属性后就可以对生产者对象进行构造。ProducerFactoryImpl实现了ProducerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createProducer会返回ProducerImpl实例，而ProducerImpl自身实现了接口Producer。作为生产者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地。
      
@@ -271,28 +283,28 @@
  	* 请确保content对象的类型具有默认构造方法。<br>
  	* 尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
  
-<table class= "table table-bordered table-striped table-condensed">
-   <tr>
-      <td>&#26041;&#27861;</td>
-      <td>&#25551;&#36848;</td>
-   </tr>
-   <tr>
-      <td>String sendMessage(Object content)</td>
-      <td>content&#20026;&#21457;&#36865;&#30340;&#28040;&#24687;</td>
-   </tr>
-   <tr>
-      <td>String sendMessage(Object content,String messageType) </td>
-      <td>messageType&#29992;&#20110;&#25351;&#23450;&#36807;&#28388;&#30340;&#28040;&#24687;&#31867;&#22411;</td>
-   </tr>
-   <tr>
-      <td>String sendMessage(Object content, Map<String,String> properties)</td>
-      <td>properties&#25351;&#23450;&#28040;&#24687;&#23646;&#24615;</td>
-   </tr>
-   <tr>
-      <td>String sendMessage(Object content, Map<String, String> properties, String messageType)</td>
-      <td>&#21516;&#26102;&#25351;&#23450;&#36807;&#28388;&#30340;&#28040;&#24687;&#31867;&#22411;&#21644;&#28040;&#24687;&#23646;&#24615;</td>
-   </tr>
-</table>
+	<table class= "table table-bordered table-striped table-condensed">
+	   <tr>
+	      <td>&#26041;&#27861;</td>
+	      <td>&#25551;&#36848;</td>
+	   </tr>
+	   <tr>
+	      <td>String sendMessage(Object content)</td>
+	      <td>content&#20026;&#21457;&#36865;&#30340;&#28040;&#24687;</td>
+	   </tr>
+	   <tr>
+	      <td>String sendMessage(Object content,String messageType) </td>
+	      <td>messageType&#29992;&#20110;&#25351;&#23450;&#36807;&#28388;&#30340;&#28040;&#24687;&#31867;&#22411;</td>
+	   </tr>
+	   <tr>
+	      <td>String sendMessage(Object content, Map<String,String> properties)</td>
+	      <td>properties&#25351;&#23450;&#28040;&#24687;&#23646;&#24615;</td>
+	   </tr>
+	   <tr>
+	      <td>String sendMessage(Object content, Map<String, String> properties, String messageType)</td>
+	      <td>&#21516;&#26102;&#25351;&#23450;&#36807;&#28388;&#30340;&#28040;&#24687;&#31867;&#22411;&#21644;&#28040;&#24687;&#23646;&#24615;</td>
+	   </tr>
+	</table>
 
 
 * ### 使用swallow接收消息
@@ -318,47 +330,47 @@
 
 1.使用swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成。由于ConsumerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了消费者的所有属性及其默认值。
      
-<table  class= "table table-bordered table-striped table-condensed">
-   <tr>
-      <td>&#23646;&#24615;</td>
-      <td>&#40664;&#35748;&#20540;</td>
-   </tr>
-   <tr>
-      <td>threadPoolSize </td>
-      <td>1</td>
-   </tr>
-   <tr>
-      <td>messageFilter</td>
-      <td>MessageFilter.AllMatchFilter</td>
-   </tr>
-   <tr>
-      <td>consumerType</td>
-      <td>ConsumerType.DURABLE_AT_LEAST_ONCE</td>
-   </tr>
-   <tr>
-      <td>delayBaseOnBackoutMessageException</td>
-      <td>100ms</td>
-   </tr>
-   <tr>
-      <td>delayUpperboundOnBackoutMessageException</td>
-      <td>3000ms</td>
-   </tr>
-   <tr>
-      <td>retryCountOnBackoutMessageException</td>
-      <td>5</td>
-   </tr>
-   <tr>
-      <td>startMessageId</td>
-      <td>-1</td>
-   </tr>
-</table>
-     
+	<table  class= "table table-bordered table-striped table-condensed">
+	   <tr>
+	      <td>&#23646;&#24615;</td>
+	      <td>&#40664;&#35748;&#20540;</td>
+	   </tr>
+	   <tr>
+	      <td>threadPoolSize </td>
+	      <td>1</td>
+	   </tr>
+	   <tr>
+	      <td>messageFilter</td>
+	      <td>MessageFilter.AllMatchFilter</td>
+	   </tr>
+	   <tr>
+	      <td>consumerType</td>
+	      <td>ConsumerType.DURABLE_AT_LEAST_ONCE</td>
+	   </tr>
+	   <tr>
+	      <td>delayBaseOnBackoutMessageException</td>
+	      <td>100ms</td>
+	   </tr>
+	   <tr>
+	      <td>delayUpperboundOnBackoutMessageException</td>
+	      <td>3000ms</td>
+	   </tr>
+	   <tr>
+	      <td>retryCountOnBackoutMessageException</td>
+	      <td>5</td>
+	   </tr>
+	   <tr>
+	      <td>startMessageId</td>
+	      <td>-1</td>
+	   </tr>
+	</table>
+
 * threadPoolSize表示consumer处理消息的线程池线程数，默认为1。Consumer接收到消息时，会调用用户实现的MessageListener.onMessage()。默认情况下，Consumer内部使用单线程来 调用MessageListener.onMessage()，即Consumer会单线程地调用onMessage()，只有onMessage()执 行完并响应给服务器(即发送ack给服务器)，服务器在收到ack后，才会推送下一个消息过来。如果希望并行地处理更多消息，可以通过设置threadPoolSize，实现多线程（本地有threadPoolSize个线程调用onMessage()，同事服务器也可以在未收到threadPoolSize个ack的情况下继续推送消息)，能提高接收消息的速度，但是如此一来，消息的先后顺序则无法保证。
 * messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
 * consumerType表示consumer的类型，包括2种类型：
  
-> AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。(注意：只是尽量保证，而非绝对保证。)
-> NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
+	* AT_LEAST：尽量保证消息最少消费一次，不出现消息丢失的情况。(注意：只是尽量保证，而非绝对保证。)
+	* NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始。
           
 * delayBaseOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。
 * delayUpperboundOnBackoutMessageException表示当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。
@@ -367,68 +379,68 @@
       
 2.如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。
 
-<table class= "table table-bordered table-striped table-condensed">
-   <tr>
-      <td>&#26041;&#27861;</td>
-      <td>&#25551;&#36848;</td>
-   </tr>
-   <tr>
-      <td>int getThreadPoolSize()</td>
-      <td>&#36820;&#22238;consumer&#22788;&#29702;&#28040;&#24687;&#30340;&#32447;&#31243;&#27744;&#32447;&#31243;&#25968;</td>
-   </tr>
-   <tr>
-      <td>void setThreadPoolSize(int)</td>
-      <td>&#35774;&#32622;consumer&#22788;&#29702;&#28040;&#24687;&#30340;&#32447;&#31243;&#27744;&#32447;&#31243;&#25968;</td>
-   </tr>
-   <tr>
-      <td>MessageFilter getMessageFilter()</td>
-      <td>&#36820;&#22238;&#28040;&#24687;&#36807;&#28388;&#26041;&#24335;</td>
-   </tr>
-   <tr>
-      <td>void setMessageFilter(MessageFilter)</td>
-      <td>&#36820;&#22238;&#28040;&#24687;&#36807;&#28388;&#26041;&#24335;</td>
-   </tr>
-   <tr>
-      <td>ConsumerType getConsumerType()</td>
-      <td>&#36820;&#22238;&#28040;&#36153;&#32773;&#31867;&#22411;</td>
-   </tr>
-   <tr>
-      <td>void setConsumerType(ConsumerType)</td>
-      <td>&#35774;&#32622;&#28040;&#36153;&#32773;&#31867;&#22411;</td>
-   </tr>
-   <tr>
-      <td>int getDelayBaseOnBackoutMessageException()</td>
-      <td>&#36820;&#22238;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#23567;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
-   </tr>
-   <tr>
-      <td>void setDelayBaseOnBackoutMessageException(int)</td>
-      <td>&#35774;&#32622;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#23567;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
-   </tr>
-   <tr>
-      <td> int getDelayUpperboundOnBackoutMessageException()</td>
-      <td>&#36820;&#22238;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#22823;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
-   </tr>
-   <tr>
-      <td>void setDelayUpperboundOnBackoutMessageException(int)</td>
-      <td>&#35774;&#32622;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#22823;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
-   </tr>
-   <tr>
-      <td>int getRetryCountOnBackoutMessageException()</td>
-      <td>&#36820;&#22238;&#26368;&#22810;&#37325;&#35797;&#30340;&#27425;&#25968;</td>
-   </tr>
-   <tr>
-      <td>void setRetryCountOnBackoutMessageException(int)</td>
-      <td>&#35774;&#32622;&#26368;&#22810;&#37325;&#35797;&#30340;&#27425;&#25968;</td>
-   </tr>
-   <tr>
-      <td>long getStartMessageId()</td>
-      <td>&#36820;&#22238;&#35835;&#21462;&#28040;&#24687;&#30340;&#20301;&#32622;</td>
-   </tr>
-   <tr>
-      <td>void setStartMessageId(long)</td>
-      <td>&#35774;&#32622;&#35835;&#21462;&#28040;&#24687;&#30340;&#20301;&#32622;</td>
-   </tr>
-</table>
+	<table class= "table table-bordered table-striped table-condensed">
+	   <tr>
+	      <td>&#26041;&#27861;</td>
+	      <td>&#25551;&#36848;</td>
+	   </tr>
+	   <tr>
+	      <td>int getThreadPoolSize()</td>
+	      <td>&#36820;&#22238;consumer&#22788;&#29702;&#28040;&#24687;&#30340;&#32447;&#31243;&#27744;&#32447;&#31243;&#25968;</td>
+	   </tr>
+	   <tr>
+	      <td>void setThreadPoolSize(int)</td>
+	      <td>&#35774;&#32622;consumer&#22788;&#29702;&#28040;&#24687;&#30340;&#32447;&#31243;&#27744;&#32447;&#31243;&#25968;</td>
+	   </tr>
+	   <tr>
+	      <td>MessageFilter getMessageFilter()</td>
+	      <td>&#36820;&#22238;&#28040;&#24687;&#36807;&#28388;&#26041;&#24335;</td>
+	   </tr>
+	   <tr>
+	      <td>void setMessageFilter(MessageFilter)</td>
+	      <td>&#36820;&#22238;&#28040;&#24687;&#36807;&#28388;&#26041;&#24335;</td>
+	   </tr>
+	   <tr>
+	      <td>ConsumerType getConsumerType()</td>
+	      <td>&#36820;&#22238;&#28040;&#36153;&#32773;&#31867;&#22411;</td>
+	   </tr>
+	   <tr>
+	      <td>void setConsumerType(ConsumerType)</td>
+	      <td>&#35774;&#32622;&#28040;&#36153;&#32773;&#31867;&#22411;</td>
+	   </tr>
+	   <tr>
+	      <td>int getDelayBaseOnBackoutMessageException()</td>
+	      <td>&#36820;&#22238;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#23567;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
+	   </tr>
+	   <tr>
+	      <td>void setDelayBaseOnBackoutMessageException(int)</td>
+	      <td>&#35774;&#32622;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#23567;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
+	   </tr>
+	   <tr>
+	      <td> int getDelayUpperboundOnBackoutMessageException()</td>
+	      <td>&#36820;&#22238;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#22823;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
+	   </tr>
+	   <tr>
+	      <td>void setDelayUpperboundOnBackoutMessageException(int)</td>
+	      <td>&#35774;&#32622;2&#27425;&#37325;&#35797;&#20043;&#38388;&#26368;&#22823;&#30340;&#20572;&#39039;&#26102;&#38388;</td>
+	   </tr>
+	   <tr>
+	      <td>int getRetryCountOnBackoutMessageException()</td>
+	      <td>&#36820;&#22238;&#26368;&#22810;&#37325;&#35797;&#30340;&#27425;&#25968;</td>
+	   </tr>
+	   <tr>
+	      <td>void setRetryCountOnBackoutMessageException(int)</td>
+	      <td>&#35774;&#32622;&#26368;&#22810;&#37325;&#35797;&#30340;&#27425;&#25968;</td>
+	   </tr>
+	   <tr>
+	      <td>long getStartMessageId()</td>
+	      <td>&#36820;&#22238;&#35835;&#21462;&#28040;&#24687;&#30340;&#20301;&#32622;</td>
+	   </tr>
+	   <tr>
+	      <td>void setStartMessageId(long)</td>
+	      <td>&#35774;&#32622;&#35835;&#21462;&#28040;&#24687;&#30340;&#20301;&#32622;</td>
+	   </tr>
+	</table>
      
 3.设置好接收端属性后就可以对消费者对象进行构造。ConsumerFactoryImpl实现了ConsumerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createConsumer会返回ConsumerImpl实例，而ConsumerImpl自身实现了接口Consumer。作为消费者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地，该名字需要与所感兴趣的生产者指定的目的地名称一致。
      
