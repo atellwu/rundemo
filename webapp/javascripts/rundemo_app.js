@@ -271,18 +271,10 @@
 			}
 		},
 		"changeJavaCodeFile" : function(index) {
-			// 当前的index是多少
-			var curLi = $("#javaCodeTab > li[class='active']");
-			var curIndex = curLi.index();
-			// 如果更改了，则
-			if (index != curIndex) {
-				// 更改active
-				curLi.removeClass("active");
-				var newLi = $("#javaCodeTab > li:eq(" + index + ")");
-				newLi.addClass("active");
-				// 重新加载code
-				rundemo_app.loadCode(newLi.children("a").attr("filePath"));
-			}
+			var curDiv = $(".tree-selected");
+			var filePath = curDiv.children("div").children("a").attr("filePath");
+			if(!(typeof(filePath) == 'undefined'))
+			rundemo_app.loadCode(filePath);
 		},
 		"changeResourceFile" : function(index) {
 			// 当前的index是多少

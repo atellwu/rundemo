@@ -1,44 +1,131 @@
-
-<div class="container-fluid">
-   <div class="row-fluid">
-      <ul class="nav nav-pills" id="javaCodeTab"
-         style="margin-left: 60px; margin-top: 20px; margin-bottom: 0px;">
-         #foreach($javaFileInfo in $javaFileInfoList) #set($index =
-         ${velocityCount} - 1)
-         <li><a style="padding: 2px 10px 2px 10px;"
-            href="javascript:rundemo_app.changeJavaHash(${index});" filePath="${javaFileInfo.getPath()}">${javaFileInfo.getDisplayName()}</a></li>
-         #end
-      </ul>
-      <span style="color: #585858; font-size: 14px">代码演示</span>
-      <hr style="margin-top: 0px; margin-bottom: 5px">
-      <div class="container-fluid">
-         <div class="row-fluid">
-            <div class="span7">
-               <!--
-                     <textarea style="width: 100%" name="content"
-                        id="content" onchange="rundemo_app.modifyCode()"
-                        rows="15"></textarea>
-                        <pre class="prettyprint">import</pre>-->
-               <div id="editor"
-                  style="border: 1px solid #A9E2F3; border-radius: 3px 3px 3px 3px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;"></div>
-            </div>
-            <div class="span5">
-               <button id="runButton" type="button"
-                  onclick="rundemo_app.runDemo()"
-                  class="btn btn-success">Run</button>
-               <button id="shutdownButton" type="button"
-                  onclick="rundemo_app.shutdown()"
-                  class="btn btn-danger"
-                  style="display: none;">Shutdown</button>
-               <pre
-                  style="cursor: text; margin-top: 20px; background-color: #3A1042; color: #FFFFFF; font-size: 12px; width: 100%; height: 320px; overflow-x: auto;"
-                  id="console"></pre>
-               <span style="float: right; font-size: 9px;">.Console.</span>
-               <input id="consoleInput" type="text" class="input-xlarge" onkeypress="rundemo_app.input(event);" placeholder="console input">
-            </div>
-         </div>
-      </div>
-   </div>
-   <!--/row-->
+<!-- FileTreeList Styles -->
+<link rel="stylesheet"
+	href="${rc.contextPath}/stylesheets/tree-view-min/ace.min.css" />
+<link href="${rc.contextPath}/stylesheets/tree-view-min/bootstrap.min.css"
+	rel="stylesheet" />
+<style  type="text/css">
+.ace-eclipse .ace_print_margin {
+	width: 0px;/* 解决样式冲突 */
+}
+</style>
+<div class="main-content">
+<div id="breadcrumbs">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="row">
+				<div class="col-sm-4">
+					<div class="widget-box">
+						<div class="widget-header widget-header-flat">
+							<h4 class="smaller">Code File TreeList</h4>
+						</div>
+						<div class="widget-body">
+							<div class="widget-main">
+								<div id="treeView" class="tree"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-8">
+					<div class="row">
+						<div class="col-xs-12">
+							<div>
+								<div class="widget-header widget-header-flat">
+									<h4 class="smaller">Code view</h4>
+								</div>
+								<div class="widget-body">
+									<div class="widget-main">
+										<div id="editor"
+											style="border: 1px solid #A9E2F3; border-radius: 3px 3px 3px 3px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="space-6"></div>
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="widget-box">
+								<div class="widget-header widget-header-flat">
+									<h4 class="smaller">Run Result</h4>
+								</div>
+								<div class="widget-body">
+									<div class="widget-main">
+										<button id="runButton" type="button"
+											onclick="rundemo_app.runDemo()" class="btn btn-success">Run</button>
+										<button id="shutdownButton" type="button"
+											onclick="rundemo_app.shutdown()" class="btn btn-danger"
+											style="display: none;">Shutdown</button>
+										<pre
+											style="cursor: text; margin-top: 20px; background-color: #3A1042; color: #FFFFFF; font-size: 12px; width: 100%; height: 320px; overflow-x: auto;"
+											id="console"></pre>
+										<span style="float: right; font-size: 9px;">.Console.</span> <input
+											id="consoleInput" type="text" class="input-xlarge"
+											onkeypress="rundemo_app.input(event);"
+											placeholder="console input">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- PAGE CONTENT ENDS -->
+		</div>
+		<!-- /.col -->
+	</div>
+	<!-- /.row -->
 </div>
-<!--/.fluid-container-->
+<!-- /.page-content -->
+</div>
+<!-- /.main-content -->
+
+<!-- 以下是显示树形文件列表控件所必须 -->
+<script type="text/javascript">
+		// window.jQuery || document.write("<script src='${rc.contextPath}/javascripts/tree-view-min/jquery-2.0.3.min.js'>"+"<"+"/script>");
+ window.jQuery || document.write("<script src='${rc.contextPath}/javascripts/tree-view-min/jquery-1.10.2.min.js'>"+"<"+"/script>");
+		</script>
+<script
+	src="${rc.contextPath}/javascripts/tree-view-min/fuelux.tree.min.js"></script>
+<script
+	src="${rc.contextPath}/javascripts/tree-view-min/ace-elements.min.js"></script>
+<script type="text/javascript">
+jQuery(function($) {
+		var DataSourceTree = function(options) {
+			this._data = options.data;
+			this._delay = options.delay;
+		}
+		DataSourceTree.prototype.data = function(options, callback) {
+			var self = this;
+			var $data = null;
+
+			if (!("name" in options) && !("type" in options)) {
+				$data = this._data;//the root tree
+				callback({
+					data : $data
+				});
+				return;
+			} else if ("type" in options && options.type == "folder") {
+				if ("additionalParameters" in options
+						&& "children" in options.additionalParameters)
+					$data = options.additionalParameters.children;
+				else
+					$data = {}//no data
+			}
+
+			if ($data != null)//this setTimeout is only for mimicking some random delay
+				setTimeout(function() {
+					callback({
+						data : $data
+					});
+				}, parseInt(Math.random() * 500) + 200);
+		};
+	
+		var tree_data = "${javaFileInfoList}"; 
+		tree_data = tree_data.replace(/%/g, "'").replace(/#/g, "<").replace(/\|/g, ">");//还原JSON字符串
+		$('#treeView').ace_tree({
+			dataSource : new DataSourceTree({
+				data : eval('(' + tree_data + ')')
+			})
+		});
+	});
+</script>
