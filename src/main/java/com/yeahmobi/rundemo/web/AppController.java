@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,7 +16,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +27,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
 import com.yeahmobi.rundemo.Entry.FileTree;
+import com.yeahmobi.rundemo.config.Config;
 import com.yeahmobi.rundemo.project.AppProject;
 import com.yeahmobi.rundemo.project.JavaCodeInfo;
 import com.yeahmobi.rundemo.project.JavaProject;
@@ -41,16 +40,6 @@ public class AppController {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory
 			.getLogger(AppController.class);
-
-	private String appprojectDir;
-	
-	@Value("#{confProperties['demoDir']}")
-	private String demoDir;
-
-	@PostConstruct
-	public void init() {
-		this.appprojectDir = this.demoDir + "/appprojects/";
-	}
 
 	@RequestMapping(value = "/")
 	public ModelAndView allApps(HttpServletRequest request,
@@ -150,7 +139,7 @@ public class AppController {
 		String[] resFileNameList = javaProject.loadResFileNameList();
 		String pom = appProject.loadPom();
 		//
-		File file = new File(appprojectDir + app + "/src/main/");
+		File file = new File(Config.appprojectDir + app + "/src/main/");
 		String javaFileInfos = FileTree.getJsonFileList(file);
 		map.put("pom", (pom));
 		// 返回的json数据中含有引号"和<>，前台js解析时会自动转义，这里用其他字符替换，传到前台后再替换回来

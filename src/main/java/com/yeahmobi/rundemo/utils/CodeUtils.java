@@ -147,7 +147,7 @@ public class CodeUtils {
         //      System.out.println(mm.matches());
         //      System.out.println(mm.group(1));
         System.out.println(CodeUtils.getJavaFileInfo(new File(Config.appprojectDir
-                + "swallow-example/src/main/java/com/dianping/swallow/example/consumer/DurableConsumerExample.java"),
+                + "swallow-example/src/main/java/com/yeahmobi/swallow/example/consumer/DurableConsumerExample.java"),
                 "swallow-example"));
     }
 }

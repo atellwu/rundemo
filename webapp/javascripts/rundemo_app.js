@@ -337,6 +337,25 @@
 			$('#errorMsg > div[class="modal-header"] > h3').text(title);
 			$('#errorMsg > div[class="modal-body"] > p').text(errorMsg);
 			$('#errorMsg').modal('show');
+		},
+		"createApp" : function(){
+			$.ajax({
+				type : $('#form').attr('method'),
+				url : $('#form').attr('action'),
+				data : $('#form').serialize(),
+				dataType : "json",
+				success : function(data) {
+					if (data.success == false) {
+						$('#progressModal').modal('hide');
+						rundemo_app.appError("错误", data.errorMsg);
+					} else {
+						window.location.href = w.contextpath + '/' + data.app;
+					}
+				},
+				error : rundemo_app.httpError
+			});
+			$('#createAppModal').modal('hide');
+			$('#progressModal').modal('show');
 		}
 	};
 	w.rundemo_app = rundemo_app;

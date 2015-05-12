@@ -2,10 +2,11 @@ package com.yeahmobi.rundemo.web;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +18,13 @@ import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
+import com.yeahmobi.rundemo.config.Config;
 import com.yeahmobi.rundemo.utils.Constants;
 
 @Controller
@@ -29,25 +32,25 @@ public class AdminController {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(AdminController.class);
 	
-	private String shellDir;
-	private String appprojectDir;
-	private String gitTempDir;
-	
-	@Value("#{confProperties['demoDir']}")
-	private String demoDir;
-
 	@PostConstruct
 	public void init() {
-		this.appprojectDir = this.demoDir + "appprojects/";
-		this.shellDir = this.demoDir + "shell/";
-		this.gitTempDir = this.demoDir + "git_temp/";
+		try {
+			Config.copyShellFile();
+		} catch (IOException e) {
+			LOG.info("copy shell files to target directory failed:"+e.getMessage());
+		} catch (InterruptedException e) {
+			LOG.info("give shell files permission failed:"+e.getMessage());
+		}
 	}
 
-	@RequestMapping(value = "/create")
-	public RedirectView create(String app, String gitUrl, String branch,
+	@RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String create(String app, String gitUrl, String branch,
 			String subdir, String mavenOpt, HttpServletRequest request,
-			HttpServletResponse response) throws FileNotFoundException,
-			IOException, InterruptedException {
+			HttpServletResponse response) {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		
 		// (1)调用shell，下载git到本地，并且求出classpath
 		if (StringUtils.isBlank(branch)) {
 			branch = "master";
@@ -55,7 +58,7 @@ public class AdminController {
 		InputStream input = null;
 		try {
 			Process proc = Runtime.getRuntime().exec(
-					new String[] { this.shellDir + "down_git.sh", gitUrl,
+					new String[] { Config.shellDir + "down_git.sh", gitUrl,
 							app, branch, mavenOpt, subdir });
 			input = proc.getInputStream();
 			LineIterator lineIterator = IOUtils
@@ -65,33 +68,47 @@ public class AdminController {
 				LOG.info("down_git.sh output:" + line);
 			}
 			proc.waitFor();
+			operateFiles(app, subdir);
+			map.put("app", app);
+			map.put("success", true);
+		} catch (IOException e) {
+			map.put("success", false);
+			map.put("errorMsg", e.toString());
+		} catch (InterruptedException e) {
+			map.put("success", false);
+			map.put("errorMsg", e.toString());
 		} finally {
 			IOUtils.closeQuietly(input);
+		}
+		Gson gson = new Gson();
+		return gson.toJson(map);
+
+		//return new RedirectView(request.getContextPath() + "/" + app);
+	}
+
+	private void operateFiles(String app, String subdir) throws IOException{
+		if (!StringUtils.isBlank(subdir)) {
+			subdir = "/" + subdir;
+		} else {
+			subdir = "";
 		}
 		// (2)Config.shellDir" + "/git_temp/{app}相关文件复制到appprojects/{app}
 		// cp -rp Config.shellDir" + "/git_temp/{app}/subpath/src
 		// Config.shellDir" + "/appprojects/{app}/src
 		// cp -p Config.shellDir" + "/git_temp/{app}/subpath/pom.xml
 		// Config.shellDir" + "/appprojects/{app}/pom.xml
-		if (!StringUtils.isBlank(subdir)) {
-			subdir = "/" + subdir;
-		} else {
-			subdir = "";
-		}
-		FileUtils.deleteDirectory(new File(appprojectDir + app));
+		FileUtils.deleteDirectory(new File(Config.appprojectDir + app));
 		this.copyFile2AppProject(app, subdir);
 		// 删除gitTempDir/{app}
-		FileUtils.deleteDirectory(new File(this.gitTempDir + app + "/"));
-
-		return new RedirectView(request.getContextPath() + "/" + app);
+		FileUtils.deleteDirectory(new File(Config.gitTempDir + app + "/"));
 	}
 
 	private void copyFile2AppProject(String app, String subdir)
 			throws IOException {
-		File file = new File(this.gitTempDir + app + subdir	+ "/");
+		File file = new File(Config.gitTempDir + app + subdir	+ "/");
 		File[] files = file.listFiles(new CopyFileFilter());
 		for (File f : files) {
-			File newFile = new File(this.appprojectDir + app + "/" + f.getName());
+			File newFile = new File(Config.appprojectDir + app + "/" + f.getName());
 			if (f.isFile()) {
 				FileUtils.copyFile(f, newFile);
 			} else {
