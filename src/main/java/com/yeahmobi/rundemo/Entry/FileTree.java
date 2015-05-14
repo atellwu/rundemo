@@ -15,7 +15,6 @@ public class FileTree {
 	public FileTree(String name, String type) {
 		this.name = name;
 		this.type = type;
-		
 	}
 	
 	public String getName() {
@@ -60,12 +59,12 @@ public class FileTree {
 		for(File file : files){
 			FileTree fileTree = null;
 			if (file.isDirectory()) {
-				fileTree = new FileTree(file.getName(), "folder");
+				fileTree = new FileTree(file.getName() + "<input type=hidden id=h_"+(index*100)+">", "folder");
 				List<FileTree> list = spliceJsonData(file.listFiles(), (index++)*100);
 				AdditionalParameters additionalParameters = new AdditionalParameters(list);
 				fileTree.setAdditionalParameters(additionalParameters);
 			}else {
-				String name = "<a href=javascript:rundemo_app.changeJavaHash("+(index++)+"); filePath="+file.getAbsolutePath()+">"+file.getName()+"</a>";
+				String name = "<a id=item_"+(index)+" href=javascript:rundemo_app.changeJavaHash("+(index++)+"); filePath="+file.getAbsolutePath()+">"+file.getName()+"</a>";
 				fileTree = new FileTree(name, "item");
 			}
 			mainlist.add(fileTree);

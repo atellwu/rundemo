@@ -134,12 +134,10 @@ public class AppController {
 		ProjectContext.putJavaProject(app, pageid, javaProject);
 
 		AppProject appProject = ProjectContext.getAppProject(app);
-		// List<JavaFileInfo> javaFileInfoList =
-		// appProject.loadJavaFileNameList();
 		String[] resFileNameList = javaProject.loadResFileNameList();
 		String pom = appProject.loadPom();
-		//
-		File file = new File(Config.appprojectDir + app + "/src/main/");
+		
+		File file = new File(Config.appprojectDir + app + "/src/main/java/");//com/yeahmobi/example
 		String javaFileInfos = FileTree.getJsonFileList(file);
 		map.put("pom", (pom));
 		// 返回的json数据中含有引号"和<>，前台js解析时会自动转义，这里用其他字符替换，传到前台后再替换回来

@@ -271,10 +271,38 @@
 			}
 		},
 		"changeJavaCodeFile" : function(index) {
+			var filePath;
 			var curDiv = $(".tree-selected");
-			var filePath = curDiv.children("div").children("a").attr("filePath");
-			if(!(typeof(filePath) == 'undefined'))
-			rundemo_app.loadCode(filePath);
+			if(curDiv.length == 0){
+				var temp = $("#item_"+index).parent().parent();
+				temp.addClass("tree-selected");
+				temp.children("i").attr("class","icon-ok")
+				temp.parent().attr("display","block");
+				filePath = $("#item_"+index).attr("filePath");
+				rundemo_app.loadCode(filePath);
+			}else{
+				var curA = curDiv.children("div").children("a");
+				filePath = curA.attr("filePath");
+				//<a id="item_800" filepath="/../.." href="javascript:rundemo_app.changeJavaHash(800);">Test.java</a>
+				//id的后缀与index相同
+				var oldIndex = curA.attr("id").substring(curA.attr("id").indexOf("_")+1);
+				if( oldIndex != index.toString()){
+					
+					curDiv.removeClass("tree-selected");
+					curDiv.children("i").attr("class","tree-dot");
+					
+					var temp = $("#item_"+index).parent().parent();
+					temp.addClass("tree-selected");
+					temp.children("i").attr("class","icon-ok")
+					temp.parent().attr("display","block");
+					filePath = $("#item_"+index).attr("filePath");
+				}
+				if(!(typeof(filePath) == 'undefined'))
+					rundemo_app.loadCode(filePath);
+			}
+		},
+		"readyLoadCode" : function(){
+			
 		},
 		"changeResourceFile" : function(index) {
 			// 当前的index是多少
@@ -386,7 +414,8 @@ $(document).ready(function() {
 
 	// 根据#hash定位
 	window.onhashchange = rundemo_app.onHashChange;
-	rundemo_app.onHashChange();
+	//rundemo_app.onHashChange();
+	setTimeout("rundemo_app.onHashChange()", 1000);
 	// 离开页面时，删除JavaProject
 	window.onunload = rundemo_app.onunload;
 

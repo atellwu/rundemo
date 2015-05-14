@@ -16,6 +16,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -31,15 +36,16 @@ import com.yeahmobi.rundemo.utils.Constants;
 public class AdminController {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(AdminController.class);
-	
+
 	@PostConstruct
 	public void init() {
 		try {
 			Config.copyShellFile();
 		} catch (IOException e) {
-			LOG.info("copy shell files to target directory failed:"+e.getMessage());
+			LOG.info("copy shell files to target directory failed:"
+					+ e.getMessage());
 		} catch (InterruptedException e) {
-			LOG.info("give shell files permission failed:"+e.getMessage());
+			LOG.info("give shell files permission failed:" + e.getMessage());
 		}
 	}
 
@@ -55,60 +61,84 @@ public class AdminController {
 		if (StringUtils.isBlank(branch)) {
 			branch = "master";
 		}
+		Git git = null;
 		InputStream input = null;
 		try {
-			Process proc = Runtime.getRuntime().exec(
-					new String[] { Config.shellDir + "down_git.sh", gitUrl,
-							app, branch, mavenOpt, subdir });
-			input = proc.getInputStream();
-			LineIterator lineIterator = IOUtils
-					.lineIterator(new InputStreamReader(input));
-			while (lineIterator.hasNext()) {
-				String line = lineIterator.next();
-				LOG.info("down_git.sh output:" + line);
-			}
-			proc.waitFor();
+			//（1）用JGit下载项目代码至本地(这样就不要求系统装git)
+			git = cloneProjectFromGit(app, gitUrl, branch);
+			//（2）下载完后cd 到pom文件目录下，使用mvn命令生成classpath文件（要求本地安装maven）
+			input = generateClasspath(app, subdir, mavenOpt, map);
+			//(3) copy git_temp下的src、pom.xml和classpath至appproject
 			operateFiles(app, subdir);
 			map.put("app", app);
 			map.put("success", true);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			map.put("success", false);
 			map.put("errorMsg", e.toString());
-		} catch (InterruptedException e) {
-			map.put("success", false);
-			map.put("errorMsg", e.toString());
+		   LOG.error(e.getMessage());
 		} finally {
+			if(git!=null){
+				git.close();
+			}
 			IOUtils.closeQuietly(input);
 		}
 		Gson gson = new Gson();
 		return gson.toJson(map);
-
-		//return new RedirectView(request.getContextPath() + "/" + app);
 	}
 
-	private void operateFiles(String app, String subdir) throws IOException{
+	private InputStream generateClasspath(String app, String subdir,
+			String mavenOpt, Map<String, Object> map) throws IOException,
+			InterruptedException {
+		InputStream input;
+		Process proc = Runtime.getRuntime().exec(
+				new String[] { Config.shellDir + "ouput_classpath.sh", Config.gitTempDir + app 	+ "/",
+						subdir, mavenOpt });
+		input = proc.getInputStream();
+		LineIterator lineIterator = IOUtils
+				.lineIterator(new InputStreamReader(input));
+		while (lineIterator.hasNext()) {
+			String line = lineIterator.next();
+			LOG.info("ouput_classpath.sh output:" + line);
+		}
+		int exitVal = proc.waitFor();
+		if(exitVal!=0){
+			map.put("success", false);
+			map.put("errorMsg", "mvn *** command ouput classpath failed! Please check run log!");
+		}
+		return input;
+	}
+
+	private Git cloneProjectFromGit(String app, String gitUrl, String branch)
+			throws GitAPIException, InvalidRemoteException, TransportException {
+		Git git;
+		CloneCommand cloneCommand = Git.cloneRepository();
+		cloneCommand.setDirectory(new File(Config.gitTempDir + app 	+ "/"));
+		cloneCommand.setURI(gitUrl);
+		cloneCommand.setBranch(branch);
+		git = cloneCommand.call();
+		return git;
+	}
+
+	private void operateFiles(String app, String subdir) throws IOException {
 		if (!StringUtils.isBlank(subdir)) {
 			subdir = "/" + subdir;
 		} else {
 			subdir = "";
 		}
-		// (2)Config.shellDir" + "/git_temp/{app}相关文件复制到appprojects/{app}
-		// cp -rp Config.shellDir" + "/git_temp/{app}/subpath/src
-		// Config.shellDir" + "/appprojects/{app}/src
-		// cp -p Config.shellDir" + "/git_temp/{app}/subpath/pom.xml
-		// Config.shellDir" + "/appprojects/{app}/pom.xml
+		//为避免应用重复，创建新应用时首先删除原来同名的应用
 		FileUtils.deleteDirectory(new File(Config.appprojectDir + app));
 		this.copyFile2AppProject(app, subdir);
-		// 删除gitTempDir/{app}
+		//copy完文件后，删除git_temp目录下的临时文件
 		FileUtils.deleteDirectory(new File(Config.gitTempDir + app + "/"));
 	}
 
 	private void copyFile2AppProject(String app, String subdir)
 			throws IOException {
-		File file = new File(Config.gitTempDir + app + subdir	+ "/");
+		File file = new File(Config.gitTempDir + app + subdir + "/");
 		File[] files = file.listFiles(new CopyFileFilter());
 		for (File f : files) {
-			File newFile = new File(Config.appprojectDir + app + "/" + f.getName());
+			File newFile = new File(Config.appprojectDir + app + "/"
+					+ f.getName());
 			if (f.isFile()) {
 				FileUtils.copyFile(f, newFile);
 			} else {

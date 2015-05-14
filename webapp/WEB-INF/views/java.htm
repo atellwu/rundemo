@@ -78,7 +78,6 @@
 <!-- /.page-content -->
 </div>
 <!-- /.main-content -->
-
 <!-- 以下是显示树形文件列表控件所必须 -->
 <script type="text/javascript">
 		// window.jQuery || document.write("<script src='${rc.contextPath}/javascripts/tree-view-min/jquery-2.0.3.min.js'>"+"<"+"/script>");
@@ -122,10 +121,20 @@ jQuery(function($) {
 	
 		var tree_data = "${javaFileInfoList}"; 
 		tree_data = tree_data.replace(/%/g, "'").replace(/#/g, "<").replace(/\|/g, ">");//还原JSON字符串
+		var headId = 0;
+		var hash = window.location.href;
+		hash = hash.substring(hash.lastIndexOf("=")==-1 ? hash.length : hash.lastIndexOf("=")+1);
+		if(hash.length > 0){
+			if(hash.substring(0, hash.length-2).length == 0){
+				headId = "0"
+			}else{
+				headId = hash.substring(0, hash.length-2)+"00";
+			}
+		}
 		$('#treeView').ace_tree({
 			dataSource : new DataSourceTree({
 				data : eval('(' + tree_data + ')')
 			})
-		});
+		}, headId);
 	});
 </script>
