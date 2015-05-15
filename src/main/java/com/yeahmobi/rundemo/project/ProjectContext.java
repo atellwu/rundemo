@@ -57,7 +57,7 @@ public class ProjectContext {
                     			} catch (IOException e) {
                     				throw new RuntimeException(e.getMessage(), e);
                     			}
-                    			packageName = p.get("packageName").toString();
+                    			packageName = p.get("packageName")==null ? "" : p.get("packageName").toString();
                     	   }
                        }
                     AppProject appProject = new AppProject(app, packageName, classpath);
@@ -111,7 +111,7 @@ public class ProjectContext {
                                 			} catch (IOException e) {
                                 				throw new RuntimeException(e.getMessage(), e);
                                 			}
-                                			packageName = p.get("packageName").toString();
+                                			packageName = p.get("packageName")==null ? "" : p.get("packageName").toString();
                                 	   }
                                    }
                                 appProject = new AppProject(app, packageName, classpath);
