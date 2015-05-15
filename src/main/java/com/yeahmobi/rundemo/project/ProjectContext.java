@@ -1,10 +1,12 @@
 package com.yeahmobi.rundemo.project;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
@@ -12,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.yeahmobi.rundemo.config.Config;
+import com.yeahmobi.rundemo.utils.Constants;
 
 /**
  * TODO Comment of ProjectContext
@@ -24,25 +27,40 @@ public class ProjectContext {
     private static ConcurrentHashMap<String, AppProject> appProjects = new ConcurrentHashMap<String, AppProject>();
 
     private static ConcurrentHashMap<String, ConcurrentHashMap<String, JavaProject>> appToJavaProjects = new ConcurrentHashMap<String, ConcurrentHashMap<String, JavaProject>>();
+    
+    private static Properties p;
 
     //初始化ProjectContext
     static {
-        //扫描Config.shellDir" + "/appprojects/目录，创建appprojects
+        //扫描Config.appprojectDir" + "appprojects/目录，创建appprojects
         File appprojectsDir = new File(Config.appprojectDir);
         File[] appprojectDirs = appprojectsDir.listFiles();
         if (appprojectDirs != null) {
             for (File appprojectDir : appprojectDirs) {
                 String app = appprojectDir.getName();
-                File[] classpathFiles = appprojectDir.listFiles(new FilenameFilter() {
+                File[] eligibleFiles = appprojectDir.listFiles(new FilenameFilter() {
                     @Override
                     public boolean accept(File dir, String name) {
-                        return "classpath".equals(name);
+                        return Constants.CLASSPATH.equals(name) || Constants.APPPROPERTIES.equals(name);
                     }
                 });
                 try {
-                    File classpathFile = classpathFiles[0];
-                    String classpath = FileUtils.readFileToString(classpathFile, "ISO-8859-1").trim();
-                    AppProject appProject = new AppProject(app, classpath);
+                	String classpath = null;
+                	String packageName = null;
+                    for(File file : eligibleFiles){
+                    	   if(Constants.CLASSPATH.equals(file.getName())){
+                    		   classpath = FileUtils.readFileToString(file, "ISO-8859-1").trim();
+                    	   }else if(Constants.APPPROPERTIES.equals(file.getName())){
+                    		   p = new Properties();
+                    			try {
+                    				p.load(new FileInputStream(file));
+                    			} catch (IOException e) {
+                    				throw new RuntimeException(e.getMessage(), e);
+                    			}
+                    			packageName = p.get("packageName").toString();
+                    	   }
+                       }
+                    AppProject appProject = new AppProject(app, packageName, classpath);
                     ProjectContext.putAppProject(app, appProject);
                 } catch (Exception e) {
                     LOG.error("error when load from Config.shellDir" + "/appprojects/" + app, e);
@@ -74,16 +92,29 @@ public class ProjectContext {
                         String app0 = appprojectDir.getName();
                         if (app0.equals(app)) {//从本地文件中找到这个app
                             LOG.info("loading AppProject from local filesystem, app=" + app);
-                            File[] classpathFiles = appprojectDir.listFiles(new FilenameFilter() {
+                            File[] eligibleFiles = appprojectDir.listFiles(new FilenameFilter() {
                                 @Override
                                 public boolean accept(File dir, String name) {
-                                    return "classpath".equals(name);
+                                	 return Constants.CLASSPATH.equals(name) || Constants.APPPROPERTIES.equals(name);
                                 }
                             });
                             try {
-                                File classpathFile = classpathFiles[0];
-                                String classpath = FileUtils.readFileToString(classpathFile, "ISO-8859-1").trim();
-                                appProject = new AppProject(app, classpath);
+                            	String classpath = null;
+                            	String packageName = null;
+                                for(File file : eligibleFiles){
+                                	   if(Constants.CLASSPATH.equals(file.getName())){
+                                		   classpath = FileUtils.readFileToString(file, "ISO-8859-1").trim();
+                                	   }else if(Constants.APPPROPERTIES.equals(file.getName())){
+                                		   p = new Properties();
+                                			try {
+                                				p.load(new FileInputStream(file));
+                                			} catch (IOException e) {
+                                				throw new RuntimeException(e.getMessage(), e);
+                                			}
+                                			packageName = p.get("packageName").toString();
+                                	   }
+                                   }
+                                appProject = new AppProject(app, packageName, classpath);
                                 ProjectContext.putAppProject(app, appProject);
                                 LOG.info("loaded AppProject from local filesystem, app=" + app);
                             } catch (Exception e) {

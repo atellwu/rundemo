@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
-
+/**
+ * 构建前台文件树展示所需要的数据结构
+ * @author Abel.cui
+ *
+ */
 public class FileTree {
-	public String name;
-	public String type;
-	public AdditionalParameters additionalParameters;
+	public String name;//显示文件名
+	public String type;//类型：item、folder
+	public AdditionalParameters additionalParameters;//子目录
 	
 	public FileTree(String name, String type) {
 		this.name = name;
@@ -44,7 +48,7 @@ public class FileTree {
 	public String toJsonString(){
 		return JSONObject.toJSONString(this);
 	}
-
+	
 	public static String getJsonFileList(File file) {
 		List<FileTree> list = spliceJsonData(file.listFiles(), 0);
 		JSONObject object = new JSONObject();
@@ -59,8 +63,9 @@ public class FileTree {
 		for(File file : files){
 			FileTree fileTree = null;
 			if (file.isDirectory()) {
-				fileTree = new FileTree(file.getName() + "<input type=hidden id=h_"+(index*100)+">", "folder");
-				List<FileTree> list = spliceJsonData(file.listFiles(), (index++)*100);
+				//默认每个目录下有1W个文件，给每个java文件编号，便于前端根据URL来定位文件
+				fileTree = new FileTree(file.getName() + "<input type=hidden id=h_"+(index*10000)+">", "folder");
+				List<FileTree> list = spliceJsonData(file.listFiles(), (index++)*10000);
 				AdditionalParameters additionalParameters = new AdditionalParameters(list);
 				fileTree.setAdditionalParameters(additionalParameters);
 			}else {
@@ -70,10 +75,5 @@ public class FileTree {
 			mainlist.add(fileTree);
 		}
 		return mainlist;
-	}
-	
-	public static void main(String[] args) {
-		File file = new File("D:\\data\\rundemo\\appprojects\\test_abel\\src\\main\\java");
-		System.out.println(getJsonFileList(file));
 	}
 }

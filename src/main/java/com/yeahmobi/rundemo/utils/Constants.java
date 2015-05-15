@@ -7,5 +7,7 @@ public class Constants {
 	public static final String SRC = "src";
 
 	public static final String POM = "pom.xml";
+	
+	public static final String APPPROPERTIES = "app.properties";
 
 }

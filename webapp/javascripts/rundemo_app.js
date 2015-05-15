@@ -274,12 +274,7 @@
 			var filePath;
 			var curDiv = $(".tree-selected");
 			if(curDiv.length == 0){
-				var temp = $("#item_"+index).parent().parent();
-				temp.addClass("tree-selected");
-				temp.children("i").attr("class","icon-ok")
-				temp.parent().attr("display","block");
-				filePath = $("#item_"+index).attr("filePath");
-				rundemo_app.loadCode(filePath);
+				filePath = rundemo_app.readyLoadCode(index);
 			}else{
 				var curA = curDiv.children("div").children("a");
 				filePath = curA.attr("filePath");
@@ -291,18 +286,22 @@
 					curDiv.removeClass("tree-selected");
 					curDiv.children("i").attr("class","tree-dot");
 					
-					var temp = $("#item_"+index).parent().parent();
-					temp.addClass("tree-selected");
-					temp.children("i").attr("class","icon-ok")
-					temp.parent().attr("display","block");
-					filePath = $("#item_"+index).attr("filePath");
+					filePath = rundemo_app.readyLoadCode(index);
 				}
-				if(!(typeof(filePath) == 'undefined'))
-					rundemo_app.loadCode(filePath);
+			}
+			if(typeof(filePath) == 'undefined'){
+				window.editor.setValue("");
+				rundemo_app.appError("Error", "You visit the link does not exist, please check and re-visit!");
+			}else{
+				rundemo_app.loadCode(filePath);
 			}
 		},
-		"readyLoadCode" : function(){
-			
+		"readyLoadCode" : function(index){
+			var temp = $("#item_"+index).parent().parent();
+			temp.addClass("tree-selected");
+			temp.children("i").attr("class","icon-ok")
+			temp.parent().attr("display","block");
+			return $("#item_"+index).attr("filePath");
 		},
 		"changeResourceFile" : function(index) {
 			// 当前的index是多少
@@ -361,10 +360,10 @@
 					+ ',msg:' + errorThrown + ')');
 		},
 		"alertError" : function(title, errorMsg) {
-			// 显示错误消息
-			$('#errorMsg > div[class="modal-header"] > h3').text(title);
-			$('#errorMsg > div[class="modal-body"] > p').text(errorMsg);
-			$('#errorMsg').modal('show');
+			// 动态显示和隐藏错误消息
+			$('#error_Msg > div > h4').text(title+": "+errorMsg);
+			$('#error_Msg').show(500);
+			setTimeout("$('#error_Msg').hide(1000);",10000);
 		},
 		"createApp" : function(){
 			$.ajax({
@@ -415,7 +414,7 @@ $(document).ready(function() {
 	// 根据#hash定位
 	window.onhashchange = rundemo_app.onHashChange;
 	//rundemo_app.onHashChange();
-	setTimeout("rundemo_app.onHashChange()", 1000);
+	setTimeout("rundemo_app.onHashChange()", 500);
 	// 离开页面时，删除JavaProject
 	window.onunload = rundemo_app.onunload;
 

@@ -19,11 +19,13 @@ import com.yeahmobi.rundemo.utils.CodeUtils;
 public class AppProject {
 
 	private final String app;
+	private final String packageName;
 	private final String classpath;
 
-	public AppProject(String app, String classpath) {
+	public AppProject(String app, String packageName, String classpath) {
 		super();
 		this.app = app;
+		this.packageName = packageName;
 		this.classpath = classpath;
 	}
 
@@ -35,6 +37,9 @@ public class AppProject {
 		return classpath;
 	}
 
+	public String getPackageName(){
+		return packageName;
+	}
 	/**
 	 * 从本地load文件
 	 * 
@@ -91,7 +96,7 @@ public class AppProject {
 
 	@Override
 	public String toString() {
-		return "AppProject [app=" + app + ", classpath=" + classpath + "]";
+		return "AppProject [app=" + app + ", packageName="+ packageName +", classpath=" + classpath + "]";
 	}
 
 	public static void main(String[] args) {

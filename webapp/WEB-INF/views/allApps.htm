@@ -97,11 +97,19 @@
 						(可选)</label>
 					<div class="controls">
 						<input class="input-large" type="text" name="subdir"
-							placeholder="可选，如 example">
+							placeholder="可选，pom文件所在目录">
+					</div>
+				</div>
+				<div id="packageName" style="display: none" class="control-group">
+					<label class="control-label" style="color: #696969">显示的package
+						(可选)</label>
+					<div class="controls">
+						<input class="input-large" type="text" name="packageName"
+							placeholder="可选，如example，默认显示该应用下全部文件">
 					</div>
 				</div>
 				<div id="mavenOpt" style="display: none" class="control-group">
-					<label class="control-label" style="color: #696969">maven命令附加参数
+					<label class="control-label" style="color: #696969">maven命令参数
 						(可选)</label>
 					<div class="controls">
 						<input class="input-large" type="text" name="mavenOpt"
@@ -146,6 +154,7 @@
 		function advance() {
 			$("#branch").toggle();
 			$("#subdir").toggle();
+			$("#packageName").toggle();
 			$("#mavenOpt").toggle();
 		}
 	</script>
