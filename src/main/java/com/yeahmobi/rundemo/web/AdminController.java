@@ -55,38 +55,49 @@ public class AdminController {
 	@RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public String create(String app, String gitUrl, String branch,
-			String subdir, String packageName,String mavenOpt, HttpServletRequest request,
-			HttpServletResponse response) {
-		
+			String subdir, String packageName, String mavenOpt,
+			HttpServletRequest request, HttpServletResponse response) {
+
 		Map<String, Object> map = new HashMap<String, Object>();
-		
-		// (1)调用shell，下载git到本地，并且求出classpath
-		if (StringUtils.isBlank(branch)) {
-			branch = "master";
-		}
+
+		app = app.trim();
+		gitUrl = gitUrl.trim();
+		branch = StringUtils.isNotBlank(branch) ? branch.trim() : "master";
+		subdir = StringUtils.isNotBlank(subdir) ? subdir.trim() : "";
+		packageName = StringUtils.isNotBlank(packageName) ? packageName.trim() : "";
+
 		Git git = null;
 		InputStream input = null;
 		try {
-			//（1）用JGit下载项目代码至本地(这样就不要求系统装git)
+			// (1) 用JGit下载项目代码至本地(这样就不要求系统装git)
 			git = this.cloneProjectFromGit(app, gitUrl, branch);
-			//（2）下载完后cd 到pom文件目录下，使用mvn命令生成classpath文件（要求本地安装maven）
+			// （2）下载完后cd 到pom文件目录下，使用mvn命令生成classpath文件（要求本地安装maven）
 			input = this.generateClasspath(app, subdir, mavenOpt, map);
-			//(3) copy git_temp下的src、pom.xml和classpath至appproject
+			// (3) copy git_temp下的src、pom.xml和classpath至appproject
 			this.operateFiles(app, subdir);
-			// (4) 持久化packageName至	Config.appprojectDir + app + "/app.properties"文件，便于后面读取展示该package下的文件
+			// (4) 持久化packageName至 Config.appprojectDir + app +
+			// "/app.properties"文件，便于后面读取展示该package下的文件
 			Map<String, String> propertiesMap = new HashMap<String, String>();
-			//TODO 以后可能还有其他属性值
+			// TODO 以后可能还有其他属性值
 			propertiesMap.put("packageName", packageName);
 			this.persistentProperties2File(app, propertiesMap);
-			
+
 			map.put("app", app);
 			map.put("success", true);
 		} catch (Exception e) {
 			map.put("success", false);
-			map.put("errorMsg", e.toString());
-		   LOG.error(e.getMessage());
+			map.put("errorMsg", e.getMessage());
+			// 创建应用发生异常时，应删除git_temp目录下的临时文件，否则下次再创建相同名称的应用时会报错：Destination path
+			// "test" already exists and is not an empty directory
+			try {
+				FileUtils.deleteDirectory(new File(Config.gitTempDir + app
+						+ "/"));
+			} catch (IOException e1) {
+				LOG.error(e1.getMessage());
+			}
+			LOG.error(e.getMessage());
 		} finally {
-			if(git!=null){
+			if (git != null) {
 				git.close();
 			}
 			IOUtils.closeQuietly(input);
@@ -100,19 +111,20 @@ public class AdminController {
 			InterruptedException {
 		InputStream input;
 		Process proc = Runtime.getRuntime().exec(
-				new String[] { Config.shellDir + "ouput_classpath.sh", Config.gitTempDir + app 	+ "/",
-						subdir, mavenOpt });
+				new String[] { Config.shellDir + "ouput_classpath.sh",
+						Config.gitTempDir + app + "/", subdir, mavenOpt });
 		input = proc.getInputStream();
-		LineIterator lineIterator = IOUtils
-				.lineIterator(new InputStreamReader(input));
+		LineIterator lineIterator = IOUtils.lineIterator(new InputStreamReader(
+				input));
 		while (lineIterator.hasNext()) {
 			String line = lineIterator.next();
 			LOG.info("ouput_classpath.sh output:" + line);
 		}
 		int exitVal = proc.waitFor();
-		if(exitVal!=0){
+		if (exitVal != 0) {
 			map.put("success", false);
-			map.put("errorMsg", "mvn *** command ouput classpath failed! Please check run log!");
+			map.put("errorMsg",
+					"mvn *** command ouput classpath failed! Please check run log!");
 		}
 		return input;
 	}
@@ -121,7 +133,7 @@ public class AdminController {
 			throws GitAPIException, InvalidRemoteException, TransportException {
 		Git git;
 		CloneCommand cloneCommand = Git.cloneRepository();
-		cloneCommand.setDirectory(new File(Config.gitTempDir + app 	+ "/"));
+		cloneCommand.setDirectory(new File(Config.gitTempDir + app + "/"));
 		cloneCommand.setURI(gitUrl);
 		cloneCommand.setBranch(branch);
 		git = cloneCommand.call();
@@ -134,10 +146,10 @@ public class AdminController {
 		} else {
 			subdir = "";
 		}
-		//为避免应用重复，创建新应用时首先删除原来同名的应用
+		// 为避免应用重复，创建新应用时首先删除原来同名的应用
 		FileUtils.deleteDirectory(new File(Config.appprojectDir + app));
 		this.copyFile2AppProject(app, subdir);
-		//copy完文件后，删除git_temp目录下的临时文件
+		// copy完文件后，删除git_temp目录下的临时文件
 		FileUtils.deleteDirectory(new File(Config.gitTempDir + app + "/"));
 	}
 
@@ -155,44 +167,46 @@ public class AdminController {
 			}
 		}
 	}
-	
-	private void persistentProperties2File(String app, Map<String, String> propertiesMap) throws IOException{
+
+	private void persistentProperties2File(String app,
+			Map<String, String> propertiesMap) throws IOException {
 		FileWriter writer = null;
-		File appPropertiesFile = new File(Config.appprojectDir + app + "/app.properties");
+		File appPropertiesFile = new File(Config.appprojectDir + app
+				+ "/app.properties");
 		try {
 			writer = new FileWriter(appPropertiesFile);
 			Set<Map.Entry<String, String>> entrySet = propertiesMap.entrySet();
 			Iterator<Map.Entry<String, String>> iterator = entrySet.iterator();
 			while (iterator.hasNext()) {
 				Map.Entry<String, String> entry = iterator.next();
-				if(StringUtils.isNotBlank(entry.getValue())){
+				if (StringUtils.isNotBlank(entry.getValue())) {
 					writer.write(entry.toString());
 				}
 			}
 		} catch (IOException e) {
-		}finally{
-			if(writer!=null){
+		} finally {
+			if (writer != null) {
 				writer.flush();
 			}
 			IOUtils.closeQuietly(writer);
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		Map<String, String> propertiesMap = new HashMap<String, String>();
 		propertiesMap.put("packagename", "okkkkkk");
 		propertiesMap.put("packagename1", "okkkkkk2");
-		
+
 		Set<Map.Entry<String, String>> entrySet = propertiesMap.entrySet();
 		Iterator<Map.Entry<String, String>> iterator = entrySet.iterator();
 		while (iterator.hasNext()) {
 			Map.Entry<String, String> entry = iterator.next();
-			if(StringUtils.isNotBlank(entry.getValue())){
+			if (StringUtils.isNotBlank(entry.getValue())) {
 				System.out.println(entry.toString());
 			}
 		}
 	}
-	
+
 }
 
 class CopyFileFilter implements FileFilter {

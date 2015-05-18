@@ -17,18 +17,21 @@
 <body>
 	#parse("navbar.htm")
 	<div style="display: none" id="error_Msg">
-	<div class="alert alert-danger">
-		<button type="button" class="close" data-dismiss="alert">×</button>
-		<h4 style="text-align: center;"></h4>
+		<div class="alert alert-danger">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<h4 style="text-align: center;"></h4>
+		</div>
 	</div>
-</div>
-	<div class="tabbable tabs-left"
-		style="margin: 0 auto; margin-top: 0px; margin-left: 30px; margin-bottom: 50px; height: 500px;">
-		<ul class="nav nav-tabs" style="font-size: 14px">
+	
+	<div class="tabbable tabs-top"
+		style="margin: 2 auto; margin-top: 0px; margin-left: 30px; margin-right: 30px; margin-bottom: 50px; height: 500px;">
+		<ul class="nav nav-tabs padding-12 tab-color-blue background-blue"
+			style="font-size: 14px">
 			<li class=""><a data-toggle="tab" href="#lA">pom.xml</a></li>
 			<li class=""><a data-toggle="tab" href="#lB">resource</a></li>
 			<li class="active"><a data-toggle="tab" href="#lC">java</a></li>
 		</ul>
+		
 		<div class="tab-content">
 			<div id="lA" class="tab-pane">#parse("pom.htm")</div>
 			<div id="lB" class="tab-pane">#parse("resources.htm")</div>
@@ -36,6 +39,7 @@
 		</div>
 		#parse("foot.htm")
 	</div>
+
 	<!-- Le javascript
     ================================================== -->
 	<!-- Placed at the end of the document so the pages load faster -->
@@ -47,6 +51,5 @@
 		type="text/javascript"></script>
 	<script type="text/javascript"
 		src="${rc.contextPath}/javascripts/rundemo_app.js?t=20120910"></script>
-
 </body>
 </html>

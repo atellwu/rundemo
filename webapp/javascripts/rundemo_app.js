@@ -366,6 +366,9 @@
 			setTimeout("$('#error_Msg').hide(1000);",10000);
 		},
 		"createApp" : function(){
+			if (!$('#form').validate().form()) {
+				return false;
+			}
 			$.ajax({
 				type : $('#form').attr('method'),
 				url : $('#form').attr('action'),
