@@ -382,10 +382,37 @@
 						window.location.href = w.contextpath + '/' + data.app;
 					}
 				},
-				error : rundemo_app.httpError
+				error : function(xhr, textStatus, errorThrown){
+					$('#progressModal').modal('hide');
+					rundemo_app.httpError(xhr, textStatus, errorThrown);
+				}
 			});
 			$('#createAppModal').modal('hide');
 			$('#progressModal').modal('show');
+		},
+		"updateApp" : function(app){
+			var param = new Object();
+			param.app = app;
+			var url = w.contextpath + '/update';
+			$.ajax({
+				type : 'POST',
+				url : url,
+				data : param,
+				dataType : "json",
+				success : function(data) {
+					if (data.success == false) {
+						$('#progressModal1').modal('hide');
+						rundemo_app.appError("错误", data.errorMsg);
+					} else {
+						window.location.href = w.contextpath + '/' + data.app;
+					}
+				},
+				error : function(xhr, textStatus, errorThrown){
+					$('#progressModal1').modal('hide');
+					rundemo_app.httpError(xhr, textStatus, errorThrown);
+				}
+			});
+			$('#progressModal1').modal('show');
 		}
 	};
 	w.rundemo_app = rundemo_app;

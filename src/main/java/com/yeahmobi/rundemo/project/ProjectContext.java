@@ -45,8 +45,12 @@ public class ProjectContext {
                     }
                 });
                 try {
-                	String classpath = null;
+                	String gitUrl = null;
+                	String branch = null;
+                	String subdir = null;
+                	String mavenOpt = null;
                 	String packageName = null;
+                	String classpath = null;
                     for(File file : eligibleFiles){
                     	   if(Constants.CLASSPATH.equals(file.getName())){
                     		   classpath = FileUtils.readFileToString(file, "ISO-8859-1").trim();
@@ -57,10 +61,14 @@ public class ProjectContext {
                     			} catch (IOException e) {
                     				throw new RuntimeException(e.getMessage(), e);
                     			}
-                    			packageName = p.get("packageName")==null ? "" : p.get("packageName").toString();
+                    			gitUrl = p.getProperty("gitUrl");
+                    			branch = p.getProperty("branch");
+                    			subdir = p.getProperty("subdir");
+                    			packageName = p.getProperty("packageName");
+                    			mavenOpt = p.getProperty("mavenOpt");
                     	   }
                        }
-                    AppProject appProject = new AppProject(app, packageName, classpath);
+                    AppProject appProject = new AppProject(app, gitUrl, branch, subdir, packageName, mavenOpt,classpath);
                     ProjectContext.putAppProject(app, appProject);
                 } catch (Exception e) {
                     LOG.error("error when load from Config.shellDir" + "/appprojects/" + app, e);
@@ -99,8 +107,12 @@ public class ProjectContext {
                                 }
                             });
                             try {
-                            	String classpath = null;
+                            	String gitUrl = null;
+                            	String branch = null;
+                            	String subdir = null;
+                            	String mavenOpt = null;
                             	String packageName = null;
+                            	String classpath = null;
                                 for(File file : eligibleFiles){
                                 	   if(Constants.CLASSPATH.equals(file.getName())){
                                 		   classpath = FileUtils.readFileToString(file, "ISO-8859-1").trim();
@@ -111,12 +123,15 @@ public class ProjectContext {
                                 			} catch (IOException e) {
                                 				throw new RuntimeException(e.getMessage(), e);
                                 			}
-                                			packageName = p.get("packageName")==null ? "" : p.get("packageName").toString();
+                                			gitUrl = p.getProperty("gitUrl");
+                                			branch = p.getProperty("branch");
+                                			subdir = p.getProperty("subdir");
+                                			packageName = p.getProperty("packageName");
+                                			mavenOpt = p.getProperty("mavenOpt");
                                 	   }
                                    }
-                                appProject = new AppProject(app, packageName, classpath);
+                                appProject = new AppProject(app, gitUrl, branch, subdir, packageName, mavenOpt,classpath);
                                 ProjectContext.putAppProject(app, appProject);
-                                LOG.info("loaded AppProject from local filesystem, app=" + app);
                             } catch (Exception e) {
                                 LOG.error("error when load from Config.shellDir" + "/appprojects/" + app, e);
                             }

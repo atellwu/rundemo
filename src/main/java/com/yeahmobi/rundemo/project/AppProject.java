@@ -19,13 +19,23 @@ import com.yeahmobi.rundemo.utils.CodeUtils;
 public class AppProject {
 
 	private final String app;
+	private final String gitUrl;
+	private final String branch;
+	private final String subdir;
 	private final String packageName;
+	private final String mavenOpt;
 	private final String classpath;
 
-	public AppProject(String app, String packageName, String classpath) {
+
+	public AppProject(String app, String gitUrl, String branch, String subdir,
+			String packageName, String mavenOpt, String classpath) {
 		super();
 		this.app = app;
+		this.gitUrl = gitUrl;
+		this.branch = branch;
+		this.subdir = subdir;
 		this.packageName = packageName;
+		this.mavenOpt = mavenOpt;
 		this.classpath = classpath;
 	}
 
@@ -40,6 +50,23 @@ public class AppProject {
 	public String getPackageName(){
 		return packageName;
 	}
+	
+	public String getGitUrl(){
+		return gitUrl;
+	}
+	
+	public String getBranch() {
+		return branch;
+	}
+
+	public String getSubdir() {
+		return subdir;
+	}
+
+	public String getMavenOpt() {
+		return mavenOpt;
+	}
+
 	/**
 	 * 从本地load文件
 	 * 

@@ -22,7 +22,15 @@
 			<h4 style="text-align: center;"></h4>
 		</div>
 	</div>
-	
+	<div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog"
+		tabindex="-1" class="modal hide fade" id="progressModal1"
+		style="display: none;">
+		<div class="modal-body">
+			<h3 class="header smaller lighter grey">
+				<i class="icon-spinner icon-spin orange bigger-125"></i> 正在更新，请稍等...
+			</h3>
+		</div>
+	</div>
 	<div class="tabbable tabs-top"
 		style="margin: 2 auto; margin-top: 0px; margin-left: 30px; margin-right: 30px; margin-bottom: 50px; height: 500px;">
 		<ul class="nav nav-tabs padding-12 tab-color-blue background-blue"
@@ -30,6 +38,7 @@
 			<li class=""><a data-toggle="tab" href="#lA">pom.xml</a></li>
 			<li class=""><a data-toggle="tab" href="#lB">resource</a></li>
 			<li class="active"><a data-toggle="tab" href="#lC">java</a></li>
+			<li class="tab-color-red background-red"><a href="javascript:rundemo_app.updateApp('${app}');">更新</a></li>
 		</ul>
 		
 		<div class="tab-content">

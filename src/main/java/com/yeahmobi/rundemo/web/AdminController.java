@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.yeahmobi.rundemo.config.Config;
+import com.yeahmobi.rundemo.project.AppProject;
+import com.yeahmobi.rundemo.project.ProjectContext;
 import com.yeahmobi.rundemo.utils.Constants;
 
 @Controller
@@ -79,7 +81,13 @@ public class AdminController {
 			// "/app.properties"文件，便于后面读取展示该package下的文件
 			Map<String, String> propertiesMap = new HashMap<String, String>();
 			// TODO 以后可能还有其他属性值
+			propertiesMap.put("app", app);
+			propertiesMap.put("gitUrl", gitUrl);
+			propertiesMap.put("branch", branch);
+			propertiesMap.put("subdir", subdir);
 			propertiesMap.put("packageName", packageName);
+			propertiesMap.put("mavenOpt", mavenOpt);
+			
 			this.persistentProperties2File(app, propertiesMap);
 
 			map.put("app", app);
@@ -87,6 +95,12 @@ public class AdminController {
 		} catch (Exception e) {
 			map.put("success", false);
 			map.put("errorMsg", e.getMessage());
+			LOG.error(e.getMessage());
+		} finally {
+			if (git != null) {
+				git.close();
+			}
+			IOUtils.closeQuietly(input);
 			// 创建应用发生异常时，应删除git_temp目录下的临时文件，否则下次再创建相同名称的应用时会报错：Destination path
 			// "test" already exists and is not an empty directory
 			try {
@@ -95,12 +109,66 @@ public class AdminController {
 			} catch (IOException e1) {
 				LOG.error(e1.getMessage());
 			}
+		}
+		Gson gson = new Gson();
+		return gson.toJson(map);
+	}
+	
+	@RequestMapping(value = "/update", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String update(String app) {
+
+		AppProject appProject = ProjectContext.getAppProject(app);
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		String gitUrl = appProject.getGitUrl();
+		String branch = appProject.getBranch();
+		String subdir = StringUtils.isNotBlank(appProject.getSubdir()) ? appProject.getSubdir() : "";
+		String packageName = StringUtils.isNotBlank(appProject.getPackageName()) ? appProject.getPackageName() : "";
+		String mavenOpt = StringUtils.isNotBlank(appProject.getMavenOpt()) ? appProject.getMavenOpt() : "";
+
+		Git git = null;
+		InputStream input = null;
+		try {
+			// (1) 用JGit下载项目代码至本地(这样就不要求系统装git)
+			git = this.cloneProjectFromGit(app, gitUrl, branch);
+			// （2）下载完后cd 到pom文件目录下，使用mvn命令生成classpath文件（要求本地安装maven）
+			input = this.generateClasspath(app, subdir, mavenOpt, map);
+			// (3) copy git_temp下的src、pom.xml和classpath至appproject
+			this.operateFiles(app, subdir);
+			// (4) 持久化packageName至 Config.appprojectDir + app +
+			// "/app.properties"文件，便于后面读取展示该package下的文件
+			Map<String, String> propertiesMap = new HashMap<String, String>();
+			// TODO 以后可能还有其他属性值
+			propertiesMap.put("app", app);
+			propertiesMap.put("gitUrl", gitUrl);
+			propertiesMap.put("branch", branch);
+			propertiesMap.put("subdir", subdir);
+			propertiesMap.put("packageName", packageName);
+			propertiesMap.put("mavenOpt", mavenOpt);
+			
+			this.persistentProperties2File(app, propertiesMap);
+
+			map.put("app", app);
+			map.put("success", true);
+		} catch (Exception e) {
+			map.put("success", false);
+			map.put("errorMsg", e.getMessage());
 			LOG.error(e.getMessage());
 		} finally {
 			if (git != null) {
 				git.close();
 			}
 			IOUtils.closeQuietly(input);
+			// 创建应用发生异常时，应删除git_temp目录下的临时文件，否则下次再创建相同名称的应用时会报错：Destination path
+			// "test" already exists and is not an empty directory
+			try {
+				FileUtils.deleteDirectory(new File(Config.gitTempDir + app
+						+ "/"));
+			} catch (IOException e1) {
+				LOG.error(e1.getMessage());
+			}
 		}
 		Gson gson = new Gson();
 		return gson.toJson(map);
@@ -141,7 +209,7 @@ public class AdminController {
 	}
 
 	private void operateFiles(String app, String subdir) throws IOException {
-		if (!StringUtils.isBlank(subdir)) {
+		if (!StringUtils.isNotBlank(subdir)) {
 			subdir = "/" + subdir;
 		} else {
 			subdir = "";
@@ -180,7 +248,7 @@ public class AdminController {
 			while (iterator.hasNext()) {
 				Map.Entry<String, String> entry = iterator.next();
 				if (StringUtils.isNotBlank(entry.getValue())) {
-					writer.write(entry.toString());
+					writer.write(entry.toString()+"\n");
 				}
 			}
 		} catch (IOException e) {
