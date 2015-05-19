@@ -131,22 +131,24 @@
 		tree_data = tree_data.replace(/%/g, "'").replace(/#/g, "<").replace(
 				/\|/g, ">");//还原JSON字符串
 		//根据URL计算headId	
-		var headId = 0;
 		var hash = window.location.href;
 		hash = hash.substring(hash.lastIndexOf("=") == -1 ? hash.length : hash
 				.lastIndexOf("=") + 1);
-		if (hash.length > 0) {
-			if (hash.substring(0, hash.length - 4).length == 0) {
-				headId = "0"
-			} else {
-				headId = hash.substring(0, hash.length - 4) + "0000";
-			}
-		}
+		
 		////////////////////////////
-		$('#treeView').ace_tree({
+		var obj = $('#treeView').ace_tree({
 			dataSource : new DataSourceTree({
 				data : eval('(' + tree_data + ')')
 			})
-		}, headId);
+		}, hash);
+		
+		//待树加载完成后，再触发点击事件
+		
+		
+		$('#treeView').on('selected.fu.tree', function (event, data) {
+			 var name = data.info[0].name;
+			 var id = name.substring(name.indexOf("id=")+3, name.indexOf(" filePath"));
+			 rundemo_app.changeJavaHash(id);
+		});
 	});
 </script>

@@ -208,6 +208,25 @@
 		"modifyCode" : function() {
 			w.codeLastModifiedTime = new Date();
 		},
+		"changeJavaHash_1" : function(index) {
+			var hash = window.location.hash;
+			var newHash = "";
+			if (hash.length > 0) {// 去掉#号
+				hash = hash.substring(1);
+				$.each(hash.split('&'), function(i, part) {
+					var keyValue = part.split('=');
+					if (keyValue[0] == 'j') {
+						newHash += "&j=" + index;
+					} else {
+						newHash += '&' + part;
+					}
+				});
+				newHash = newHash.substring(1);
+			} else {
+				newHash = "r=0&j=" + index;
+			}
+			window.location.hash = newHash;
+		},
 		"changeJavaHash" : function(index) {
 			var hash = window.location.hash;
 			var newHash = "";
@@ -271,37 +290,13 @@
 			}
 		},
 		"changeJavaCodeFile" : function(index) {
-			var filePath;
-			var curDiv = $(".tree-selected");
-			if(curDiv.length == 0){
-				filePath = rundemo_app.readyLoadCode(index);
-			}else{
-				var curA = curDiv.children("div").children("a");
-				filePath = curA.attr("filePath");
-				//<a id="item_800" filepath="/../.." href="javascript:rundemo_app.changeJavaHash(800);">Test.java</a>
-				//id的后缀与index相同
-				var oldIndex = curA.attr("id").substring(curA.attr("id").indexOf("_")+1);
-				if( oldIndex != index.toString()){
-					
-					curDiv.removeClass("tree-selected");
-					curDiv.children("i").attr("class","tree-dot");
-					
-					filePath = rundemo_app.readyLoadCode(index);
-				}
-			}
+			var filePath = $("#"+index).attr("filePath");
 			if(typeof(filePath) == 'undefined'){
 				window.editor.setValue("");
 				rundemo_app.appError("Error", "You visit the link does not exist, please check and re-visit!");
 			}else{
 				rundemo_app.loadCode(filePath);
 			}
-		},
-		"readyLoadCode" : function(index){
-			var temp = $("#item_"+index).parent().parent();
-			temp.addClass("tree-selected");
-			temp.children("i").attr("class","icon-ok")
-			temp.parent().attr("display","block");
-			return $("#item_"+index).attr("filePath");
 		},
 		"changeResourceFile" : function(index) {
 			// 当前的index是多少
