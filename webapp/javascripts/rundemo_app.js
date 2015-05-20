@@ -265,7 +265,7 @@
 			}
 			window.location.hash = newHash;
 		},
-		"onHashChange" : function() {
+		"onHashChange" : function(index) {
 			var hash = window.location.hash;
 			if (hash.length > 0) {
 				// 去掉#号
@@ -285,18 +285,40 @@
 					window.location.hash = "";
 				}
 			} else {
-				rundemo_app.changeJavaCodeFile(0);
+				rundemo_app.changeJavaHash(index);
+				rundemo_app.changeJavaCodeFile(index);
 				rundemo_app.changeResourceFile(0);
 			}
 		},
 		"changeJavaCodeFile" : function(index) {
+			//通过输入链接展示代码并选中文件树中的文件
+			var curDiv = $(".tree-selected");
+			if(curDiv.length == 0){
+				rundemo_app.changeSelectedStyle(index);
+			}else{
+				var curA = curDiv.children("div").children("a");
+				filePath = curA.attr("filePath");
+				var oldIndex = curA.attr("id");
+				if( oldIndex != index){
+					curDiv.removeClass("tree-selected");
+					curDiv.children("i").attr("class","tree-dot");
+					
+					rundemo_app.changeSelectedStyle(index);
+				}
+			}
+			
 			var filePath = $("#"+index).attr("filePath");
 			if(typeof(filePath) == 'undefined'){
-				window.editor.setValue("");
 				rundemo_app.appError("Error", "You visit the link does not exist, please check and re-visit!");
 			}else{
 				rundemo_app.loadCode(filePath);
 			}
+		},
+		"changeSelectedStyle" : function(index){
+			var temp = $("#"+index).parent().parent();
+			temp.addClass("tree-selected");
+			temp.children("i").attr("class","icon-ok")
+			temp.parent().attr("display","block");
 		},
 		"changeResourceFile" : function(index) {
 			// 当前的index是多少
@@ -438,8 +460,6 @@ $(document).ready(function() {
 
 	// 根据#hash定位
 	window.onhashchange = rundemo_app.onHashChange;
-	//rundemo_app.onHashChange();
-	setTimeout("rundemo_app.onHashChange()", 500);
 	// 离开页面时，删除JavaProject
 	window.onunload = rundemo_app.onunload;
 
