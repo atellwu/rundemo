@@ -157,7 +157,7 @@
 		$('#treeView').on('selected.fu.tree', function (event, data) {
 			 var name = data.info[0].name;
 			 var id = name.substring(name.indexOf("id=")+3, name.indexOf(" filePath"));
-			 rundemo_app.changeJavaHash(id+"");
+			 rundemo_app.changeJavaHash(id);
 		});
 		
 		var firstHeadId = "#h_0";
@@ -178,7 +178,9 @@
 							autoClick(firstHeadId);
 						}
 					}
-					rundemo_app.onHashChange(firstHeadId.substring(3));
+					if(firstHeadId.substring(3)!=""){
+						rundemo_app.onHashChange(firstHeadId.substring(3));
+					}
 				}
 				
 			});

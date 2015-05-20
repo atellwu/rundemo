@@ -207,26 +207,7 @@
 		},
 		"modifyCode" : function() {
 			w.codeLastModifiedTime = new Date();
-		},
-		"changeJavaHash_1" : function(index) {
-			var hash = window.location.hash;
-			var newHash = "";
-			if (hash.length > 0) {// 去掉#号
-				hash = hash.substring(1);
-				$.each(hash.split('&'), function(i, part) {
-					var keyValue = part.split('=');
-					if (keyValue[0] == 'j') {
-						newHash += "&j=" + index;
-					} else {
-						newHash += '&' + part;
-					}
-				});
-				newHash = newHash.substring(1);
-			} else {
-				newHash = "r=0&j=" + index;
-			}
-			window.location.hash = newHash;
-		},
+		},		
 		"changeJavaHash" : function(index) {
 			var hash = window.location.hash;
 			var newHash = "";
@@ -285,7 +266,9 @@
 					window.location.hash = "";
 				}
 			} else {
-				rundemo_app.changeJavaHash(index);
+				if(index!="0"){
+					rundemo_app.changeJavaHash(index);
+				}
 				rundemo_app.changeJavaCodeFile(index);
 				rundemo_app.changeResourceFile(0);
 			}
