@@ -2,14 +2,13 @@ package com.yeahmobi.rundemo.web;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
+import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
@@ -84,18 +84,9 @@ public class AdminController {
 				input = this.generateClasspath(app, subdir, mavenOpt, map);
 				// (3) copy git_temp下的src、pom.xml和classpath至appproject
 				this.operateFiles(app, subdir);
-				// (4) 持久化packageName至 Config.appprojectDir + app +
+				// (4) 序列化Appproject对象至 Config.appprojectDir + app +
 				// "/app.properties"文件，便于后面读取展示该package下的文件
-				Map<String, String> propertiesMap = new HashMap<String, String>();
-				// TODO 以后可能还有其他属性值
-				propertiesMap.put("app", app);
-				propertiesMap.put("gitUrl", gitUrl);
-				propertiesMap.put("branch", branch);
-				propertiesMap.put("subdir", subdir);
-				propertiesMap.put("packageName", packageName);
-				propertiesMap.put("mavenOpt", mavenOpt);
-				
-				this.persistentProperties2File(app, propertiesMap);
+				this.serialize(Config.appprojectDir + app +"/app.properties", new AppProject(app, gitUrl, branch, subdir, packageName, mavenOpt, ""));
 
 				map.put("app", app);
 				map.put("success", true);
@@ -142,18 +133,9 @@ public class AdminController {
 			input = this.generateClasspath(app, subdir, mavenOpt, map);
 			// (3) copy git_temp下的src、pom.xml和classpath至appproject
 			this.operateFiles(app, subdir);
-			// (4) 持久化packageName至 Config.appprojectDir + app +
+			// (4) 序列化Appproject对象至 Config.appprojectDir + app +
 			// "/app.properties"文件，便于后面读取展示该package下的文件
-			Map<String, String> propertiesMap = new HashMap<String, String>();
-			// TODO 以后可能还有其他属性值
-			propertiesMap.put("app", app);
-			propertiesMap.put("gitUrl", gitUrl);
-			propertiesMap.put("branch", branch);
-			propertiesMap.put("subdir", subdir);
-			propertiesMap.put("packageName", packageName);
-			propertiesMap.put("mavenOpt", mavenOpt);
-			
-			this.persistentProperties2File(app, propertiesMap);
+			this.serialize(Config.appprojectDir + app +"/app.properties", new AppProject(app, gitUrl, branch, subdir, packageName, mavenOpt, ""));
 
 			map.put("app", app);
 			map.put("success", true);
@@ -171,6 +153,20 @@ public class AdminController {
 		return gson.toJson(map);
 	}
 
+	// 序列化对象到文件
+	public void serialize(String fileName, Object appProject) {
+		try {
+			// 创建一个对象输出流，讲对象输出到文件
+			ObjectOutputStream out = new ObjectOutputStream(
+					new FileOutputStream(fileName));
+			out.writeObject(appProject); // 序列化一个会员对象
+			out.close();
+		} catch (Exception x) {
+			LOG.error("serialize appProject object to app.properties failed",x);
+		}
+
+	}
+	
 	private InputStream generateClasspath(String app, String subdir,
 			String mavenOpt, Map<String, Object> map) throws IOException,
 			InterruptedException {
@@ -193,7 +189,6 @@ public class AdminController {
 		}
 		return input;
 	}
-	
     
 	private Git cloneProjectFromGit(String app, String gitUrl, String branch)
 			throws GitAPIException, InvalidRemoteException, TransportException {
@@ -242,49 +237,11 @@ public class AdminController {
 		}
 	}
 
-	private void persistentProperties2File(String app,
-			Map<String, String> propertiesMap) throws IOException {
-		FileWriter writer = null;
-		File appPropertiesFile = new File(Config.appprojectDir + app
-				+ "/app.properties");
-		try {
-			writer = new FileWriter(appPropertiesFile);
-			Set<Map.Entry<String, String>> entrySet = propertiesMap.entrySet();
-			Iterator<Map.Entry<String, String>> iterator = entrySet.iterator();
-			while (iterator.hasNext()) {
-				Map.Entry<String, String> entry = iterator.next();
-				if (StringUtils.isNotBlank(entry.getValue())) {
-					writer.write(entry.toString()+"\n");
-				}
-			}
-		} catch (IOException e) {
-		} finally {
-			if (writer != null) {
-				writer.flush();
-			}
-			IOUtils.closeQuietly(writer);
-		}
-	}
-
 	public static void main(String[] args) throws InvalidRemoteException, TransportException, GitAPIException, IOException {
-		/*Map<String, String> propertiesMap = new HashMap<String, String>();
-		propertiesMap.put("packagename", "okkkkkk");
-		propertiesMap.put("packagename1", "okkkkkk2");
-
-		Set<Map.Entry<String, String>> entrySet = propertiesMap.entrySet();
-		Iterator<Map.Entry<String, String>> iterator = entrySet.iterator();
-		while (iterator.hasNext()) {
-			Map.Entry<String, String> entry = iterator.next();
-			if (StringUtils.isNotBlank(entry.getValue())) {
-				System.out.println(entry.toString());
-			}
-		}*/
-		/*Git git = pullProjectFromGit("guava1", "https://github.com/Corsair007/guavaexample.git", "master");		
-		git.close();*/
-		File appDir = new File(Config.localGitDir + "test/");
-		System.out.println(appDir.list().length);
-		if(appDir.exists() && appDir.list().length > 0){
-		}
+		Git git = Git.open(new File(Config.localGitDir + "/guavaexample/.git"));
+		PullCommand pullCommand = git.pull();
+		PullResult pullResult = pullCommand.call();
+		System.out.println(pullResult.getFetchedFrom());
 	}
 
 }

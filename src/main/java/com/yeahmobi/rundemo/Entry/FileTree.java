@@ -52,31 +52,12 @@ public class FileTree {
 	}
 	
 	public static String getJsonFileList(File file) {
-		List<FileTree> list = splice_JsonData(file.listFiles(), "");
+		List<FileTree> list = splice_JsonData(file.listFiles(), StringUtils.EMPTY);
 		JSONObject object = new JSONObject();
 		for(FileTree fileTree: list){
 			object.put(fileTree.name, fileTree);
 		}
 		return object.toJSONString();
-	}
-	
-	private static List<FileTree> spliceJsonData(File[] files,int index){
-		List<FileTree> mainlist = new ArrayList<FileTree>();
-		for(File file : files){
-			FileTree fileTree = null;
-			if (file.isDirectory()) {
-				//默认每个目录下有1W个文件，给每个java文件编号，便于前端根据URL来定位文件
-				fileTree = new FileTree(file.getName() + "<input type=hidden id=h_"+(index*10000)+">", "folder");
-				List<FileTree> list = spliceJsonData(file.listFiles(), (index++)*10000);
-				AdditionalParameters additionalParameters = new AdditionalParameters(list);
-				fileTree.setAdditionalParameters(additionalParameters);
-			}else {
-				String name = "<a id=item_"+(index)+" href=javascript:rundemo_app.changeJavaHash("+(index++)+"); filePath="+file.getAbsolutePath()+">"+file.getName()+"</a>";
-				fileTree = new FileTree(name, "item");
-			}
-			mainlist.add(fileTree);
-		}
-		return mainlist;
 	}
 	
 	private static List<FileTree> splice_JsonData(File[] files, String prefix){

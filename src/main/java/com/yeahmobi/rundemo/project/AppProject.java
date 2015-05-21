@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,16 +17,16 @@ import org.apache.commons.io.IOUtils;
 import com.yeahmobi.rundemo.config.Config;
 import com.yeahmobi.rundemo.utils.CodeUtils;
 
-public class AppProject {
+public class AppProject implements Serializable{
 
-	private final String app;
-	private final String gitUrl;
-	private final String branch;
-	private final String subdir;
-	private final String packageName;
-	private final String mavenOpt;
-	private final String classpath;
-
+	private static final long serialVersionUID = 1L;
+	private String app;
+	private String gitUrl;
+	private String branch;
+	private String subdir;
+	private String packageName;
+	private String mavenOpt;
+	private String classpath;
 
 	public AppProject(String app, String gitUrl, String branch, String subdir,
 			String packageName, String mavenOpt, String classpath) {
@@ -126,8 +127,32 @@ public class AppProject {
 		return "AppProject [app=" + app + ", packageName="+ packageName +", classpath=" + classpath + "]";
 	}
 
-	public static void main(String[] args) {
+	public void setApp(String app) {
+		this.app = app;
+	}
 
+	public void setGitUrl(String gitUrl) {
+		this.gitUrl = gitUrl;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
+	}
+
+	public void setSubdir(String subdir) {
+		this.subdir = subdir;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+
+	public void setMavenOpt(String mavenOpt) {
+		this.mavenOpt = mavenOpt;
+	}
+
+	public void setClasspath(String classpath) {
+		this.classpath = classpath;
 	}
 
 }

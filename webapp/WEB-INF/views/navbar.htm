@@ -19,7 +19,11 @@
                #if(${app})
                <li><a href="${rc.contextPath}/">所有应用</a></li>
                <li class="active"><a
-                  href="${rc.contextPath}/${app}">${app}</a></li> #end
+                  href="${rc.contextPath}/${app}">${app}</a></li>
+               #end
+            </ul>
+            <ul class="nav pull-right">
+           	<li> <a href="javascript:rundemo_app.updateApp('${app}');">更新</a></li>
             </ul>
          </div>
          <!--/.nav-collapse -->

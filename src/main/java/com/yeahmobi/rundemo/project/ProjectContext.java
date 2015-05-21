@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
@@ -28,8 +28,6 @@ public class ProjectContext {
 
     private static ConcurrentHashMap<String, ConcurrentHashMap<String, JavaProject>> appToJavaProjects = new ConcurrentHashMap<String, ConcurrentHashMap<String, JavaProject>>();
     
-    private static Properties p;
-
     //初始化ProjectContext
     static {
         //扫描Config.appprojectDir" + "appprojects/目录，创建appprojects
@@ -45,37 +43,37 @@ public class ProjectContext {
                     }
                 });
                 try {
-                	String gitUrl = null;
-                	String branch = null;
-                	String subdir = null;
-                	String mavenOpt = null;
-                	String packageName = null;
                 	String classpath = null;
                     for(File file : eligibleFiles){
                     	   if(Constants.CLASSPATH.equals(file.getName())){
                     		   classpath = FileUtils.readFileToString(file, "ISO-8859-1").trim();
-                    	   }else if(Constants.APPPROPERTIES.equals(file.getName())){
-                    		   p = new Properties();
-                    			try {
-                    				p.load(new FileInputStream(file));
-                    			} catch (IOException e) {
-                    				throw new RuntimeException(e.getMessage(), e);
-                    			}
-                    			gitUrl = p.getProperty("gitUrl");
-                    			branch = p.getProperty("branch");
-                    			subdir = p.getProperty("subdir");
-                    			packageName = p.getProperty("packageName");
-                    			mavenOpt = p.getProperty("mavenOpt");
                     	   }
                        }
-                    AppProject appProject = new AppProject(app, gitUrl, branch, subdir, packageName, mavenOpt,classpath);
+                    AppProject appProject = ProjectContext.deserialize(Config.appprojectDir + app +"/app.properties");
+                    appProject.setClasspath(classpath);
                     ProjectContext.putAppProject(app, appProject);
                 } catch (Exception e) {
-                    LOG.error("error when load from Config.shellDir" + "/appprojects/" + app, e);
+                    LOG.error("error when load from " + Config.appprojectDir + app, e);
                 }
             }
         }
     }
+    
+    // 从文件反序列化到对象
+ 	public static AppProject deserialize(String filePath) {
+ 		AppProject appProject = null;
+ 		try {
+ 			// 创建一个对象输入流，从文件读取对象
+ 			ObjectInputStream in = new ObjectInputStream(new FileInputStream(
+ 					filePath));
+ 			// 注意读对象时必须按照序列化对象顺序读，否则会出错
+ 			appProject = (AppProject) (in.readObject());
+ 			in.close();
+ 		} catch (Exception x) {
+ 			LOG.error("deserialize app.properties to AppProject object failed", x);
+ 		}
+ 		return appProject;
+ 	}
 
     public static List<String> getAllAppNames() {
         List<String> names = new ArrayList<String>();
@@ -107,33 +105,17 @@ public class ProjectContext {
                                 }
                             });
                             try {
-                            	String gitUrl = null;
-                            	String branch = null;
-                            	String subdir = null;
-                            	String mavenOpt = null;
-                            	String packageName = null;
                             	String classpath = null;
                                 for(File file : eligibleFiles){
                                 	   if(Constants.CLASSPATH.equals(file.getName())){
                                 		   classpath = FileUtils.readFileToString(file, "ISO-8859-1").trim();
-                                	   }else if(Constants.APPPROPERTIES.equals(file.getName())){
-                                		   p = new Properties();
-                                			try {
-                                				p.load(new FileInputStream(file));
-                                			} catch (IOException e) {
-                                				throw new RuntimeException(e.getMessage(), e);
-                                			}
-                                			gitUrl = p.getProperty("gitUrl");
-                                			branch = p.getProperty("branch");
-                                			subdir = p.getProperty("subdir");
-                                			packageName = p.getProperty("packageName");
-                                			mavenOpt = p.getProperty("mavenOpt");
                                 	   }
                                    }
-                                appProject = new AppProject(app, gitUrl, branch, subdir, packageName, mavenOpt,classpath);
+                                appProject = ProjectContext.deserialize(Config.appprojectDir + app +"/app.properties");
+                                appProject.setClasspath(classpath);
                                 ProjectContext.putAppProject(app, appProject);
                             } catch (Exception e) {
-                                LOG.error("error when load from Config.shellDir" + "/appprojects/" + app, e);
+                                LOG.error("error when load from " + Config.appprojectDir + app, e);
                             }
                             break;
                         }
