@@ -11,7 +11,7 @@ public class Config {
 	private static Properties p;
 	public static Object demoDir;
 	public static String shellDir;
-	public static String gitTempDir;
+	public static String localGitDir;
 	public static String appprojectDir;
 	public static String javaprojectDir;
 	static {
@@ -26,7 +26,7 @@ public class Config {
 		shellDir = demoDir + "shell/";
 		appprojectDir = demoDir + "appprojects/";
 		javaprojectDir = demoDir + "javaprojects/";
-		gitTempDir = demoDir + "git_temp/";
+		localGitDir = demoDir + "localgits/";
 	}
 
 	// Copy shell file to target Directory

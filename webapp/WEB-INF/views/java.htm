@@ -127,6 +127,13 @@
 				}, parseInt(Math.random() * 500) + 200);
 		};
 		
+		var getHeadIds = function(){
+			var hash = window.location.href;
+			hash = hash.substring(hash.lastIndexOf("=") == -1 ? hash.length : hash
+					.lastIndexOf("=") + 1);
+			return hash.split("_");
+		}
+		
 		//自动触发鼠标点击事件
 		var autoClick = function(id){
 			if(document.all) {//IE
@@ -136,54 +143,60 @@
 					e.initEvent("click", true, true);
 					$(id).parent().parent()[0].dispatchEvent(e);
 			}
-		}
+		};
+		
+		var locationFiletree = function(headIds){
+			var firstHeadId = "#h_0";
+			//1.文件树首个为文件时，直接显示代码
+			if(headIds[0]=="" && $('#h_0').length == 0){
+				rundemo_app.onHashChange(0);
+			}else{
+				//2.首个为目录时，要先触发目录的点击事件后，
+				var i = headIds.length-2 > 0 ? 1 : headIds.length;
+				var id = "#h_"+headIds[0];
+				//点击目录，子目录和子文件加载完成后触发loaded.fu.tree事件
+				$('#treeView').on('loaded.fu.tree', function (event, data) {
+					if(i < headIds.length-1){
+						id = id + "_" + headIds[i++];
+						autoClick(id);
+					}else{
+						//默认加载显示第一个文件或第一个文件夹下的第一个文件
+						if(headIds[0]==""){
+							firstHeadId = firstHeadId + "_" + "0";
+							if($(firstHeadId).length > 0){
+								autoClick(firstHeadId);
+							}else if(firstHeadId.substring(3)!=""){
+								rundemo_app.onHashChange(firstHeadId.substring(3));
+							}
+						}else{
+							//根据hash直接加载
+							rundemo_app.onHashChange();
+						}
+						
+					}
+					
+				});
+			}
+		};
 
 		var tree_data = "${javaFileInfoList}";
 		tree_data = tree_data.replace(/%/g, "'").replace(/#/g, "<").replace(
 				/\|/g, ">");//还原JSON字符串
 		//根据URL计算headId	
-		var hash = window.location.href;
-		hash = hash.substring(hash.lastIndexOf("=") == -1 ? hash.length : hash
-				.lastIndexOf("=") + 1);
-		var headIds = hash.split("_");
-		////////////////////////////
-		var obj = $('#treeView').ace_tree({
+		var headIds = getHeadIds();
+		$('#treeView').ace_tree({
 			dataSource : new DataSourceTree({
 				data : eval('(' + tree_data + ')')
 			})
 		}, headIds[0]);
 		
-		//点击文件时触发该事件
+		//点击文件时触发selected.fu.tree事件
 		$('#treeView').on('selected.fu.tree', function (event, data) {
 			 var name = data.info[0].name;
 			 var id = name.substring(name.indexOf("id=")+3, name.indexOf(" filePath"));
 			 rundemo_app.changeJavaHash(id);
 		});
-		
-		var firstHeadId = "#h_0";
-		if(headIds[0]=="" && $('#h_0').length == 0){//首个为文件时直接展开
-			rundemo_app.onHashChange(0);
-		}else{
-			var i = headIds.length-2 > 0 ? 1 : headIds.length;
-			var id = "#h_"+headIds[0];
-			$('#treeView').on('loaded.fu.tree', function (event, data) {
-				if(i < headIds.length-1){
-					id = id + "_" + headIds[i++];
-					autoClick(id);
-				}else{
-					//默认加载显示第一个文件或第一个文件夹下的第一个文件
-					if(headIds[0]==""){
-						firstHeadId = firstHeadId + "_" + "0";
-						if($(firstHeadId).length > 0){
-							autoClick(firstHeadId);
-						}
-					}
-					if(firstHeadId.substring(3)!=""){
-						rundemo_app.onHashChange(firstHeadId.substring(3));
-					}
-				}
-				
-			});
-		}
+		//根据不同情况，定位文件树
+		locationFiletree(headIds);
 	});
 </script>
