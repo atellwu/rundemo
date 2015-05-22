@@ -11,6 +11,10 @@
 	padding-top: 12px;
 	background-color: #CEECF5;
 }
+
+#detailBackgroundColor {
+	background-color: #D1EDF5;
+}
 </style>
 <script>
 	//环境变量
@@ -36,7 +40,20 @@
 				<!-- <img alt="" style=""
                src="${rc.contextPath}/images/big-logo.png"> -->
 			</div>
-			<p>一个可实时运行的demo平台，您可以在查看应用的demo的同时，执行这些demo，看到运行结果。同时可以修改代码，也可以马上看到修改后的效果！</p>
+			<p>
+				一个可实时运行的demo平台，您可以在查看应用的demo的同时，执行这些demo，看到运行结果。同时可以修改代码，也可以马上看到修改后的效果！
+				<a style="margin-left: 10px; font-size: 16px; color: #006DCC;"
+					alt="点击查看详细介绍" href="#" onclick="showDetail();">详细介绍 »</a>
+			</p>
+			<div style="display: none;" id="detailMsg">
+				<div class="alert" id="detailBackgroundColor">
+					<span style="text-align: center;"> 本系统主要功能如下：<br>
+						1.创建新应用：
+						可将自己的Sample项目上传至github上，通过github地址clone至本地，然后系统会自动展示你需要显示的包下的文件列表，点击各个文件可查看、修改和运行，运行结果可直接再页面显示
+
+					</span>
+				</div>
+			</div>
 			<p style="margin-top: 50px;">
 				<a href="#createAppModal" role="button" class="btn btn-info"
 					data-toggle="modal" style="margin-right: 10px">创建应用 »</a> <span
@@ -127,7 +144,7 @@
 						<button type="button" class="btn btn-success"
 							onclick="javascript:rundemo_app.createApp();">创建</button>
 						<button type="button" onclick="advance()"
-							style="margin-left: 50px" class="btn">更多选项</button>
+							style="margin-left: 50px" class="btn" id="options">更多选项</button>
 					</div>
 				</div>
 			</form>
@@ -167,6 +184,14 @@
 			$("#subdir").toggle();
 			$("#packageName").toggle();
 			$("#mavenOpt").toggle();
+			$("#options").text("收起");
+			if($("#mavenOpt").css("display")=="block"){
+			}else{
+				$("#options").text("更多选项");
+			}
+		}
+		function showDetail() {
+			$("#detailMsg").toggle();
 		}
 	</script>
 	<script type="text/javascript"

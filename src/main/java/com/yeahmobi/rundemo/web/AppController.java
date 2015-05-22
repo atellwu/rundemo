@@ -135,12 +135,6 @@ public class AppController {
 		String[] resFileNameList = javaProject.loadResFileNameList();
 		String pom = appProject.loadPom();
 		
-		/*String defalutDir = "/src/main/java/";
-		if(StringUtils.isNotBlank(appProject.getPackageName())){
-			defalutDir = defalutDir + appProject.getPackageName();
-		}
-		File file = new File(Config.appprojectDir + app + defalutDir);//com/yeahmobi/example
-		String javaFileInfos = FileTree.getJsonFileList(file, app);*/
 		String javaFileTreeJsonData = appProject.getFileTreeJsonData().replace("\"", ";").replace("<", "#").replace(">", "|");
 		map.put("pom", pom);
 		// 返回的json数据中含有引号"和<>，前台js解析时会自动转义，这里用其他字符替换，传到前台后再替换回来
@@ -150,6 +144,8 @@ public class AppController {
 		map.put("app", app);
 		map.put("allAppNames", ProjectContext.getAllAppNames());
 		map.put("pageid", pageid);
+		map.put("gitUrl", appProject.getGitUrl());
+		map.put("packageName", appProject.getPackageName().isEmpty() ? "/src/main/java" : appProject.getPackageName());
 		return new ModelAndView("app", map);
 	}
 

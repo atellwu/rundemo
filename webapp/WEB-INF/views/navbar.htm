@@ -1,32 +1,29 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
-   <div class="navbar-inner">
-      <div class="container-fluid">
-         <a class="btn btn-navbar" data-toggle="collapse"
-            data-target=".nav-collapse"> <span class="icon-bar"></span>
-         </a> <a class="brand" href="${rc.contextPath}/">RunDemo</a>
-         <div>
-            <p class="navbar-text pull-right">
-               #if($username)
-               <a href="#" class="navbar-link">$username</a>
-               #else
-               <a href="#" class="navbar-link"></a>
-               #end
-               <!-- <a class="navbar-link" href="${rc.contextPath}/"><img alt="" style="height:36px"
+	<div class="navbar-inner">
+		<div class="container-fluid">
+			<a class="btn btn-navbar" data-toggle="collapse"
+				data-target=".nav-collapse"> <span class="icon-bar"></span>
+			</a> <a class="brand" href="${rc.contextPath}/">RunDemo</a>
+			<div>
+				<p class="navbar-text pull-right">
+					#if($username) <a href="#" class="navbar-link">$username</a> #else
+					<a href="#" class="navbar-link"></a> #end
+					<!-- <a class="navbar-link" href="${rc.contextPath}/"><img alt="" style="height:36px"
                src="${rc.contextPath}/images/small-logo.png"></a>  -->
-            </p>
-            
-            <ul class="nav">
-               #if(${app})
-               <li><a href="${rc.contextPath}/">所有应用</a></li>
-               <li class="active"><a
-                  href="${rc.contextPath}/${app}">${app}</a></li>
-               #end
-            </ul>
-            <ul class="nav pull-right">
-           	<li> <a href="javascript:rundemo_app.updateApp('${app}');">更新</a></li>
-            </ul>
-         </div>
-         <!--/.nav-collapse -->
-      </div>
-   </div>
+				</p>
+
+				<ul class="nav">
+					#if(${app})
+					<li><a href="${rc.contextPath}/">所有应用</a></li>
+					<li class="active"><a href="${rc.contextPath}/${app}">${app}</a></li>
+					#end
+				</ul>
+				<ul class="nav pull-right">
+					#if(${gitUrl})<li><a target="_blank" href="${gitUrl}">github地址：${gitUrl}</a></li>#end
+					#if(${app})<li><a href="javascript:rundemo_app.updateApp('${app}');">更新</a></li>#end
+				</ul>
+			</div>
+			<!--/.nav-collapse -->
+		</div>
+	</div>
 </div>
