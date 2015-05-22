@@ -101,7 +101,7 @@ public class AdminController {
 				// "/app.properties"文件，便于后面读取展示该package下的文件
 				this.serialize(Config.appprojectDir + app + "/app.properties",
 						new AppProject(app, gitUrl, branch, subdir,
-								packageName, mavenOpt, ""));
+								packageName, mavenOpt));
 
 				map.put("app", app);
 				map.put("success", true);
@@ -158,7 +158,7 @@ public class AdminController {
 			this.operateFiles(app, subdir);
 			this.serialize(Config.appprojectDir + app + "/app.properties",
 					new AppProject(app, gitUrl, branch, subdir, packageName,
-							mavenOpt, ""));
+							mavenOpt));
 
 			map.put("app", app);
 			map.put("success", true);

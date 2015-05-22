@@ -1,10 +1,10 @@
 package com.yeahmobi.rundemo.web;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -26,8 +26,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
-import com.yeahmobi.rundemo.Entry.FileTree;
-import com.yeahmobi.rundemo.config.Config;
 import com.yeahmobi.rundemo.project.AppProject;
 import com.yeahmobi.rundemo.project.JavaCodeInfo;
 import com.yeahmobi.rundemo.project.JavaProject;
@@ -137,18 +135,17 @@ public class AppController {
 		String[] resFileNameList = javaProject.loadResFileNameList();
 		String pom = appProject.loadPom();
 		
-		String defalutDir = "/src/main/java/";
+		/*String defalutDir = "/src/main/java/";
 		if(StringUtils.isNotBlank(appProject.getPackageName())){
 			defalutDir = defalutDir + appProject.getPackageName();
 		}
 		File file = new File(Config.appprojectDir + app + defalutDir);//com/yeahmobi/example
-		String javaFileInfos = FileTree.getJsonFileList(file);
-		map.put("pom", (pom));
+		String javaFileInfos = FileTree.getJsonFileList(file, app);*/
+		String javaFileTreeJsonData = appProject.getFileTreeJsonData().replace("\"", ";").replace("<", "#").replace(">", "|");
+		map.put("pom", pom);
 		// 返回的json数据中含有引号"和<>，前台js解析时会自动转义，这里用其他字符替换，传到前台后再替换回来
 		// filePath路径不能以"\"来分割，否则前台js将JSON字符串转成JSON对象时会报含有非法字符
-		map.put("javaFileInfoList",
-				javaFileInfos.replace("\"", "%").replace("<", "#")
-						.replace(">", "|"));
+		map.put("javaFileInfoList", URLEncoder.encode(javaFileTreeJsonData,"UTF-8"));
 		map.put("resFileNameList", resFileNameList);
 		map.put("app", app);
 		map.put("allAppNames", ProjectContext.getAllAppNames());

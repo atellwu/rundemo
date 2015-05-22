@@ -2,12 +2,16 @@ package com.yeahmobi.rundemo.Entry;
 
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yeahmobi.rundemo.project.JavaFileInfo;
+import com.yeahmobi.rundemo.utils.CodeUtils;
 /**
  * 构建前台文件树展示所需要的数据结构
  * @author Abel.cui
@@ -51,8 +55,8 @@ public class FileTree {
 		return JSONObject.toJSONString(this);
 	}
 	
-	public static String getJsonFileList(File file) {
-		List<FileTree> list = splice_JsonData(file.listFiles(), StringUtils.EMPTY);
+	public static String getJsonFileList(File file, String app) throws IOException {
+		List<FileTree> list = splice_JsonData(file.listFiles(), StringUtils.EMPTY, app);
 		JSONObject object = new JSONObject();
 		for(FileTree fileTree: list){
 			object.put(fileTree.name, fileTree);
@@ -60,7 +64,7 @@ public class FileTree {
 		return object.toJSONString();
 	}
 	
-	private static List<FileTree> splice_JsonData(File[] files, String prefix){
+	private static List<FileTree> splice_JsonData(File[] files, String prefix, String app) throws IOException{
 		if(StringUtils.isNotBlank(prefix)){
 			prefix = prefix +"_";
 		}
@@ -71,11 +75,13 @@ public class FileTree {
 			if (file.isDirectory()) {
 				//默认每个目录下有1W个文件，给每个java文件编号，便于前端根据URL来定位文件
 				fileTree = new FileTree(file.getName() + "<input type=hidden id=h_"+prefix+i+">", "folder");
-				List<FileTree> list = splice_JsonData(file.listFiles(), prefix+i);
+				List<FileTree> list = splice_JsonData(file.listFiles(), prefix+i, app);
 				AdditionalParameters additionalParameters = new AdditionalParameters(list);
 				fileTree.setAdditionalParameters(additionalParameters);
 			}else {
-				String name = "<a id="+prefix+i+" filePath="+file.getAbsolutePath()+">"+file.getName()+"</a>";
+				//file.getName -> displayName
+				JavaFileInfo javaFileInfo = CodeUtils.getJavaFileInfo(file, app);
+				String name = "<a id="+prefix+i+" filePath="+file.getAbsolutePath()+">"+javaFileInfo.getDisplayName()+"</a>";
 				fileTree = new FileTree(name, "item");
 			}
 			mainlist.add(fileTree);

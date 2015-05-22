@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.yeahmobi.rundemo.Entry.FileTree;
 import com.yeahmobi.rundemo.config.Config;
 import com.yeahmobi.rundemo.utils.Constants;
 
@@ -43,6 +45,7 @@ public class ProjectContext {
                     }
                 });
                 try {
+                	
                 	String classpath = null;
                     for(File file : eligibleFiles){
                     	   if(Constants.CLASSPATH.equals(file.getName())){
@@ -51,6 +54,8 @@ public class ProjectContext {
                        }
                     AppProject appProject = ProjectContext.deserialize(Config.appprojectDir + app +"/app.properties");
                     appProject.setClasspath(classpath);
+                    String fileTreeJsonData = getFileTreeJsonData(app, appProject.getPackageName());
+                    appProject.setFileTreeJsonData(fileTreeJsonData);
                     ProjectContext.putAppProject(app, appProject);
                 } catch (Exception e) {
                     LOG.error("error when load from " + Config.appprojectDir + app, e);
@@ -58,6 +63,15 @@ public class ProjectContext {
             }
         }
     }
+    //
+    public static String getFileTreeJsonData(String app, String packageName) throws IOException{
+		String defalutDir = "/src/main/java/";
+		if(StringUtils.isNotBlank(packageName)){
+			defalutDir = defalutDir + packageName;
+		}
+		File file = new File(Config.appprojectDir + app + defalutDir);//com/yeahmobi/example
+		return FileTree.getJsonFileList(file, app);
+	}
     
     // 从文件反序列化到对象
  	public static AppProject deserialize(String filePath) {
@@ -113,6 +127,8 @@ public class ProjectContext {
                                    }
                                 appProject = ProjectContext.deserialize(Config.appprojectDir + app +"/app.properties");
                                 appProject.setClasspath(classpath);
+                                String fileTreeJsonData = getFileTreeJsonData(app, appProject.getPackageName());
+                                appProject.setFileTreeJsonData(fileTreeJsonData);
                                 ProjectContext.putAppProject(app, appProject);
                             } catch (Exception e) {
                                 LOG.error("error when load from " + Config.appprojectDir + app, e);

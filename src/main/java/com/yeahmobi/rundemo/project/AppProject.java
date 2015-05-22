@@ -27,9 +27,10 @@ public class AppProject implements Serializable{
 	private String packageName;
 	private String mavenOpt;
 	private String classpath;
+	private String fileTreeJsonData;
 
 	public AppProject(String app, String gitUrl, String branch, String subdir,
-			String packageName, String mavenOpt, String classpath) {
+			String packageName, String mavenOpt) {
 		super();
 		this.app = app;
 		this.gitUrl = gitUrl;
@@ -37,7 +38,6 @@ public class AppProject implements Serializable{
 		this.subdir = subdir;
 		this.packageName = packageName;
 		this.mavenOpt = mavenOpt;
-		this.classpath = classpath;
 	}
 
 	public String getApp() {
@@ -153,6 +153,14 @@ public class AppProject implements Serializable{
 
 	public void setClasspath(String classpath) {
 		this.classpath = classpath;
+	}
+
+	public String getFileTreeJsonData() {
+		return fileTreeJsonData;
+	}
+
+	public void setFileTreeJsonData(String fileTreeJsonData) {
+		this.fileTreeJsonData = fileTreeJsonData;
 	}
 
 }

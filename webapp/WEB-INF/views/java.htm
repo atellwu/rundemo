@@ -179,9 +179,9 @@
 			}
 		};
 
-		var tree_data = "${javaFileInfoList}";
-		tree_data = tree_data.replace(/%/g, "'").replace(/#/g, "<").replace(
-				/\|/g, ">");//还原JSON字符串
+		var tree_data = decodeURIComponent("${javaFileInfoList}");
+		tree_data = tree_data.replace(/;/g, "'").replace(/#/g, "<").replace(
+				/\|/g, ">").replace(/\+/g, " ");//还原JSON字符串
 		//根据URL计算headId	
 		var headIds = getHeadIds();
 		$('#treeView').ace_tree({
