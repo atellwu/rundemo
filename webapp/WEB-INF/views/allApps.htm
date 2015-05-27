@@ -13,7 +13,10 @@
 }
 
 #detailBackgroundColor {
-	background-color: #D1EDF5;
+	background-color: #EFFBF8;
+	font-size: 16px;
+	font-family: sans-serif;
+	line-height: 25px;
 }
 </style>
 <script>
@@ -31,9 +34,9 @@
 		</div>
 	</div>
 	<div class="container"
-		style="margin-left: 0px; width: 100%; margin-bottom: 50px; height: 500px">
+		style="margin-left: 0px; width: 100%; margin-bottom: 25px; height: auto;">
 		<div class="hero-unit"
-			style="background-color: #EFFBF8; margin: 0 auto; margin-top: 10px; height: 400px; width: 70%">
+			style="background-color: #EFFBF8; margin: 0 auto; margin-top: 10px; height: auto; width: 70%">
 			<div style="margin: 0 auto; margin-top: -50px; margin-bottom: 20px;">
 				<h1
 					style="height: 200px; width: 600px; background: url('${rc.contextPath}/images/big-logo.png') no-repeat scroll 0 0 transparent;"></h1>
@@ -43,18 +46,14 @@
 			<p>
 				一个可实时运行的demo平台，您可以在查看应用的demo的同时，执行这些demo，看到运行结果。同时可以修改代码，也可以马上看到修改后的效果！
 				<a style="margin-left: 10px; font-size: 16px; color: #006DCC;"
-					alt="点击查看详细介绍" href="#" onclick="showDetail();">详细介绍 »</a>
+					alt="点击查看详细介绍" href="#" onclick="showDetail();" id="detailLink">更多 >></a>
 			</p>
 			<div style="display: none;" id="detailMsg">
 				<div class="alert" id="detailBackgroundColor">
-					<span style="text-align: center;"> 本系统主要功能如下：<br>
-						1.创建新应用：
-						可将自己的Sample项目上传至github上，通过github地址clone至本地，然后系统会自动展示你需要显示的包下的文件列表，点击各个文件可查看、修改和运行，运行结果可直接再页面显示
-
-					</span>
+					#parse("docdesc.htm")
 				</div>
 			</div>
-			<p style="margin-top: 50px;">
+			<p style="margin-top: 25px;">
 				<a href="#createAppModal" role="button" class="btn btn-info"
 					data-toggle="modal" style="margin-right: 10px">创建应用 »</a> <span
 					style="font-size: 14px;">或</span><span
@@ -116,7 +115,7 @@
 					</div>
 				</div>
 				<div id="subdir" style="display: none" class="control-group">
-					<label class="control-label" style="color: #696969">仓库的子目录
+					<label class="control-label" style="color: #696969">pom文件所在目录
 						(可选)</label>
 					<div class="controls">
 						<input class="input-large" type="text" name="subdir"
@@ -184,14 +183,19 @@
 			$("#subdir").toggle();
 			$("#packageName").toggle();
 			$("#mavenOpt").toggle();
-			$("#options").text("收起");
 			if($("#mavenOpt").css("display")=="block"){
+				$("#options").text("收起");
 			}else{
 				$("#options").text("更多选项");
 			}
 		}
 		function showDetail() {
 			$("#detailMsg").toggle();
+			if($("#detailMsg").css("display")=="block"){
+				$("#detailLink").text("隐藏 <<");
+			}else{
+				$("#detailLink").text("更多 >>");
+			}
 		}
 	</script>
 	<script type="text/javascript"

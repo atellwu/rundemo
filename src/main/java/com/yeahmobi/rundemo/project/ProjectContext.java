@@ -65,7 +65,7 @@ public class ProjectContext {
     }
     //
     public static String getFileTreeJsonData(String app, String packageName) throws IOException{
-		String defalutDir = "/src/main/java/";
+		String defalutDir = Constants.DEFAULT_PACKAGE;
 		if(StringUtils.isNotBlank(packageName)){
 			defalutDir = defalutDir + packageName;
 		}

@@ -31,6 +31,7 @@ import com.yeahmobi.rundemo.project.JavaCodeInfo;
 import com.yeahmobi.rundemo.project.JavaProject;
 import com.yeahmobi.rundemo.project.ProjectContext;
 import com.yeahmobi.rundemo.utils.CodeUtils;
+import com.yeahmobi.rundemo.utils.Constants;
 
 @Controller
 public class AppController {
@@ -145,7 +146,7 @@ public class AppController {
 		map.put("allAppNames", ProjectContext.getAllAppNames());
 		map.put("pageid", pageid);
 		map.put("gitUrl", appProject.getGitUrl());
-		map.put("packageName", appProject.getPackageName().isEmpty() ? "/src/main/java" : appProject.getPackageName());
+		map.put("packageName", appProject.getPackageName().isEmpty() ? Constants.DEFAULT_PACKAGE : appProject.getPackageName());
 		return new ModelAndView("app", map);
 	}
 

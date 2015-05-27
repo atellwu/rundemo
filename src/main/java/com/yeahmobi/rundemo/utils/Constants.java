@@ -8,6 +8,8 @@ public class Constants {
 
 	public static final String POM = "pom.xml";
 	
+	public static final String DEFAULT_PACKAGE = "/src/main/java/";
+	
 	public static final String APPPROPERTIES = "app.properties";
-
+	
 }

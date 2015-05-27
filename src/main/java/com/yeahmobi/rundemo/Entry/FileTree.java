@@ -4,6 +4,7 @@ package com.yeahmobi.rundemo.Entry;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -64,6 +65,9 @@ public class FileTree {
 	}
 	
 	private static List<FileTree> splice_JsonData(File[] files, String prefix, String app) throws IOException{
+		if(files == null || files.length <=0 ){
+			return Collections.emptyList();
+		}
 		if(StringUtils.isNotBlank(prefix)){
 			prefix = prefix +"_";
 		}
@@ -72,7 +76,7 @@ public class FileTree {
 			File file = files[i];
 			FileTree fileTree = null;
 			if (file.isDirectory()) {
-				//默认每个目录下有1W个文件，给每个java文件编号，便于前端根据URL来定位文件
+				//给每个java文件编号，便于前端根据URL来定位文件
 				fileTree = new FileTree(file.getName() + "<input type=hidden id=h_"+prefix+i+">", "folder");
 				List<FileTree> list = splice_JsonData(file.listFiles(), prefix+i, app);
 				AdditionalParameters additionalParameters = new AdditionalParameters(list);

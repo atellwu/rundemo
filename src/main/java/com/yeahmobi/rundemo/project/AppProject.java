@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.yeahmobi.rundemo.config.Config;
 import com.yeahmobi.rundemo.utils.CodeUtils;
+import com.yeahmobi.rundemo.utils.Constants;
 
 public class AppProject implements Serializable{
 
@@ -98,7 +99,7 @@ public class AppProject implements Serializable{
 	public List<JavaFileInfo> loadJavaFileNameList() throws IOException {
 		List<JavaFileInfo> list = new ArrayList<JavaFileInfo>();
 		File appprojectsDir = new File(Config.appprojectDir + app
-				+ "/src/main/java/");
+				+ Constants.DEFAULT_PACKAGE);
 		Collection<File> files = FileUtils
 				.listFiles(appprojectsDir, null, true);
 		if (files.size() > 0) {
