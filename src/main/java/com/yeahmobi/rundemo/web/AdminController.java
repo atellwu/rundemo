@@ -159,7 +159,8 @@ public class AdminController {
 			this.serialize(Config.appprojectDir + app + "/app.properties",
 					new AppProject(app, gitUrl, branch, subdir, packageName,
 							mavenOpt));
-
+			//TODO 更新后清除缓存，重新加载
+			ProjectContext.removeAppProject(app);
 			map.put("app", app);
 			map.put("success", true);
 		} catch (Exception e) {

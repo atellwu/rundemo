@@ -4,7 +4,9 @@ package com.yeahmobi.rundemo.Entry;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -67,6 +69,9 @@ public class FileTree {
 	private static List<FileTree> splice_JsonData(File[] files, String prefix, String app) throws IOException{
 		if(files == null || files.length <=0 ){
 			return Collections.emptyList();
+		}else {
+			//按文件名排序
+			sortByFileName(files);
 		}
 		if(StringUtils.isNotBlank(prefix)){
 			prefix = prefix +"_";
@@ -90,5 +95,18 @@ public class FileTree {
 			mainlist.add(fileTree);
 		}
 		return mainlist;
+	}
+
+	private static void sortByFileName(File[] files) {
+		Collections.sort(Arrays.asList(files), new Comparator<File>() {
+		    @Override
+		    public int compare(File o1, File o2) {
+		        if (o1.isDirectory() && o2.isFile())
+		            return 1;
+		        if (o1.isFile() && o2.isDirectory())
+		            return -1;
+		        return o1.getName().compareTo(o2.getName());
+		    }
+		});
 	}
 }
