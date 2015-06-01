@@ -417,33 +417,3 @@
 	};
 	w.rundemo_app = rundemo_app;
 }(window || this));
-
-$(document).ready(function() {
-	// editor
-	var editor = ace.edit("editor");
-	editor.setFontSize(14);
-	editor.setTheme("ace/theme/eclipse");
-	editor.getSession().setMode("ace/mode/java");
-	editor.on("change", rundemo_app.modifyCode);
-	window.editor = editor;
-	// pom
-	var pomEditor = ace.edit("pomEditor");
-	pomEditor.setFontSize(14);
-	pomEditor.setTheme("ace/theme/eclipse");
-	pomEditor.getSession().setMode("ace/mode/xml");
-	pomEditor.setReadOnly(true);
-	// res
-	var resEditor = ace.edit("resEditor");
-	resEditor.setFontSize(14);
-	resEditor.setTheme("ace/theme/eclipse");
-	resEditor.getSession().setMode("ace/mode/xml");
-	resEditor.on("change", rundemo_app.resChange);
-	resEditor.on("blur", rundemo_app.resBlur);
-	window.resEditor = resEditor;
-
-	// 根据#hash定位
-	window.onhashchange = rundemo_app.onHashChange;
-	// 离开页面时，删除JavaProject
-	window.onunload = rundemo_app.onunload;
-
-});
