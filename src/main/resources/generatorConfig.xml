@@ -11,23 +11,23 @@
     <context id="dper" targetRuntime="MyBatis3">
         <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"></plugin>
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-            connectionURL="jdbc:mysql://localhost:3306/dianping?useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;noAccessToProcedureBodies=true"
+            connectionURL="jdbc:mysql://localhost:3306/rundemo?useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;noAccessToProcedureBodies=true"
             userId="root" password="">
         </jdbcConnection>
         <javaTypeResolver>
             <property name="forceBigDecimals" value="false" />
         </javaTypeResolver>
-        <javaModelGenerator targetPackage="com.dianping.portal.model"
+        <javaModelGenerator targetPackage="com.yeahmobi.portal.model"
             targetProject="./src/main/java">
             <property name="enableSubPackages" value="true" />
             <property name="trimStrings" value="true" />
         </javaModelGenerator>
-        <sqlMapGenerator targetPackage="com.dianping.portal.dao"
+        <sqlMapGenerator targetPackage="com.yeahmobi.portal.dao"
             targetProject="./src/main/resources">
             <property name="enableSubPackages" value="true" />
         </sqlMapGenerator>
         <javaClientGenerator type="XMLMAPPER"
-            targetPackage="com.dianping.portal.dao" targetProject="./src/main/java">
+            targetPackage="com.yeahmobi.portal.dao" targetProject="./src/main/java">
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
 

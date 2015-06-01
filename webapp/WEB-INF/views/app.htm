@@ -12,56 +12,66 @@
 	window.tempCodeLastCompiledTime;
 	window.resModified = false;
 </script>
+<style type="text/css">
+#progressModal1 {
+  margin-left: 30%;
+  margin-top: 2px;
+  margin-bottom: 25%;
+  overflow-y: auto;
+}
+.modal.fade.in  {
+  top: 10%;
+}
+</style>
 </head>
 
 <body>
-   #parse("navbar.htm")
+	#parse("navbar.htm")
+	<div style="display: none" id="error_Msg">
+		<div class="alert alert-danger">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<h4 style="text-align: center;"></h4>
+		</div>
+	</div>
 
-   <div class="tabbable tabs-left"
-      style="margin: 0 auto; margin-top: 0px; margin-left: 30px; margin-bottom: 50px; height: 500px;">
-      <ul class="nav nav-tabs" style="font-size: 14px">
-         <li class=""><a data-toggle="tab" href="#lA">pom.xml</a></li>
-         <li class=""><a data-toggle="tab" href="#lB">resource</a></li>
-         <li class="active"><a data-toggle="tab" href="#lC">java</a></li>
-      </ul>
-      <div class="tab-content">
-         <div id="lA" class="tab-pane">#parse("pom.htm")</div>
-         <div id="lB" class="tab-pane">#parse("resources.htm")</div>
-         <div id="lC" class="tab-pane active">#parse("java.htm")</div>
-      </div>
-   </div>
+	<div class="tabbable tabs-top"
+		style="margin: 2 auto; margin-top: 0px; margin-left: 30px; margin-right: 30px; margin-bottom: 50px; height: 500px;">
+		<ul class="nav nav-tabs padding-12 tab-color-blue background-blue"
+			style="font-size: 14px">
+			<li class=""><a data-toggle="tab" href="#lA">pom.xml</a></li>
+			<li class=""><a data-toggle="tab" href="#lB">resource</a></li>
+			<li class="active"><a data-toggle="tab" href="#lC">java</a></li>
+		</ul>
 
+		<div class="tab-content">
+			<div id="lA" class="tab-pane">#parse("pom.htm")</div>
+			<div id="lB" class="tab-pane">#parse("resources.htm")</div>
+			<div id="lC" class="tab-pane active">#parse("java.htm")</div>
+		</div>
+		
+		<div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog"
+			tabindex="-1" class="modal fade" id="progressModal1"
+			style="display: none;">
+			<div class="modal-body">
+				<h3 class="header smaller lighter grey">
+					<i class="icon-spinner icon-spin orange bigger-125"></i>
+					正在更新，请稍等...
+				</h3>
+			</div>
+		</div>
+		#parse("foot.htm")
+	</div>
 
-   <!-- 错误消息弹出框 -->
-   <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog"
-      tabindex="-1" class="modal hide fade" id="errorMsg"
-      style="display: none;">
-      <div class="modal-header">
-         <button aria-hidden="true" data-dismiss="modal" class="close"
-            type="button">×</button>
-         <h3></h3>
-      </div>
-      <div class="modal-body">
-         <p></p>
-      </div>
-      <div class="modal-footer">
-         <button data-dismiss="modal" class="btn">关闭</button>
-      </div>
-   </div>
-
-   #parse("foot.htm")
-
-   <!-- Le javascript
+	<!-- Le javascript
     ================================================== -->
-   <!-- Placed at the end of the document so the pages load faster -->
-   <script type="text/javascript"
-      src="${rc.contextPath}/javascripts/bootstrap/jquery-1.7.2.js"></script>
-   <script type="text/javascript"
-      src="${rc.contextPath}/javascripts/bootstrap/bootstrap.js"></script>
-   <script type="text/javascript"
-      src="${rc.contextPath}/javascripts/rundemo_app.js?t=20120910"></script>
-   <script src="${rc.contextPath}/javascripts/ace-src-min/ace.js"
-      type="text/javascript"></script>
-
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script type="text/javascript"
+		src="${rc.contextPath}/javascripts/bootstrap/jquery-1.7.2.js"></script>
+	<script type="text/javascript"
+		src="${rc.contextPath}/javascripts/bootstrap/bootstrap.js"></script>
+	<script src="${rc.contextPath}/javascripts/ace-src-min/ace.js"
+		type="text/javascript"></script>
+	<script type="text/javascript"
+		src="${rc.contextPath}/javascripts/rundemo_app.js?t=20120910"></script>
 </body>
 </html>

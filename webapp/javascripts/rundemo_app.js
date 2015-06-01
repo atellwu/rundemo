@@ -207,7 +207,7 @@
 		},
 		"modifyCode" : function() {
 			w.codeLastModifiedTime = new Date();
-		},
+		},		
 		"changeJavaHash" : function(index) {
 			var hash = window.location.hash;
 			var newHash = "";
@@ -246,7 +246,7 @@
 			}
 			window.location.hash = newHash;
 		},
-		"onHashChange" : function() {
+		"onHashChange" : function(index) {
 			var hash = window.location.hash;
 			if (hash.length > 0) {
 				// 去掉#号
@@ -266,23 +266,42 @@
 					window.location.hash = "";
 				}
 			} else {
-				rundemo_app.changeJavaCodeFile(0);
+				if(index!="0"){
+					rundemo_app.changeJavaHash(index);
+				}
+				rundemo_app.changeJavaCodeFile(index);
 				rundemo_app.changeResourceFile(0);
 			}
 		},
 		"changeJavaCodeFile" : function(index) {
-			// 当前的index是多少
-			var curLi = $("#javaCodeTab > li[class='active']");
-			var curIndex = curLi.index();
-			// 如果更改了，则
-			if (index != curIndex) {
-				// 更改active
-				curLi.removeClass("active");
-				var newLi = $("#javaCodeTab > li:eq(" + index + ")");
-				newLi.addClass("active");
-				// 重新加载code
-				rundemo_app.loadCode(newLi.children("a").attr("filePath"));
+			//通过输入链接展示代码并选中文件树中的文件
+			var curDiv = $(".tree-selected");
+			if(curDiv.length == 0){
+				rundemo_app.changeSelectedStyle(index);
+			}else{
+				var curA = curDiv.children("div").children("a");
+				filePath = curA.attr("filePath");
+				var oldIndex = curA.attr("id");
+				if( oldIndex != index){
+					curDiv.removeClass("tree-selected");
+					curDiv.children("i").attr("class","tree-dot");
+					
+					rundemo_app.changeSelectedStyle(index);
+				}
 			}
+			
+			var filePath = $("#"+index).attr("filePath");
+			if(typeof(filePath) == 'undefined'){
+				rundemo_app.appError("Error", "You visit the link does not exist, please check and re-visit!");
+			}else{
+				rundemo_app.loadCode(filePath);
+			}
+		},
+		"changeSelectedStyle" : function(index){
+			var temp = $("#"+index).parent().parent();
+			temp.addClass("tree-selected");
+			temp.children("i").attr("class","icon-ok")
+			temp.parent().attr("display","block");
 		},
 		"changeResourceFile" : function(index) {
 			// 当前的index是多少
@@ -341,10 +360,59 @@
 					+ ',msg:' + errorThrown + ')');
 		},
 		"alertError" : function(title, errorMsg) {
-			// 显示错误消息
-			$('#errorMsg > div[class="modal-header"] > h3').text(title);
-			$('#errorMsg > div[class="modal-body"] > p').text(errorMsg);
-			$('#errorMsg').modal('show');
+			// 动态显示和隐藏错误消息
+			$('#error_Msg > div > h4').text(title+": "+errorMsg);
+			$('#error_Msg').show(500);
+			setTimeout("$('#error_Msg').hide(1000);",10000);
+		},
+		"createApp" : function(){
+			if (!$('#form').validate().form()) {
+				return false;
+			}
+			$.ajax({
+				type : $('#form').attr('method'),
+				url : $('#form').attr('action'),
+				data : $('#form').serialize(),
+				dataType : "json",
+				success : function(data) {
+					if (data.success == false) {
+						$('#progressModal').modal('hide');
+						rundemo_app.appError("错误", data.errorMsg);
+					} else {
+						window.location.href = w.contextpath + '/' + data.app;
+					}
+				},
+				error : function(xhr, textStatus, errorThrown){
+					$('#progressModal').modal('hide');
+					rundemo_app.httpError(xhr, textStatus, errorThrown);
+				}
+			});
+			$('#createAppModal').modal('hide');
+			$('#progressModal').modal('show');
+		},
+		"updateApp" : function(app){
+			var param = new Object();
+			param.app = app;
+			var url = w.contextpath + '/update';
+			$.ajax({
+				type : 'POST',
+				url : url,
+				data : param,
+				dataType : "json",
+				success : function(data) {
+					if (data.success == false) {
+						$('#progressModal1').modal('hide');
+						rundemo_app.appError("错误", data.errorMsg);
+					} else {
+						window.location.href = w.contextpath + '/' + data.app;
+					}
+				},
+				error : function(xhr, textStatus, errorThrown){
+					$('#progressModal1').modal('hide');
+					rundemo_app.httpError(xhr, textStatus, errorThrown);
+				}
+			});
+			$('#progressModal1').modal('show');
 		}
 	};
 	w.rundemo_app = rundemo_app;
@@ -375,7 +443,6 @@ $(document).ready(function() {
 
 	// 根据#hash定位
 	window.onhashchange = rundemo_app.onHashChange;
-	rundemo_app.onHashChange();
 	// 离开页面时，删除JavaProject
 	window.onunload = rundemo_app.onunload;
 
