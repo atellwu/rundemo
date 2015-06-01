@@ -10,7 +10,7 @@ rundemo为你的demo提供在线运行的功能：可以在rundemo上查看应�
 4.将war包放到容器中，运行容器，访问首页即可。
 
 ###rundemo功能使用说明
-**1) 创建应用**：为您的demo起一个应用名称(是唯一的)，输入所在GitHub的仓库地址，包括一些可选项，如分支branch(默认为master分支)、pom文件所在目录(默认在主目录下，不在主目录下的需要填入相对路径)、需要显示的package(您可以选择显示指定包下的应用代码文件，默认显示/src/main/java/下所有包文件)以及maven的一些命令参数；例如有个guavaexample的项目在github的地址为：https://github.com/Corsair007/guavaexample.git，分支为master，pom文件在主目录下，需要显示com/yeahmobi/rundemo/guavaexample包下的代码文件。
+**1) 创建应用**：为您的demo起一个应用名称(是唯一的)，输入所在GitHub的仓库地址，包括一些可选项，如分支branch(默认为master分支)、pom文件所在目录(默认在主目录下，不在主目录下的需要填入相对路径)、需要显示的package(您可以选择显示指定包下的应用代码文件，默认显示/src/main/java/下所有包文件)以及maven的一些命令参数；例如有个guavaexample的项目在github的地址为：`https://github.com/Corsair007/guavaexample.git` ，分支为master，pom文件在主目录下，需要显示com/yeahmobi/rundemo/guavaexample包下的代码文件。
 
  ![image](https://github.com/atellwu/rundemo/raw/develop/webapp/images/readme/1.png)
 
